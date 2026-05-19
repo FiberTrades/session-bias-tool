@@ -189,7 +189,7 @@
   .cal-month-summary .total { font-family: 'Fraunces', serif; font-size: 16px; }
   .cal-month-summary .total.good { color: var(--good); }
   .cal-month-summary .total.bad  { color: var(--bad); }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr) 100px; grid-template-rows: auto; grid-auto-rows: 65px; gap: 4px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr) 100px; grid-template-rows: auto; grid-auto-rows: 65px; gap: 4px; overflow: hidden; }
   .cal-day-header { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); text-align: center; padding: 6px 0; }
   .cal-day-header.week-col { text-align: center; }
   .cal-day { background: var(--bg); border: 1px solid var(--border); height: 65px; min-height: 65px; max-height: 65px; padding: 6px 8px; cursor: default; transition: all 150ms; position: relative; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
@@ -1934,22 +1934,24 @@
     // Compute exact number of week rows this month needs and lock the grid to that many 65px rows.
     const weeks = Math.ceil((daysInMonth + startWeekday) / 7);
     const grid = document.getElementById('cal-grid');
-    let rowsTemplate = 'auto';
+    let rowsTemplate = '28px';
     for (let i = 0; i < weeks; i++) rowsTemplate += ' 65px';
     grid.style.gridTemplateRows = rowsTemplate;
+    // Cap the grid height so any rogue cell flowing outside the defined rows is clipped by overflow:hidden
+    grid.style.maxHeight = `${28 + weeks * 65 + weeks * 4 + 4}px`;
 
     const SZ = 'height:65px !important;min-height:65px;max-height:65px;';
     const headers = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     let html = '';
-    headers.forEach(h => html += `<div class="cal-day-header" style="grid-row:1;">${h}</div>`);
-    html += `<div class="cal-day-header week-col" style="grid-row:1;">Week</div>`;
+    headers.forEach((h, i) => html += `<div class="cal-day-header" style="grid-row:1;grid-column:${i+1};">${h}</div>`);
+    html += `<div class="cal-day-header week-col" style="grid-row:1;grid-column:8;">Week</div>`;
 
     let weekIdx = 0;
     let currentRow = 2; // CSS Grid rows are 1-indexed; row 1 is headers, week rows start at 2
     let currentWeek = { trades: [], net: 0 };
 
-    // Leading empty cells before the 1st of the month — all pinned to row 2
-    for (let i = 0; i < startWeekday; i++) html += `<div class="cal-day empty" style="grid-row:${currentRow};${SZ}"></div>`;
+    // Leading empty cells before the 1st of the month — each pinned to row 2 with explicit column
+    for (let i = 0; i < startWeekday; i++) html += `<div class="cal-day empty" style="grid-row:${currentRow};grid-column:${i+1};${SZ}"></div>`;
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dateObj = new Date(calendarYear, calendarMonth, d);
@@ -1968,20 +1970,21 @@
       const plLabel = dayTrades.length > 0 ? fmtMoneyShort(net) : '';
       const plCls = net > 0 ? 'good' : net < 0 ? 'bad' : '';
       const tradeCount = dayTrades.length > 0 ? `${dayTrades.length} trade${dayTrades.length === 1 ? '' : 's'}` : '';
-      html += `<div class="cal-day ${cls} ${hasTrade} ${todayCls}" data-date="${key}" style="grid-row:${currentRow};${SZ}">
+      const weekday = dateObj.getDay();
+      const colNum = weekday + 1; // explicit column placement
+      html += `<div class="cal-day ${cls} ${hasTrade} ${todayCls}" data-date="${key}" style="grid-row:${currentRow};grid-column:${colNum};${SZ}">
         <div class="cal-day-num">${d}</div>
         ${plLabel ? `<div class="cal-day-pl ${plCls}">${plLabel}</div>` : ''}
         ${tradeCount ? `<div class="cal-day-trades">${tradeCount}</div>` : ''}
       </div>`;
       currentWeek.trades.push(...dayTrades);
       currentWeek.net += net;
-      const weekday = dateObj.getDay();
       if (weekday === 6 || d === daysInMonth) {
-        // Fill trailing empty cells if month ends mid-week — also pinned to current row
+        // Fill trailing empty cells if month ends mid-week — each pinned to current row + explicit col
         if (d === daysInMonth && weekday !== 6) {
-          for (let i = weekday + 1; i <= 6; i++) html += `<div class="cal-day empty" style="grid-row:${currentRow};${SZ}"></div>`;
+          for (let i = weekday + 1; i <= 6; i++) html += `<div class="cal-day empty" style="grid-row:${currentRow};grid-column:${i+1};${SZ}"></div>`;
         }
-        // Append week summary cell — pinned to current row, last column
+        // Append week summary cell — pinned to current row, column 8
         weekIdx++;
         const wCls = currentWeek.net > 0 ? 'good' : currentWeek.net < 0 ? 'bad' : '';
         const wLabel = currentWeek.trades.length > 0 ? fmtMoneyShort(currentWeek.net) : '£0';
