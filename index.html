@@ -185,7 +185,7 @@
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr) 100px; gap: 4px; }
   .cal-day-header { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); text-align: center; padding: 6px 0; }
   .cal-day-header.week-col { text-align: center; }
-  .cal-day { background: var(--bg); border: 1px solid var(--border); min-height: 55px; padding: 6px 8px; cursor: default; transition: all 150ms; position: relative; display: flex; flex-direction: column; }
+  .cal-day { background: var(--bg); border: 1px solid var(--border); height: 65px; padding: 6px 8px; cursor: default; transition: all 150ms; position: relative; display: flex; flex-direction: column; box-sizing: border-box; }
   .cal-day.empty { opacity: 0.5; cursor: default; }
   .cal-day.has-trade { cursor: pointer; }
   .cal-day.has-trade:hover { border-color: var(--text-mid); }
@@ -200,7 +200,7 @@
   .cal-day-pl.good { color: var(--good); }
   .cal-day-pl.bad  { color: var(--bad); }
   .cal-day-trades { font-size: 9px; color: var(--text-dim); text-align: center; }
-  .cal-week-summary { background: var(--bg-elev); border: 1px solid var(--border-2); min-height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; }
+  .cal-week-summary { background: var(--bg-elev); border: 1px solid var(--border-2); height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; box-sizing: border-box; }
   .cal-week-summary .pl { font-family: 'Fraunces', serif; font-size: 14px; line-height: 1; }
   .cal-week-summary .pl.good { color: var(--good); }
   .cal-week-summary .pl.bad  { color: var(--bad); }
@@ -432,7 +432,7 @@
     </div>
 
     <section>
-      <div class="section-header"><span class="section-num">01</span><span class="section-title">Did you take a trade today?</span></div>
+      <div class="section-header"><span class="section-num">01</span><span class="section-title">Did you take a trade?</span></div>
       <p class="section-hint">If no, the trade-specific sections are skipped.</p>
       <div class="options two-col" data-review="traded">
         <button class="option" data-value="Yes">Yes</button>
@@ -442,16 +442,22 @@
 
     <section id="section-trades" class="hidden">
       <div class="section-header"><span class="section-num">02</span><span class="section-title">Trade Log</span></div>
-      <p class="section-hint">Defaults fill new rows. Override per trade as needed.</p>
+
+      <div style="margin-left:60px;margin-top:14px;margin-bottom:18px;padding:14px 20px;background:var(--bg-elev);border:1px solid var(--border-2);display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <span style="font-size:10px;color:var(--text-dim);letter-spacing:0.25em;text-transform:uppercase;">Logging trades for</span>
+        <input type="date" id="session-date" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text);padding:8px 12px;font-family:'DM Mono',monospace;font-size:13px;outline:none;" />
+        <span id="session-date-status" style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;"></span>
+        <button type="button" id="session-date-today" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Today</button>
+        <span style="font-size:10px;color:var(--text-dim);font-style:italic;margin-left:auto;">Change to back-fill a past session</span>
+      </div>
+
+      <p class="section-hint" style="margin-top:0;">Defaults fill new rows. Override per trade as needed.</p>
 
       <div class="defaults-strip">
         <span class="defaults-label">Defaults</span>
         <div class="defaults-field"><span class="k">Risk £</span><input id="default-risk" type="number" step="any" placeholder="100" /></div>
         <div class="defaults-field"><span class="k">Costs £</span><input id="default-costs" type="number" step="any" placeholder="10" /></div>
         <span class="defaults-label" style="font-size:8px;">Auto-fills new trades</span>
-        <div style="flex:1;"></div>
-        <button class="import-mt5-btn" id="import-mt5-btn">+ Import from MT5</button>
-        <input type="file" id="mt5-file-input" accept=".html,.htm,.xml" style="display:none" />
       </div>
 
       <div class="trades-wrap">
@@ -622,7 +628,6 @@
 
     <div class="actions" style="margin-top:40px;">
       <button class="btn" id="stats-export">Export Stats to Discord</button>
-      <button class="btn danger" id="stats-clear-mt5">Clear MT5 Imports</button>
       <button class="btn danger" id="stats-clear">Clear All Stats</button>
     </div>
   </div>
@@ -768,49 +773,6 @@
   </div>
 </div>
 
-<div class="modal-bg" id="mt5-modal-bg">
-  <div class="modal" style="max-width:1080px;">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">Import from MT5</div>
-        <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-top:6px;" id="mt5-modal-subtitle">—</div>
-      </div>
-      <button class="modal-close" id="mt5-modal-close">Cancel</button>
-    </div>
-
-    <div style="padding:16px 18px;background:var(--bg-elev);border:1px solid var(--border-2);display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:14px;">
-      <span style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--text-dim);">Filter</span>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="radio" name="mt5-range" id="mt5-range-week" checked />
-        <label for="mt5-range-week" style="font-size:11px;cursor:pointer;">Last 7 days</label>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="radio" name="mt5-range" id="mt5-range-all" />
-        <label for="mt5-range-all" style="font-size:11px;cursor:pointer;">All trades</label>
-      </div>
-      <div style="width:1px;height:24px;background:var(--border-2);"></div>
-      <div style="display:flex;align-items:center;gap:8px;" title="MT5 profit within ±this amount is classified as BE. Above = Win, below = Lose.">
-        <label for="mt5-be-threshold" style="font-size:11px;color:var(--text-mid);cursor:help;">BE threshold £</label>
-        <input type="number" id="mt5-be-threshold" step="any" min="0" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text);padding:4px 8px;font-family:'DM Mono',monospace;font-size:11px;width:60px;outline:none;" />
-      </div>
-      <div style="flex:1;"></div>
-      <span style="font-size:10px;color:var(--text-dim);" id="mt5-dupe-info">—</span>
-    </div>
-
-    <div style="font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:10px;line-height:1.5;">
-      Classification: <span style="color:var(--good);">Win</span> if profit &gt; +threshold · <span style="color:var(--bad);">Lose</span> if profit &lt; −threshold · <span style="color:var(--info);">BE</span> otherwise. Tick rows to include and confirm Result and R per row.
-    </div>
-
-    <div id="mt5-preview-list" style="margin-bottom:24px;"></div>
-
-    <div class="actions" style="margin-top:24px;">
-      <button class="btn" id="mt5-select-all">Select All</button>
-      <button class="btn" id="mt5-select-none">Select None</button>
-      <button class="btn" id="mt5-import-confirm">Import Selected</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-bg" id="edit-trade-modal-bg">
   <div class="modal" style="max-width:560px;">
     <div class="modal-header">
@@ -823,7 +785,10 @@
 
     <div class="edit-trade-form">
       <div class="label">Date</div>
-      <div class="field"><input id="edit-date" type="date" /></div>
+      <div class="field">
+        <input id="edit-date" type="date" />
+        <div style="font-size:9px;color:var(--text-dim);margin-top:6px;letter-spacing:0.05em;line-height:1.5;">Change this to move the trade to a different day on the calendar — use it to back-fill past sessions.</div>
+      </div>
 
       <div class="label">Result</div>
       <div class="field">
@@ -890,7 +855,6 @@
   let calendarYear = today.getFullYear();
   let yearGlanceYear = today.getFullYear();
   let equityMode = 'netpl';
-  let mt5ParsedTrades = [];
 
   (function autoResetForNewDay() {
     const todayKey = today.toDateString();
@@ -1373,13 +1337,60 @@
     renderReviewPreview();
     renderSavedBias();
     restoreDefaults();
+    initSessionDatePicker();
   }
+  function todayDateStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function updateSessionDateStatus() {
+    const picker = document.getElementById('session-date');
+    const status = document.getElementById('session-date-status');
+    if (!picker || !status) return;
+    const t = todayDateStr();
+    if (picker.value === t) {
+      status.textContent = 'Today';
+      status.style.color = 'var(--text-dim)';
+    } else if (picker.value < t) {
+      status.textContent = 'Back-fill';
+      status.style.color = 'var(--info)';
+    } else {
+      status.textContent = 'Future';
+      status.style.color = 'var(--bad)';
+    }
+  }
+
+  function initSessionDatePicker() {
+    const picker = document.getElementById('session-date');
+    if (!picker) return;
+    if (!data.review.sessionDate) data.review.sessionDate = todayDateStr();
+    picker.value = data.review.sessionDate;
+    updateSessionDateStatus();
+  }
+
+  document.getElementById('session-date').addEventListener('change', e => {
+    data.review.sessionDate = e.target.value;
+    saveData();
+    updateSessionDateStatus();
+  });
+
+  document.getElementById('session-date-today').addEventListener('click', () => {
+    data.review.sessionDate = todayDateStr();
+    document.getElementById('session-date').value = data.review.sessionDate;
+    saveData();
+    updateSessionDateStatus();
+  });
+
   document.getElementById('review-copy').addEventListener('click', () => copyToClipboard(buildReviewMessage()));
   document.getElementById('review-save-stats').addEventListener('click', () => {
     const valid = data.review.trades.filter(t => t.result && t.r && !isNaN(parseFloat(t.r)));
     if (valid.length === 0) { showToast('No valid trades to save'); return; }
     const biasSnap = { ...data.bias };
     const reviewSnap = { traded: data.review.traded, execution: data.review.execution, focus: data.review.focus, close: data.review.close, rice: data.review.rice, tvLink: data.review.tvLink, concepts: [...data.review.concepts], mindset: [...data.review.mindset], reflection: data.review.reflection };
+    // Use session date (defaults to today, can be back-filled)
+    const sessionDateStr = data.review.sessionDate || todayDateStr();
+    const sessionDate = new Date(sessionDateStr + 'T12:00:00');
     valid.forEach(t => {
       data.currentSeries.push({
         id: genId(),
@@ -1391,21 +1402,22 @@
         exitTime: t.exitTime || '',
         risk: t.risk ? parseFloat(t.risk) : null,
         costs: t.costs ? parseFloat(t.costs) : null,
-        date: today.toISOString(),
-        dayOfWeek: today.getDay(),
+        date: sessionDate.toISOString(),
+        dayOfWeek: sessionDate.getDay(),
         biasSnap, reviewSnap,
       });
     });
-    while (data.currentSeries.length >= 10) {
-      const done = data.currentSeries.slice(0, 10);
-      data.history.unshift({ trades: done, date: today.toISOString() });
-      data.currentSeries = data.currentSeries.slice(10);
-    }
+    rebuildSeriesByDate();
     saveData();
+    // Reset session date back to today after save
+    data.review.sessionDate = todayDateStr();
+    const picker = document.getElementById('session-date');
+    if (picker) { picker.value = data.review.sessionDate; updateSessionDateStatus(); }
     showToast(`${valid.length} trade${valid.length === 1 ? '' : 's'} saved`);
   });
   document.getElementById('review-reset').addEventListener('click', () => {
     data.review = newReviewBlank();
+    data.review.sessionDate = todayDateStr();
     saveData();
     document.querySelectorAll('[data-review] .option').forEach(b => b.classList.remove('selected'));
     document.querySelectorAll('.tag').forEach(b => b.classList.remove('selected'));
@@ -1413,6 +1425,8 @@
     document.getElementById('review-reflection').value = '';
     document.getElementById('section-trades').classList.add('hidden');
     document.getElementById('section-execution').classList.add('hidden');
+    const picker = document.getElementById('session-date');
+    if (picker) { picker.value = data.review.sessionDate; updateSessionDateStatus(); }
     renderTrades(); renderReviewPreview();
   });
   function renderStats() {
@@ -1544,20 +1558,6 @@
       lines.push(''); lines.push(`Current Series (${cs.length}/10): W:${s.w} L:${s.l} BE:${s.be} Net:${s.netR >= 0 ? '+' : ''}${s.netR.toFixed(2)}R`);
     }
     copyToClipboard(lines.join('\n'));
-  });
-  document.getElementById('stats-clear-mt5').addEventListener('click', () => {
-    const count = getAllLifetimeTrades().filter(t => t.mt5Ticket).length;
-    if (count === 0) { showToast('No MT5 imports to clear'); return; }
-    if (!confirm(`Delete ${count} MT5-imported trade${count === 1 ? '' : 's'}? This cannot be undone.`)) return;
-    data.currentSeries = data.currentSeries.filter(t => !t.mt5Ticket);
-    data.history.forEach(s => { s.trades = s.trades.filter(t => !t.mt5Ticket); });
-    data.history = data.history.filter(s => s.trades.length > 0);
-    rebuildSeriesByDate();
-    saveData();
-    showToast(`${count} imported trade${count === 1 ? '' : 's'} cleared`);
-    renderStats();
-    if (document.getElementById('page-trades').classList.contains('active')) renderTradesStats();
-    if (document.getElementById('page-tradeview').classList.contains('active')) renderTradeView();
   });
   document.getElementById('stats-clear').addEventListener('click', () => {
     if (confirm('Clear all logged trades?')) {
@@ -2138,252 +2138,6 @@
       row.addEventListener('click', () => openEditTradeModal(row.dataset.id));
     });
   }
-
-  // ── MT5 IMPORT ──
-  document.getElementById('import-mt5-btn').addEventListener('click', () => document.getElementById('mt5-file-input').click());
-
-  document.getElementById('mt5-file-input').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const raw = new Uint8Array(ev.target.result);
-        let text;
-        if (raw[0] === 0xFF && raw[1] === 0xFE) text = new TextDecoder('utf-16le').decode(raw.slice(2));
-        else if (raw[0] === 0xFE && raw[1] === 0xFF) text = new TextDecoder('utf-16be').decode(raw.slice(2));
-        else text = new TextDecoder('utf-8').decode(raw);
-        parseMT5(text);
-      } catch (err) { console.error(err); showToast('Could not read file'); }
-    };
-    reader.readAsArrayBuffer(file);
-    e.target.value = '';
-  });
-
-  function parseMT5(html) {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const rows = doc.querySelectorAll('tr');
-    const positions = [];
-    let inPositions = false;
-    rows.forEach(tr => {
-      const txt = tr.textContent.trim();
-      if (txt === 'Positions') { inPositions = true; return; }
-      if (inPositions && (txt === 'Orders' || txt === 'Deals')) { inPositions = false; return; }
-      if (!inPositions) return;
-      const tds = Array.from(tr.querySelectorAll('td'));
-      if (tds.length < 12) return;
-      const first = tds[0].textContent.trim();
-      if (!first || !/^\d{4}/.test(first)) return;
-      const visible = tds.filter(td => !(td.className && td.className.includes('hidden')));
-      if (visible.length < 12) return;
-      const sideRaw = visible[3].textContent.trim().toLowerCase();
-      if (sideRaw !== 'buy' && sideRaw !== 'sell') return;
-      positions.push({
-        ticket: visible[1].textContent.trim(),
-        openTime: visible[0].textContent.trim(),
-        symbol: visible[2].textContent.trim(),
-        side: sideRaw === 'buy' ? 'Long' : 'Short',
-        volume: parseFloat(visible[4].textContent.trim()) || 0,
-        openPrice: parseFloat(visible[5].textContent.trim()) || 0,
-        sl: parseFloat(visible[6].textContent.trim()) || 0,
-        tp: parseFloat(visible[7].textContent.trim()) || 0,
-        closeTime: visible[8].textContent.trim(),
-        closePrice: parseFloat(visible[9].textContent.trim()) || 0,
-        commission: parseFloat(visible[10].textContent.trim()) || 0,
-        swap: parseFloat(visible[11].textContent.trim()) || 0,
-        profit: parseFloat((visible[12]?.textContent || '0').replace(/\s/g,'')) || 0,
-      });
-    });
-    if (positions.length === 0) { showToast('No positions found in file'); return; }
-    mt5ParsedTrades = positions;
-    renderMT5Preview();
-    document.getElementById('mt5-modal-bg').classList.add('show');
-  }
-
-  function parseMT5DateTime(s) {
-    const m = s.match(/^(\d{4})\.(\d{2})\.(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
-    if (!m) return null;
-    // FTMO MT5 server is Athens time (UTC+2 winter / UTC+3 summer)
-    // London is UTC+0 winter / UTC+1 summer
-    // Both follow the same DST schedule, so MT5 server time is always 2 hours ahead of London.
-    // Subtract 2h here so getUTCHours/getUTCDay return London-time values for display.
-    return new Date(Date.UTC(+m[1], +m[2]-1, +m[3], +m[4] - 2, +m[5], +m[6]));
-  }
-
-  function existingMT5Tickets() {
-    const set = new Set();
-    getAllLifetimeTrades().forEach(t => { if (t.mt5Ticket) set.add(t.mt5Ticket); });
-    return set;
-  }
-
-  function renderMT5Preview() {
-    const list = document.getElementById('mt5-preview-list');
-    const subtitle = document.getElementById('mt5-modal-subtitle');
-    const dupeInfo = document.getElementById('mt5-dupe-info');
-    const useWeek = document.getElementById('mt5-range-week').checked;
-    const existing = existingMT5Tickets();
-    const defaultRisk = parseFloat(data.defaults.risk) || 100;
-    // Reflect the persisted threshold into the input on first render
-    const beInput = document.getElementById('mt5-be-threshold');
-    if (beInput.value === '') beInput.value = (data.settings.beThreshold != null ? data.settings.beThreshold : 10);
-    const beThreshold = Math.abs(parseFloat(beInput.value)) || 0;
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 7);
-    let dupCount = 0;
-    const filtered = mt5ParsedTrades.filter(p => {
-      const isDup = existing.has(p.ticket);
-      if (isDup) { dupCount++; return false; }
-      if (useWeek) {
-        const ot = parseMT5DateTime(p.openTime);
-        if (ot && ot < cutoff) return false;
-      }
-      return true;
-    });
-    subtitle.textContent = `${filtered.length} new trade${filtered.length === 1 ? '' : 's'} ready to import · ${mt5ParsedTrades.length} total in file`;
-    dupeInfo.textContent = dupCount > 0 ? `${dupCount} already imported, hidden` : '';
-    if (filtered.length === 0) { list.innerHTML = '<div class="empty" style="margin:0;">No new trades match this filter.</div>'; return; }
-    let html = `<div class="mt5-row headers">
-      <div class="mt5-cell"></div>
-      <div class="mt5-cell">Date</div>
-      <div class="mt5-cell center">Side</div>
-      <div class="mt5-cell right">Profit £</div>
-      <div class="mt5-cell center">Costs £</div>
-      <div class="mt5-cell right">Net £</div>
-      <div class="mt5-cell center">Result</div>
-      <div class="mt5-cell center">R</div>
-      <div class="mt5-cell center">Type</div>
-    </div>`;
-    filtered.forEach((p, i) => {
-      const openDt = parseMT5DateTime(p.openTime);
-      const dateStr = openDt ? openDt.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : p.openTime.slice(0, 10);
-      const profit = p.profit;
-      const mtCosts = Math.abs(p.commission) + Math.abs(p.swap);
-      const net = profit - mtCosts;
-      // Classification by user-adjustable threshold on MT5 profit
-      const suggestedResult = profit > beThreshold ? 'Win' : (profit < -beThreshold ? 'Lose' : 'BE');
-      // Suggest R based on |net| / default risk — captures slippage
-      const suggestedR = suggestedResult === 'BE' ? 0 : Math.abs(net) / defaultRisk;
-      const rDisplay = suggestedR.toFixed(2);
-      const profitCls = profit > 0 ? 'good' : profit < 0 ? 'bad' : '';
-      const netCls = net > 0 ? 'good' : net < 0 ? 'bad' : '';
-      html += `<div class="mt5-row" data-idx="${i}" data-profit="${profit}">
-        <div class="mt5-cell center"><input type="checkbox" class="mt5-check" checked /></div>
-        <div class="mt5-cell">${dateStr}</div>
-        <div class="mt5-cell center">${p.side}</div>
-        <div class="mt5-cell right ${profitCls}">${profit >= 0 ? '+' : ''}${profit.toFixed(2)}</div>
-        <div class="mt5-cell center"><input type="number" step="any" class="mt5-costs" value="${mtCosts.toFixed(2)}" /></div>
-        <div class="mt5-cell right mt5-net ${netCls}">${net >= 0 ? '+' : ''}${net.toFixed(2)}</div>
-        <div class="mt5-cell center"><select class="mt5-result">
-          <option value="Win" ${suggestedResult === 'Win' ? 'selected' : ''}>Win</option>
-          <option value="Lose" ${suggestedResult === 'Lose' ? 'selected' : ''}>Lose</option>
-          <option value="BE" ${suggestedResult === 'BE' ? 'selected' : ''}>BE</option>
-        </select></div>
-        <div class="mt5-cell center"><input type="text" class="mt5-r" value="${rDisplay}" /></div>
-        <div class="mt5-cell center"><select class="mt5-type">
-          <option value="">—</option>
-          <option value="Reaction">Reaction</option>
-          <option value="Continuation">Continuation</option>
-        </select></div>
-      </div>`;
-    });
-    list.innerHTML = html;
-    list.dataset.filtered = JSON.stringify(filtered.map(p => p.ticket));
-
-    // Live update Net £ when Costs is edited
-    list.querySelectorAll('.mt5-row[data-idx] .mt5-costs').forEach(input => {
-      input.addEventListener('input', e => {
-        const row = e.target.closest('.mt5-row');
-        const profitVal = parseFloat(row.dataset.profit) || 0;
-        const costsVal = parseFloat(e.target.value) || 0;
-        const n = profitVal - costsVal;
-        const netEl = row.querySelector('.mt5-net');
-        netEl.textContent = (n >= 0 ? '+' : '') + n.toFixed(2);
-        netEl.className = 'mt5-cell right mt5-net ' + (n > 0 ? 'good' : n < 0 ? 'bad' : '');
-      });
-    });
-  }
-
-  document.getElementById('mt5-modal-close').addEventListener('click', () => {
-    document.getElementById('mt5-modal-bg').classList.remove('show');
-    mt5ParsedTrades = [];
-  });
-  document.getElementById('mt5-modal-bg').addEventListener('click', e => {
-    if (e.target.id === 'mt5-modal-bg') {
-      document.getElementById('mt5-modal-bg').classList.remove('show');
-      mt5ParsedTrades = [];
-    }
-  });
-  document.getElementById('mt5-range-week').addEventListener('change', renderMT5Preview);
-  document.getElementById('mt5-range-all').addEventListener('change', renderMT5Preview);
-  document.getElementById('mt5-be-threshold').addEventListener('input', e => {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val) && val >= 0) {
-      data.settings.beThreshold = val;
-      saveData();
-    }
-    renderMT5Preview();
-  });
-  document.getElementById('mt5-select-all').addEventListener('click', () => {
-    document.querySelectorAll('#mt5-preview-list .mt5-check').forEach(c => c.checked = true);
-  });
-  document.getElementById('mt5-select-none').addEventListener('click', () => {
-    document.querySelectorAll('#mt5-preview-list .mt5-check').forEach(c => c.checked = false);
-  });
-
-  document.getElementById('mt5-import-confirm').addEventListener('click', () => {
-    const list = document.getElementById('mt5-preview-list');
-    const ticketsJson = list.dataset.filtered;
-    if (!ticketsJson) return;
-    const filteredTickets = JSON.parse(ticketsJson);
-    const filtered = mt5ParsedTrades.filter(p => filteredTickets.includes(p.ticket));
-    const rows = document.querySelectorAll('#mt5-preview-list .mt5-row[data-idx]');
-    const defaultRisk = parseFloat(data.defaults.risk) || 100;
-    let imported = 0;
-    rows.forEach(row => {
-      const checkbox = row.querySelector('.mt5-check');
-      if (!checkbox.checked) return;
-      const idx = parseInt(row.dataset.idx);
-      const p = filtered[idx];
-      if (!p) return;
-      const result = row.querySelector('.mt5-result').value;
-      const r = parseFloat(row.querySelector('.mt5-r').value);
-      const type = row.querySelector('.mt5-type').value;
-      const costs = parseFloat(row.querySelector('.mt5-costs').value);
-      const profit = parseFloat(row.dataset.profit) || 0;
-      if (!result || isNaN(r)) return;
-      const openDt = parseMT5DateTime(p.openTime);
-      const closeDt = parseMT5DateTime(p.closeTime);
-      const entryTime = openDt ? `${String(openDt.getUTCHours()).padStart(2,'0')}:${String(openDt.getUTCMinutes()).padStart(2,'0')}` : '';
-      const exitTime = closeDt ? `${String(closeDt.getUTCHours()).padStart(2,'0')}:${String(closeDt.getUTCMinutes()).padStart(2,'0')}` : '';
-      data.currentSeries.push({
-        id: genId(),
-        result,
-        r: result === 'Win' ? r : (result === 'Lose' ? r : 0),
-        type: type || null,
-        side: p.side,
-        entryTime, exitTime,
-        risk: defaultRisk,
-        costs: isNaN(costs) ? 0 : costs,
-        actualGross: profit,
-        date: openDt ? openDt.toISOString() : new Date().toISOString(),
-        dayOfWeek: openDt ? openDt.getUTCDay() : new Date().getDay(),
-        mt5Ticket: p.ticket,
-        biasSnap: null,
-        reviewSnap: null,
-      });
-      imported++;
-    });
-    // Rebuild series by date so the LATEST trades end up in the current series
-    rebuildSeriesByDate();
-    saveData();
-    document.getElementById('mt5-modal-bg').classList.remove('show');
-    mt5ParsedTrades = [];
-    if (imported === 0) showToast('Nothing imported');
-    else showToast(`${imported} trade${imported === 1 ? '' : 's'} imported`);
-    renderStats();
-    if (document.getElementById('page-trades').classList.contains('active')) renderTradesStats();
-    if (document.getElementById('page-tradeview').classList.contains('active')) renderTradeView();
-  });
 
   // ── EDIT TRADE MODAL ──
   let editingTradeId = null;
