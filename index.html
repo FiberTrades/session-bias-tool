@@ -28,7 +28,7 @@
     --neutral:   #c0c0c0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; background: var(--bg); }
+  html, body { height: 100%; background: var(--bg); color-scheme: dark; }
   body {
     color: var(--text);
     font-family: 'DM Mono', monospace;
@@ -37,6 +37,11 @@
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
   }
+  input[type="time"], input[type="date"], input[type="number"] { color-scheme: dark; }
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
+  input[type="time"]::-webkit-calendar-picker-indicator:hover,
+  input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
   .container { max-width: 1080px; margin: 0 auto; padding: 80px 32px 120px; }
   .header { margin-bottom: 56px; }
   .brand { font-size: 10px; letter-spacing: 0.4em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 56px; }
@@ -87,7 +92,7 @@
   .import-mt5-btn { background: transparent; border: 1px solid var(--text-mid); color: var(--text); padding: 8px 16px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: all 200ms; }
   .import-mt5-btn:hover { background: var(--text); color: var(--bg); }
   .trades-wrap { margin-left: 60px; }
-  .trade-row, .trade-row-headers { display: grid; grid-template-columns: 32px 90px 60px 130px 80px 70px 70px 70px 70px 70px 26px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 6px; width: fit-content; max-width: 100%; }
+  .trade-row, .trade-row-headers { display: grid; grid-template-columns: 32px 90px 60px 110px 70px 88px 88px 65px 65px 95px 95px 26px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 6px; width: fit-content; max-width: 100%; }
   .trade-row-headers { margin-bottom: 4px; }
   .trade-header-cell { background: var(--bg-elev); padding: 8px 8px; font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); text-align: center; }
   .trade-cell { background: var(--bg); padding: 8px 8px; display: flex; align-items: center; }
@@ -187,7 +192,7 @@
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr) 100px; grid-template-rows: auto; grid-auto-rows: 65px; gap: 4px; }
   .cal-day-header { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); text-align: center; padding: 6px 0; }
   .cal-day-header.week-col { text-align: center; }
-  .cal-day { background: var(--bg); border: 1px solid var(--border); padding: 6px 8px; cursor: default; transition: all 150ms; position: relative; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
+  .cal-day { background: var(--bg); border: 1px solid var(--border); height: 65px; min-height: 65px; max-height: 65px; padding: 6px 8px; cursor: default; transition: all 150ms; position: relative; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
   .cal-day.empty { opacity: 0.5; cursor: default; }
   .cal-day.has-trade { cursor: pointer; }
   .cal-day.has-trade:hover { border-color: var(--text-mid); }
@@ -202,7 +207,7 @@
   .cal-day-pl.good { color: var(--good); }
   .cal-day-pl.bad  { color: var(--bad); }
   .cal-day-trades { font-size: 9px; color: var(--text-dim); text-align: center; }
-  .cal-week-summary { background: var(--bg-elev); border: 1px solid var(--border-2); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; box-sizing: border-box; overflow: hidden; }
+  .cal-week-summary { background: var(--bg-elev); border: 1px solid var(--border-2); height: 65px; min-height: 65px; max-height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; box-sizing: border-box; overflow: hidden; }
   .cal-week-summary .pl { font-family: 'Fraunces', serif; font-size: 14px; line-height: 1; }
   .cal-week-summary .pl.good { color: var(--good); }
   .cal-week-summary .pl.bad  { color: var(--bad); }
@@ -314,7 +319,7 @@
     .section-hint, .options, .input, .textarea, .tags, .trades-wrap, .defaults-strip { margin-left: 0; }
     .input, .textarea { width: 100%; }
     .trade-row, .trade-row-headers { grid-template-columns: 28px 70px 50px 1fr 60px 60px 22px; }
-    .trade-row .trade-cell:nth-child(7), .trade-row .trade-cell:nth-child(8), .trade-row .trade-cell:nth-child(9), .trade-row .trade-cell:nth-child(10), .trade-row-headers .trade-header-cell:nth-child(7), .trade-row-headers .trade-header-cell:nth-child(8), .trade-row-headers .trade-header-cell:nth-child(9), .trade-row-headers .trade-header-cell:nth-child(10) { display: none; }
+    .trade-row .trade-cell:nth-child(7), .trade-row .trade-cell:nth-child(8), .trade-row .trade-cell:nth-child(9), .trade-row .trade-cell:nth-child(10), .trade-row .trade-cell:nth-child(11), .trade-row-headers .trade-header-cell:nth-child(7), .trade-row-headers .trade-header-cell:nth-child(8), .trade-row-headers .trade-header-cell:nth-child(9), .trade-row-headers .trade-header-cell:nth-child(10), .trade-row-headers .trade-header-cell:nth-child(11) { display: none; }
     .saved-bias-grid { grid-template-columns: 1fr; }
     .history-row { grid-template-columns: 50px 1fr 1fr 1fr 1fr; }
     #type-breakdown .history-row, #side-breakdown .history-row, #dow-breakdown .history-row { grid-template-columns: 100px 1fr 1fr 1fr 1fr; }
@@ -473,6 +478,7 @@
           <div class="trade-header-cell">Exit</div>
           <div class="trade-header-cell">Risk £</div>
           <div class="trade-header-cell">Costs £</div>
+          <div class="trade-header-cell">Gross £</div>
           <div class="trade-header-cell">Net £</div>
           <div class="trade-header-cell"></div>
         </div>
@@ -838,14 +844,14 @@
       <div class="label">Risk £</div>
       <div class="field"><input id="edit-risk" type="number" step="any" /></div>
 
-      <div class="label">Profit £</div>
+      <div class="label">Gross £</div>
       <div class="field"><input id="edit-profit" type="number" step="any" placeholder="(auto from R × Risk if blank)" /></div>
 
       <div class="label">Costs £</div>
       <div class="field"><input id="edit-costs" type="number" step="any" /></div>
 
-      <div class="label">Net P&L</div>
-      <div class="field field-readonly" id="edit-netpl">—</div>
+      <div class="label">Net £</div>
+      <div class="field"><input id="edit-netpl" type="number" step="any" placeholder="(auto = Gross − Costs)" /></div>
     </div>
 
     <div class="actions" style="margin-top:24px;">
@@ -1207,8 +1213,6 @@
     data.review.trades.forEach((t, idx) => {
       const row = document.createElement('div');
       row.className = 'trade-row';
-      const netPL = tradeNetPL(t);
-      const showNet = (t.result && t.r) ? fmtMoney(netPL) : '—';
       row.innerHTML = `
         <div class="trade-cell trade-num">${idx + 1}</div>
         <div class="trade-cell"><select class="trade-select result-select">
@@ -1225,7 +1229,8 @@
         <div class="trade-cell"><input class="trade-input exit-input" type="time" /></div>
         <div class="trade-cell"><input class="trade-input risk-input" type="number" step="any" placeholder="£" /></div>
         <div class="trade-cell"><input class="trade-input costs-input" type="number" step="any" placeholder="£" /></div>
-        <div class="trade-cell" style="font-family:'Fraunces',serif;font-size:13px;justify-content:center;color:${netPL > 0 ? 'var(--good)' : netPL < 0 ? 'var(--bad)' : 'var(--text-mid)'};">${showNet}</div>
+        <div class="trade-cell"><input class="trade-input gross-input" type="number" step="any" placeholder="auto" style="font-family:'Fraunces',serif;font-size:13px;" /></div>
+        <div class="trade-cell"><input class="trade-input net-input" type="number" step="any" placeholder="auto" style="font-family:'Fraunces',serif;font-size:13px;" /></div>
         <div class="trade-cell"><button class="trade-remove" title="Remove">×</button></div>
       `;
       wrap.appendChild(row);
@@ -1237,17 +1242,59 @@
       row.querySelector('.exit-input').value = t.exitTime || '';
       row.querySelector('.risk-input').value = t.risk || '';
       row.querySelector('.costs-input').value = t.costs || '';
+      // Initialise gross + net inputs with displayed values
+      const grossEl = row.querySelector('.gross-input');
+      const netEl   = row.querySelector('.net-input');
+      const tr0 = data.review.trades[idx];
+      const showInit = (tr0.result && (tr0.r || tr0.actualGross != null));
+      grossEl.value = showInit ? tradeGross(tr0).toFixed(2) : '';
+      netEl.value   = showInit ? tradeNetPL(tr0).toFixed(2) : '';
+      // Colour helpers
+      const colorise = () => {
+        const tr = data.review.trades[idx];
+        const g = tradeGross(tr), n = tradeNetPL(tr);
+        const show = (tr.result && (tr.r || tr.actualGross != null));
+        grossEl.style.color = !show ? 'var(--text-mid)' : g > 0 ? 'var(--good)' : g < 0 ? 'var(--bad)' : 'var(--text-mid)';
+        netEl.style.color   = !show ? 'var(--text-mid)' : n > 0 ? 'var(--good)' : n < 0 ? 'var(--bad)' : 'var(--text-mid)';
+      };
+      colorise();
+      // Light update: refresh whichever input the user is NOT typing in. Keeps focus.
+      const refresh = () => {
+        const tr = data.review.trades[idx];
+        const show = (tr.result && (tr.r || tr.actualGross != null));
+        if (document.activeElement !== grossEl) grossEl.value = show ? tradeGross(tr).toFixed(2) : '';
+        if (document.activeElement !== netEl)   netEl.value   = show ? tradeNetPL(tr).toFixed(2) : '';
+        colorise();
+      };
+      const lightUpdate = () => { refresh(); renderReviewPreview(); saveData(); };
+      const fullUpdate  = () => { renderTrades(); renderReviewPreview(); saveData(); };
 
-      const update = () => { renderTrades(); renderReviewPreview(); saveData(); };
-      row.querySelector('.result-select').addEventListener('change', e => { data.review.trades[idx].result = e.target.value; update(); });
-      row.querySelector('.r-input').addEventListener('input', e => { data.review.trades[idx].r = e.target.value.trim(); update(); });
-      row.querySelector('.type-select').addEventListener('change', e => { data.review.trades[idx].type = e.target.value; saveData(); renderReviewPreview(); });
-      row.querySelector('.side-select').addEventListener('change', e => { data.review.trades[idx].side = e.target.value; saveData(); renderReviewPreview(); });
+      row.querySelector('.result-select').addEventListener('change', e => { data.review.trades[idx].result = e.target.value; lightUpdate(); });
+      row.querySelector('.r-input').addEventListener('input', e => { data.review.trades[idx].r = e.target.value.trim(); lightUpdate(); });
+      row.querySelector('.type-select').addEventListener('change', e => { data.review.trades[idx].type = e.target.value; renderReviewPreview(); saveData(); });
+      row.querySelector('.side-select').addEventListener('change', e => { data.review.trades[idx].side = e.target.value; renderReviewPreview(); saveData(); });
       row.querySelector('.entry-input').addEventListener('input', e => { data.review.trades[idx].entryTime = e.target.value; saveData(); });
       row.querySelector('.exit-input').addEventListener('input', e => { data.review.trades[idx].exitTime = e.target.value; saveData(); });
-      row.querySelector('.risk-input').addEventListener('input', e => { data.review.trades[idx].risk = e.target.value.trim(); update(); });
-      row.querySelector('.costs-input').addEventListener('input', e => { data.review.trades[idx].costs = e.target.value.trim(); update(); });
-      row.querySelector('.trade-remove').addEventListener('click', () => { data.review.trades.splice(idx, 1); update(); });
+      row.querySelector('.risk-input').addEventListener('input', e => { data.review.trades[idx].risk = e.target.value.trim(); lightUpdate(); });
+      row.querySelector('.costs-input').addEventListener('input', e => { data.review.trades[idx].costs = e.target.value.trim(); lightUpdate(); });
+      // Gross input: stores actualGross directly; Net auto-derives
+      grossEl.addEventListener('input', e => {
+        const v = e.target.value.trim();
+        data.review.trades[idx].actualGross = (v && !isNaN(parseFloat(v))) ? parseFloat(v) : null;
+        lightUpdate();
+      });
+      // Net input: back-computes actualGross = Net + Costs so single source of truth stays consistent
+      netEl.addEventListener('input', e => {
+        const v = e.target.value.trim();
+        if (v && !isNaN(parseFloat(v))) {
+          const costs = parseFloat(data.review.trades[idx].costs) || 0;
+          data.review.trades[idx].actualGross = parseFloat(v) + costs;
+        } else {
+          data.review.trades[idx].actualGross = null;
+        }
+        lightUpdate();
+      });
+      row.querySelector('.trade-remove').addEventListener('click', () => { data.review.trades.splice(idx, 1); fullUpdate(); });
     });
   }
   function addTradeRow() {
@@ -1415,6 +1462,7 @@
         exitTime: t.exitTime || '',
         risk: t.risk ? parseFloat(t.risk) : null,
         costs: t.costs ? parseFloat(t.costs) : null,
+        actualGross: (t.actualGross != null && !isNaN(t.actualGross)) ? parseFloat(t.actualGross) : null,
         date: sessionDate.toISOString(),
         dayOfWeek: sessionDate.getDay(),
         biasSnap, reviewSnap,
@@ -2181,15 +2229,18 @@
     document.getElementById('edit-entry').value = t.entryTime || '';
     document.getElementById('edit-exit').value = t.exitTime || '';
     document.getElementById('edit-risk').value = t.risk != null ? t.risk : '';
-    document.getElementById('edit-profit').value = t.actualGross != null ? t.actualGross : '';
+    document.getElementById('edit-profit').value = t.actualGross != null ? t.actualGross.toFixed(2) : '';
     document.getElementById('edit-costs').value = t.costs != null ? t.costs : '';
+    document.getElementById('edit-netpl').value = (t.result && (t.r != null || t.actualGross != null)) ? tradeNetPL(t).toFixed(2) : '';
     updateEditNetPL();
 
     document.getElementById('edit-trade-modal-bg').classList.add('show');
   }
 
   function updateEditNetPL() {
-    const profitRaw = document.getElementById('edit-profit').value;
+    const grossEl = document.getElementById('edit-profit');
+    const netEl = document.getElementById('edit-netpl');
+    const profitRaw = grossEl.value;
     const profit = parseFloat(profitRaw);
     const r = parseFloat(document.getElementById('edit-r').value) || 0;
     const risk = parseFloat(document.getElementById('edit-risk').value) || 0;
@@ -2203,9 +2254,12 @@
       else gross = 0;
     }
     const net = gross - costs;
-    const el = document.getElementById('edit-netpl');
-    el.textContent = fmtMoney(net);
-    el.style.color = net > 0 ? 'var(--good)' : net < 0 ? 'var(--bad)' : 'var(--text-mid)';
+    // Update Net input value only if user isn't currently typing in it
+    if (document.activeElement !== netEl) {
+      netEl.value = (editingResult || profitRaw !== '') ? net.toFixed(2) : '';
+    }
+    grossEl.style.color = gross > 0 ? 'var(--good)' : gross < 0 ? 'var(--bad)' : 'var(--text-mid)';
+    netEl.style.color   = net   > 0 ? 'var(--good)' : net   < 0 ? 'var(--bad)' : 'var(--text-mid)';
   }
 
   document.querySelectorAll('.edit-result-toggle button').forEach(btn => {
@@ -2217,6 +2271,22 @@
   });
   ['edit-r', 'edit-risk', 'edit-costs', 'edit-profit'].forEach(id => {
     document.getElementById(id).addEventListener('input', updateEditNetPL);
+  });
+  // Net input handler: back-computes Gross = Net + Costs so the underlying actualGross stays consistent
+  document.getElementById('edit-netpl').addEventListener('input', e => {
+    const netRaw = e.target.value;
+    const netVal = parseFloat(netRaw);
+    const costs = parseFloat(document.getElementById('edit-costs').value) || 0;
+    const grossEl = document.getElementById('edit-profit');
+    if (netRaw !== '' && !isNaN(netVal)) {
+      if (document.activeElement !== grossEl) grossEl.value = (netVal + costs).toFixed(2);
+      grossEl.style.color = (netVal + costs) > 0 ? 'var(--good)' : (netVal + costs) < 0 ? 'var(--bad)' : 'var(--text-mid)';
+      e.target.style.color = netVal > 0 ? 'var(--good)' : netVal < 0 ? 'var(--bad)' : 'var(--text-mid)';
+    } else {
+      if (document.activeElement !== grossEl) grossEl.value = '';
+      grossEl.style.color = 'var(--text-mid)';
+      e.target.style.color = 'var(--text-mid)';
+    }
   });
 
   document.getElementById('edit-trade-close').addEventListener('click', () => {
