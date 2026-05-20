@@ -170,6 +170,9 @@
   .holdtime-cell:hover .stat-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
   .holdtime-cell .label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
   .holdtime-cell .value { font-family: 'Fraunces', serif; font-size: 24px; line-height: 1; }
+  .holdtime-cell .value.good { color: var(--good); }
+  .holdtime-cell .value.bad  { color: var(--bad); }
+  .holdtime-cell .value.be   { color: var(--info); }
   .holdtime-cell .sub { margin-top: 6px; font-size: 10px; color: var(--text-dim); }
   .chart-card { margin-top: 28px; padding: 22px; border: 1px solid var(--border-2); background: var(--bg-elev); }
   .chart-card-title { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
@@ -731,15 +734,15 @@
       <div class="holdtime-grid">
         <div class="holdtime-cell">
           <div class="stat-tooltip">Average time you held winning trades. Short avg = you take quick wins. Long avg = you let winners run.</div>
-          <div class="label">Avg Win</div><div class="value" id="ht-win">—</div><div class="sub" id="ht-win-count">No data</div>
+          <div class="label">Avg Win</div><div class="value good" id="ht-win">—</div><div class="sub" id="ht-win-count">No data</div>
         </div>
         <div class="holdtime-cell">
           <div class="stat-tooltip">Average time you held losing trades. Short avg = you cut losses fast. Long avg = you may be hoping/holding too long.</div>
-          <div class="label">Avg Loss</div><div class="value" id="ht-loss">—</div><div class="sub" id="ht-loss-count">No data</div>
+          <div class="label">Avg Loss</div><div class="value bad" id="ht-loss">—</div><div class="sub" id="ht-loss-count">No data</div>
         </div>
         <div class="holdtime-cell">
           <div class="stat-tooltip">Average time in break-even trades. Useful for spotting whether you're rushing or sitting too long before SL gets hit.</div>
-          <div class="label">Avg BE</div><div class="value" id="ht-be">—</div><div class="sub" id="ht-be-count">No data</div>
+          <div class="label">Avg BE</div><div class="value be" id="ht-be">—</div><div class="sub" id="ht-be-count">No data</div>
         </div>
       </div>
     </section>
