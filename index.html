@@ -79,6 +79,20 @@
   .tag { background: transparent; border: 1px solid var(--border-2); padding: 9px 16px; cursor: pointer; transition: all 200ms ease; font-size: 11px; letter-spacing: 0.04em; color: var(--text-mid); font-family: 'DM Mono', monospace; }
   .tag:hover { border-color: var(--text-mid); color: var(--text); }
   .tag.selected { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
+  /* Custom user-defined tag: hover reveals a small × removal handle */
+  .tag.custom { position: relative; padding-right: 26px; }
+  .tag.custom .tag-remove { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; line-height: 14px; text-align: center; font-size: 14px; color: var(--text-dim); opacity: 0; transition: opacity 150ms, color 150ms; cursor: pointer; border-radius: 2px; }
+  .tag.custom:hover .tag-remove { opacity: 1; }
+  .tag.custom .tag-remove:hover { color: var(--bad); background: var(--bg-elev); }
+  .tag.custom.selected .tag-remove { color: var(--bg); }
+  .tag.custom.selected .tag-remove:hover { color: var(--bad); background: var(--bg); }
+  /* "+ Custom" button uses dashed border to differentiate from real tags */
+  .tag-add { background: transparent; border: 1px dashed var(--border-2); padding: 9px 14px; cursor: pointer; transition: all 200ms ease; font-size: 11px; letter-spacing: 0.04em; color: var(--text-dim); font-family: 'DM Mono', monospace; }
+  .tag-add:hover { border-color: var(--text-mid); color: var(--text); }
+  /* Inline input for adding a new custom tag */
+  .tag-input-wrap { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--text-mid); padding: 4px 8px; }
+  .tag-input-wrap input { background: transparent; border: none; outline: none; color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; padding: 4px 4px; width: 140px; }
+  .tag-input-wrap input::placeholder { color: var(--text-dim); }
   .input, .textarea { width: calc(100% - 60px); margin-left: 60px; background: var(--bg); border: none; border-bottom: 1px solid var(--border-2); padding: 18px 0; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 300; transition: border-color 200ms; }
   .tv-link-card { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--border-2); }
   .tv-link-card:last-child { border-bottom: none; padding-bottom: 0; }
@@ -612,11 +626,9 @@
         <button class="tag" data-value="50% / Equilibrium">50% / Equilibrium</button>
         <button class="tag" data-value="High Sweep">High Sweep</button>
         <button class="tag" data-value="Low Sweep">Low Sweep</button>
-        <button class="tag" data-value="Previous D/W/M Sweep">Previous D/W/M Sweep</button>
+        <button class="tag" data-value="Prev D/W/M Sweep">Prev D/W/M Sweep</button>
         <button class="tag" data-value="Strong Rejection">Strong Rejection</button>
         <button class="tag" data-value="Slow Rejection">Slow Rejection</button>
-        <button class="tag" data-value="Sweep + Mitigation">Sweep + Mitigation</button>
-        <button class="tag" data-value="Sweep + Slowdown">Sweep + Slowdown</button>
         <button class="tag" data-value="Buy High">Buy High</button>
         <button class="tag" data-value="Sell Low">Sell Low</button>
         <button class="tag" data-value="Buy Low">Buy Low</button>
@@ -630,7 +642,7 @@
         <button class="tag" data-value="HDWB Weak">HDWB Weak</button>
         <button class="tag" data-value="A2B Leg">A2B Leg</button>
         <button class="tag" data-value="SSL Entry">SSL Entry</button>
-        <button class="tag" data-value="Unsafe un-SSL Entry">Unsafe un-SSL Entry</button>
+        <button class="tag" data-value="Unsafe SL Entry">Unsafe SL Entry</button>
         <button class="tag" data-value="BFI Move">BFI Move</button>
         <button class="tag" data-value="B2S Order Block">B2S Order Block</button>
         <button class="tag" data-value="S2B Order Block">S2B Order Block</button>
@@ -665,6 +677,12 @@
         <button class="tag" data-value="Rushed Decisions">Rushed Decisions</button>
         <button class="tag" data-value="Broke Rules">Broke Rules</button>
         <button class="tag" data-value="Over-sized">Over-sized</button>
+        <button class="tag" data-value="Moved to BE Early">Moved to BE Early</button>
+        <button class="tag" data-value="Enlarged SL">Enlarged SL</button>
+        <button class="tag" data-value="Removed SL">Removed SL</button>
+        <button class="tag" data-value="Closed Trade Manually">Closed Trade Manually</button>
+        <button class="tag" data-value="Hedged Trade">Hedged Trade</button>
+        <button class="tag" data-value="Cut Winner Early">Cut Winner Early</button>
         <button class="tag" data-value="Missed Setup">Missed Setup</button>
         <button class="tag" data-value="Lack of Focus">Lack of Focus</button>
         <button class="tag" data-value="Emotional">Emotional</button>
@@ -1195,6 +1213,36 @@
       });
       d._tennisServeRenamed = true;
     }
+    // Concept tag updates (one-time): rename Previous → Prev D/W/M Sweep, rename Unsafe un-SSL → Unsafe SL,
+    // drop removed Sweep + Mitigation / Sweep + Slowdown from any saved trade.
+    if (!d._conceptTagsCleanupV1) {
+      const renames = [
+        ['Previous D/W/M Sweep', 'Prev D/W/M Sweep'],
+        ['Unsafe un-SSL Entry',  'Unsafe SL Entry']
+      ];
+      const removedTags = ['Sweep + Mitigation', 'Sweep + Slowdown'];
+      function dropTags(arr, toRemove) {
+        if (!Array.isArray(arr)) return;
+        for (let i = arr.length - 1; i >= 0; i--) {
+          if (toRemove.includes(arr[i])) arr.splice(i, 1);
+        }
+      }
+      if (d.review && d.review.concepts) {
+        renames.forEach(([from, to]) => renameTag(d.review.concepts, from, to));
+        dropTags(d.review.concepts, removedTags);
+      }
+      [...(d.currentSeries || []), ...(d.history || []).flatMap(s => s.trades || [])].forEach(t => {
+        if (t.reviewSnap && t.reviewSnap.concepts) {
+          renames.forEach(([from, to]) => renameTag(t.reviewSnap.concepts, from, to));
+          dropTags(t.reviewSnap.concepts, removedTags);
+        }
+      });
+      d._conceptTagsCleanupV1 = true;
+    }
+    // User-defined custom tags persist across sessions, separate from built-ins.
+    if (!d.customTags) d.customTags = { concepts: [], mindset: [] };
+    if (!Array.isArray(d.customTags.concepts)) d.customTags.concepts = [];
+    if (!Array.isArray(d.customTags.mindset))  d.customTags.mindset  = [];
     // Migrate snapshots in stored trades
     [...(d.currentSeries || []), ...(d.history || []).flatMap(s => s.trades || [])].forEach(t => {
       if (t.biasSnap)   migrateTvLinks(t.biasSnap);
@@ -1529,16 +1577,123 @@
     });
   }
   function setupTagGroup(containerId, stateKey) {
-    document.getElementById(containerId).querySelectorAll('.tag').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const val = btn.dataset.value;
+    const container = document.getElementById(containerId);
+    // Render any user-defined custom tags + the "+ Custom" button at the end of the group.
+    renderCustomTags(containerId, stateKey);
+    // Apply "selected" state to currently-selected tags (built-in or custom).
+    syncSelectedTags(containerId, stateKey);
+    // Event delegation — handles clicks on tags, the "+" button, and "×" remove icons.
+    container.addEventListener('click', e => {
+      const removeBtn = e.target.closest('.tag-remove');
+      if (removeBtn) {
+        e.stopPropagation();
+        const tagEl = removeBtn.closest('.tag');
+        const val = tagEl.dataset.value;
+        const customList = data.customTags[stateKey];
+        const idx = customList.indexOf(val);
+        if (idx >= 0) customList.splice(idx, 1);
+        // Also drop it from the current review selection
+        const selIdx = data.review[stateKey].indexOf(val);
+        if (selIdx >= 0) data.review[stateKey].splice(selIdx, 1);
+        saveData();
+        renderCustomTags(containerId, stateKey);
+        syncSelectedTags(containerId, stateKey);
+        renderReviewPreview();
+        return;
+      }
+      const addBtn = e.target.closest('.tag-add');
+      if (addBtn) {
+        e.stopPropagation();
+        openCustomTagInput(containerId, stateKey);
+        return;
+      }
+      const tagEl = e.target.closest('.tag');
+      if (tagEl && container.contains(tagEl)) {
+        const val = tagEl.dataset.value;
         const arr = data.review[stateKey];
         const idx = arr.indexOf(val);
-        if (idx >= 0) { arr.splice(idx, 1); btn.classList.remove('selected'); }
-        else { arr.push(val); btn.classList.add('selected'); }
+        if (idx >= 0) { arr.splice(idx, 1); tagEl.classList.remove('selected'); }
+        else { arr.push(val); tagEl.classList.add('selected'); }
         renderReviewPreview();
-      });
-      if (data.review[stateKey].includes(btn.dataset.value)) btn.classList.add('selected');
+        saveData();
+      }
+    });
+  }
+  // Reconcile selected styling with state.review[stateKey] across all tag elements in the group.
+  function syncSelectedTags(containerId, stateKey) {
+    const selected = new Set(data.review[stateKey] || []);
+    document.getElementById(containerId).querySelectorAll('.tag').forEach(btn => {
+      if (selected.has(btn.dataset.value)) btn.classList.add('selected');
+      else btn.classList.remove('selected');
+    });
+  }
+  // Append custom tag buttons and the "+ Custom" button to the group.
+  function renderCustomTags(containerId, stateKey) {
+    const container = document.getElementById(containerId);
+    // Strip any existing custom tags + add button so re-renders don't duplicate.
+    container.querySelectorAll('.tag.custom, .tag-add, .tag-input-wrap').forEach(el => el.remove());
+    (data.customTags[stateKey] || []).forEach(label => {
+      const safeLabel = label.replace(/</g, '&lt;');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tag custom';
+      btn.dataset.value = label;
+      btn.innerHTML = `${safeLabel}<span class="tag-remove" title="Remove this tag">×</span>`;
+      container.appendChild(btn);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'tag-add';
+    addBtn.textContent = '+ Custom';
+    container.appendChild(addBtn);
+  }
+  // Show an inline input next to the "+ Custom" button to capture a new tag name.
+  function openCustomTagInput(containerId, stateKey) {
+    const container = document.getElementById(containerId);
+    // If an input is already open, just focus it.
+    let existing = container.querySelector('.tag-input-wrap input');
+    if (existing) { existing.focus(); return; }
+    const wrap = document.createElement('span');
+    wrap.className = 'tag-input-wrap';
+    wrap.innerHTML = `<input type="text" maxlength="30" placeholder="Tag name…" />`;
+    // Insert before the + button so the input visually replaces it temporarily.
+    const addBtn = container.querySelector('.tag-add');
+    container.insertBefore(wrap, addBtn);
+    if (addBtn) addBtn.style.display = 'none';
+    const input = wrap.querySelector('input');
+    input.focus();
+    function close(commitVal) {
+      const val = (commitVal || '').trim();
+      if (val) {
+        const lower = val.toLowerCase();
+        // Pull existing tag names (built-in + custom) for dedup
+        const existingNames = [
+          ...Array.from(container.querySelectorAll('.tag:not(.custom)')).map(t => t.dataset.value),
+          ...(data.customTags[stateKey] || [])
+        ];
+        const dup = existingNames.find(n => n.toLowerCase() === lower);
+        const finalName = dup || val;
+        // Add to custom list if not a duplicate of existing
+        if (!dup) data.customTags[stateKey].push(finalName);
+        // Auto-select it on the current review
+        if (!data.review[stateKey].includes(finalName)) data.review[stateKey].push(finalName);
+        saveData();
+        renderCustomTags(containerId, stateKey);
+        syncSelectedTags(containerId, stateKey);
+        renderReviewPreview();
+      } else {
+        // Cancel: just restore the + button
+        wrap.remove();
+        if (addBtn) addBtn.style.display = '';
+      }
+    }
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); close(input.value); }
+      else if (e.key === 'Escape') { close(''); }
+    });
+    input.addEventListener('blur', () => {
+      // Slight delay so the click on "+ Custom" or other tags doesn't get swallowed
+      setTimeout(() => { if (document.body.contains(wrap)) close(input.value); }, 100);
     });
   }
 
