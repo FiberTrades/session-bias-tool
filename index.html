@@ -155,13 +155,14 @@
   .history-cell.pl-good { color: var(--good); font-weight: 500; }
   .history-cell.pl-bad  { color: var(--bad); font-weight: 500; }
   .history-cell.pl-be   { color: var(--text-mid); font-weight: 500; }
-  .wl-summary { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .wl-summary { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
   .wl-cell { background: var(--bg); padding: 22px; position: relative; }
   .wl-cell:hover .stat-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
   .wl-cell .label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 14px; }
   .wl-cell .big { font-family: 'Fraunces', serif; font-size: 30px; line-height: 1; margin-bottom: 8px; }
   .wl-cell.win .big { color: var(--good); }
   .wl-cell.loss .big { color: var(--bad); }
+  .wl-cell.be .big { color: var(--info); }
   .wl-cell .detail { font-size: 11px; color: var(--text-mid); line-height: 1.7; }
   .holdtime-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
   .holdtime-cell { background: var(--bg); padding: 22px; text-align: center; position: relative; }
@@ -189,6 +190,7 @@
   .cal-month-summary .total { font-family: 'Fraunces', serif; font-size: 16px; }
   .cal-month-summary .total.good { color: var(--good); }
   .cal-month-summary .total.bad  { color: var(--bad); }
+  .cal-month-summary .total.be   { color: var(--info); }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr) 100px; grid-template-rows: auto; grid-auto-rows: 65px; gap: 4px; overflow: hidden; }
   .cal-day-header { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); text-align: center; padding: 6px 0; }
   .cal-day-header.week-col { text-align: center; }
@@ -206,6 +208,7 @@
   .cal-day-pl { font-family: 'Fraunces', serif; font-size: 14px; margin-top: 4px; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
   .cal-day-pl.good { color: var(--good); }
   .cal-day-pl.bad  { color: var(--bad); }
+  .cal-day-pl.be   { color: var(--info); }
   .cal-day-trades { font-size: 9px; color: var(--text-dim); text-align: center; }
   .cal-week-summary { background: var(--bg-elev); border: 1px solid var(--border-2); height: 65px; min-height: 65px; max-height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; box-sizing: border-box; overflow: hidden; }
   .cal-week-summary .pl { font-family: 'Fraunces', serif; font-size: 14px; line-height: 1; }
@@ -220,10 +223,12 @@
   .year-month:hover { border-color: var(--text-mid); }
   .year-month.good { background: var(--good-bg2); border-color: var(--good); }
   .year-month.bad  { background: var(--bad-bg2); border-color: var(--bad); }
+  .year-month.be   { background: var(--info-bg); border-color: var(--info); }
   .year-month .name { font-size: 9px; color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; }
   .year-month .v { font-size: 11px; margin-top: 4px; font-family: 'Fraunces', serif; }
   .year-month .v.good { color: var(--good); }
   .year-month .v.bad  { color: var(--bad); }
+  .year-month .v.be   { color: var(--info); }
   .year-month .v.none { color: var(--text-dim); }
   .year-glance .year-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .year-glance .year-label { font-family: 'Fraunces', serif; font-size: 18px; }
@@ -682,9 +687,12 @@
           <div class="big" id="wl-loss-count">0</div>
           <div class="detail" id="wl-loss-detail">—</div>
         </div>
-      </div>
-      <div style="margin-top:6px;padding:12px 22px;background:var(--bg-elev);border:1px solid var(--border-2);font-size:11px;color:var(--text-mid);" title="Break-even trades — closed at or near entry, often with SL moved to BE. They contribute 0R to stats but may have small £ costs.">
-        Break-evens: <span id="wl-be-count" style="color:var(--text);">0</span>
+        <div class="wl-cell be">
+          <div class="stat-tooltip">Trades that closed at or near entry, often with SL moved to BE. They contribute 0R to stats but may carry small £ costs (commission + spread).</div>
+          <div class="label">Break-evens</div>
+          <div class="big" id="wl-be-count">0</div>
+          <div class="detail" id="wl-be-detail">—</div>
+        </div>
       </div>
     </section>
 
@@ -1813,6 +1821,10 @@
     document.getElementById('wl-loss-detail').innerHTML = losses.length > 0
       ? `Total: -${totalLossR.toFixed(2)}R<br>Each: -1R`
       : 'No losses yet';
+    const beCosts = bes.reduce((s,t) => s + (parseFloat(t.costs) || 0), 0);
+    document.getElementById('wl-be-detail').innerHTML = bes.length > 0
+      ? `0R contribution<br>Costs: -£${beCosts.toFixed(2)}`
+      : 'No BE trades yet';
 
     let mw=0, ml=0, mb=0, cw=0, cl=0, cb=0;
     all.forEach(t => {
@@ -2042,10 +2054,16 @@
         return d.getFullYear() === yearGlanceYear && d.getMonth() === m;
       });
       const net = monthTrades.reduce((s,t) => s + tradeNetPL(t), 0);
+      const wins = monthTrades.filter(t => t.result === 'Win').length;
+      const losses = monthTrades.filter(t => t.result === 'Lose').length;
       let cls = 'none', vCls = 'none';
       if (monthTrades.length > 0) {
-        if (net > 0) { cls = 'good'; vCls = 'good'; }
+        if (wins > 0 && losses === 0) { cls = 'good'; vCls = 'good'; }
+        else if (losses > 0 && wins === 0) { cls = 'bad'; vCls = 'bad'; }
+        else if (wins === 0 && losses === 0) { cls = 'be'; vCls = 'be'; }
+        else if (net > 0) { cls = 'good'; vCls = 'good'; }
         else if (net < 0) { cls = 'bad'; vCls = 'bad'; }
+        else { cls = 'be'; vCls = 'be'; }
       }
       const label = monthTrades.length > 0 ? fmtMoneyShort(net) : '—';
       html += `<div class="year-month ${cls}" data-month="${m}"><div class="name">${monthNames[m]}</div><div class="v ${vCls}">${label}</div></div>`;
@@ -2101,17 +2119,22 @@
       const key = dateObj.toDateString();
       const dayTrades = grouped[key] || [];
       const net = dayTrades.reduce((s,t) => s + tradeNetPL(t), 0);
+      // Classify by the trade results, not the net £ — a BE day with costs shouldn't read as a losing day
+      const wins = dayTrades.filter(t => t.result === 'Win').length;
+      const losses = dayTrades.filter(t => t.result === 'Lose').length;
       let cls = '';
       if (dayTrades.length > 0) {
-        if (net > 0) cls = 'win';
-        else if (net < 0) cls = 'loss';
-        else cls = 'be';
+        if (wins > 0 && losses === 0) cls = 'win';
+        else if (losses > 0 && wins === 0) cls = 'loss';
+        else if (wins === 0 && losses === 0) cls = 'be'; // all trades were BE
+        else cls = net > 0 ? 'win' : net < 0 ? 'loss' : 'be'; // mixed — fall back to net £
       }
       const isToday = key === todayKey;
       const hasTrade = dayTrades.length > 0 ? 'has-trade' : '';
       const todayCls = isToday ? 'today' : '';
       const plLabel = dayTrades.length > 0 ? fmtMoneyShort(net) : '';
-      const plCls = net > 0 ? 'good' : net < 0 ? 'bad' : '';
+      // P&L label colour mirrors the day classification so BE days show neutral/blue label, not red
+      const plCls = cls === 'win' ? 'good' : cls === 'loss' ? 'bad' : 'be';
       const tradeCount = dayTrades.length > 0 ? `${dayTrades.length} trade${dayTrades.length === 1 ? '' : 's'}` : '';
       const weekday = dateObj.getDay();
       const colNum = weekday + 1; // explicit column placement
@@ -2167,8 +2190,13 @@
     });
     const summary = document.getElementById('cal-month-summary');
     if (monthTrades.length > 0) {
+      // Classify month by result mix so a BE month with costs doesn't read red
+      const monthCls = (monthWins > 0 && monthLosses === 0) ? 'good' :
+                       (monthLosses > 0 && monthWins === 0) ? 'bad' :
+                       (monthWins === 0 && monthLosses === 0) ? 'be' :
+                       monthNet > 0 ? 'good' : monthNet < 0 ? 'bad' : 'be';
       summary.innerHTML = `
-        <div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">Month Total</span><br><span class="total ${monthNet > 0 ? 'good' : monthNet < 0 ? 'bad' : ''}">${fmtMoney(monthNet)}</span></div>
+        <div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">Month Total</span><br><span class="total ${monthCls}">${fmtMoney(monthNet)}</span></div>
         <div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">Trades</span><br><span style="font-family:'Fraunces',serif;font-size:14px;">${monthTrades.length}</span></div>
         ${monthWR !== null ? `<div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">WR</span><br><span style="font-family:'Fraunces',serif;font-size:14px;">${monthWR}%</span></div>` : ''}
         ${bestDay !== null ? `<div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">Best/Worst</span><br><span style="font-family:'Fraunces',serif;font-size:13px;color:var(--good);">${fmtMoneyShort(bestDay)}</span> / <span style="font-family:'Fraunces',serif;font-size:13px;color:var(--bad);">${fmtMoneyShort(worstDay)}</span></div>` : ''}`;
