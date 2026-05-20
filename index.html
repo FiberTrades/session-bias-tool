@@ -193,9 +193,8 @@
   /* Pattern Analysis — stacked blocks: title → table → feedback prose */
   .pattern-block { margin-top: 32px; }
   .pattern-block-title { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 14px; }
-  /* Tag leaderboard tables (concept and mindset on Statistics tab) */
-  .tag-leaderboard { background: var(--bg-elev); border: 1px solid var(--border-2); }
-  /* Use flexbox rows instead of grid to avoid implicit-row sizing issues */
+  /* Tag leaderboard tables — using same explicit-row-placement playbook as the calendar to prevent phantom row gaps */
+  .tag-leaderboard { display: grid; grid-auto-rows: auto; background: var(--bg-elev); border: 1px solid var(--border-2); overflow: hidden; }
   .tag-leaderboard-row { display: flex; align-items: center; padding: 12px 18px; font-size: 13px; line-height: 1; border-bottom: 1px solid var(--border-2); min-height: 0; }
   .tag-leaderboard-row:last-child { border-bottom: none; }
   .tag-leaderboard-row.header { background: var(--bg); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); padding: 10px 18px; line-height: 1; }
@@ -2311,15 +2310,30 @@
   }
 
   // Render full top-10 leaderboard table (rank · tag · count · WR · Avg R).
+  // Uses explicit grid-row placement to prevent phantom row gaps (same fix as the calendar).
   function renderTagLeaderboard(containerId, rows) {
     const el = document.getElementById(containerId);
     if (!el) return;
     if (rows.length === 0) {
       el.innerHTML = `<div class="tag-leaderboard-empty">No tags logged yet.</div>`;
+      el.style.gridTemplateRows = '';
+      el.style.maxHeight = '';
       return;
     }
     const top = rows.slice().sort((a, b) => b.count - a.count).slice(0, 10);
-    let html = `<div class="tag-leaderboard-row header">
+    const HEADER_H = 38;  // header row height
+    const ROW_H    = 44;  // data row height
+    // Lock the container's grid rows to exactly N+1 rows (header + data rows).
+    // Same approach as the calendar: any rogue cell flowing outside gets clipped by overflow:hidden.
+    let template = `${HEADER_H}px`;
+    for (let i = 0; i < top.length; i++) template += ` ${ROW_H}px`;
+    el.style.gridTemplateRows = template;
+    el.style.maxHeight = `${HEADER_H + top.length * ROW_H + 2}px`;
+
+    const HDR_SZ = `height:${HEADER_H}px !important;min-height:${HEADER_H}px;max-height:${HEADER_H}px;`;
+    const ROW_SZ = `height:${ROW_H}px !important;min-height:${ROW_H}px;max-height:${ROW_H}px;`;
+
+    let html = `<div class="tag-leaderboard-row header" style="grid-row:1;grid-column:1;${HDR_SZ}">
       <div></div>
       <div>Tag</div>
       <div class="col-count" style="text-align:right;">Used</div>
@@ -2331,7 +2345,8 @@
       const wrStr = r.decided > 0 ? Math.round(r.wr * 100) + '%' : '—';
       const avgCls = !reliable ? 'zero' : r.avg > 0.05 ? 'good' : r.avg < -0.05 ? 'bad' : 'zero';
       const avgStr = !reliable ? '—' : (r.avg >= 0 ? '+' : '') + r.avg.toFixed(2) + 'R';
-      html += `<div class="tag-leaderboard-row">
+      // Explicit grid-row anchors each row to a fixed slot; ROW_SZ enforces height.
+      html += `<div class="tag-leaderboard-row" style="grid-row:${i + 2};grid-column:1;${ROW_SZ}">
         <div class="rank">${i + 1}</div>
         <div class="tagname">${r.tag.replace(/</g,'&lt;')}</div>
         <div class="count">${r.count}</div>
