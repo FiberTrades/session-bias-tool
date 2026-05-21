@@ -65,11 +65,11 @@
   .meta-edit-wrap input { background: var(--bg-elev); border: 1px solid var(--text-mid); padding: 4px 8px; color: var(--text); font-family: 'Fraunces', serif; font-size: 20px; outline: none; }
   .meta-edit-wrap input[type="time"] { font-size: 14px; padding: 6px 8px; font-family: 'DM Mono', monospace; }
   .meta-edit-wrap button { background: var(--text); color: var(--bg); border: none; padding: 6px 12px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; }
-  /* Bias greeting — personal hello at top of Bias page */
-  .bias-greeting { font-family: 'Fraunces', serif; font-size: 22px; color: var(--text); margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); font-style: italic; letter-spacing: -0.01em; }
+  /* Bias-tab greeting — one-line personal opener at top of Bias page */
+  .bias-greeting { font-family: 'Fraunces', serif; font-size: 20px; color: var(--text); margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); font-style: italic; letter-spacing: -0.01em; line-height: 1.4; }
   .bias-greeting .greet-name { font-style: normal; cursor: pointer; transition: color 200ms; border-bottom: 1px dashed transparent; padding-bottom: 1px; }
   .bias-greeting .greet-name:hover { color: var(--text-mid); border-bottom-color: var(--text-dim); }
-  .bias-greeting input { background: var(--bg-elev); border: 1px solid var(--text-mid); padding: 2px 10px; color: var(--text); font-family: 'Fraunces', serif; font-size: 22px; font-style: normal; outline: none; max-width: 280px; }
+  .bias-greeting input { background: var(--bg-elev); border: 1px solid var(--text-mid); padding: 2px 10px; color: var(--text); font-family: 'Fraunces', serif; font-size: 20px; font-style: normal; outline: none; max-width: 280px; }
   .page { display: none; }
   .page.active { display: block; }
   section { margin-top: 56px; }
@@ -282,8 +282,7 @@
   .cal-month-nav { display: flex; align-items: center; gap: 16px; }
   .cal-nav-btn { background: transparent; border: 1px solid var(--border-2); color: var(--text-mid); cursor: pointer; padding: 6px 12px; font-family: 'DM Mono', monospace; transition: all 200ms; }
   .cal-nav-btn:hover { color: var(--text); border-color: var(--text-mid); }
-  .cal-month-title { font-family: 'Fraunces', serif; font-size: 22px; cursor: pointer; transition: color 200ms; padding-bottom: 2px; }
-  .cal-month-title:hover { color: var(--text-mid); }
+  .cal-month-title { font-family: 'Fraunces', serif; font-size: 22px; }
   .cal-month-summary { display: flex; gap: 18px; font-size: 11px; color: var(--text-mid); letter-spacing: 0.05em; align-items: center; }
   .cal-month-summary .total { font-family: 'Fraunces', serif; font-size: 16px; }
   .cal-month-summary .total.good { color: var(--good); }
@@ -3212,10 +3211,11 @@
     document.getElementById('year-next').addEventListener('click', () => { yearGlanceYear++; renderYearGlance(); });
     wrap.querySelectorAll('.year-month').forEach(el => {
       el.addEventListener('click', () => {
+        const m = parseInt(el.dataset.month);
         calendarYear = yearGlanceYear;
-        calendarMonth = parseInt(el.dataset.month);
+        calendarMonth = m;
         renderCalendar();
-        document.querySelector('.calendar-wrap').scrollIntoView({ behavior: 'smooth' });
+        openMonthlyReviewModal(yearGlanceYear, m);
       });
     });
   }
@@ -3396,10 +3396,6 @@
     calendarMonth = today.getMonth();
     calendarYear = today.getFullYear();
     renderCalendar();
-  });
-  // Click month title → open monthly review modal for the currently displayed month
-  document.getElementById('cal-month-title').addEventListener('click', () => {
-    openMonthlyReviewModal(calendarYear, calendarMonth);
   });
 
   function openDayModal(dateKey) {
@@ -4102,184 +4098,164 @@
     if (e.key === 'Enter') document.getElementById('name-modal-save').click();
   });
 
-  // ===== Bias greeting (clickable to rename) =====
-  // Greeting variants. {name} is replaced at render time. Pool chosen by time of day,
-  // then a general pool always available. Tone is calm, professional, occasionally witty —
-  // matched to the tool's understated aesthetic.
-  const GREETINGS_MORNING = [
-    'Good morning, {name}.',
-    'Morning, {name} — let\'s read the tape.',
-    'Coffee in hand, {name}?',
-    'New day, fresh chart, {name}.',
-    'The market\'s waking up, {name}.',
-    'Early bird, {name}.',
-    'A clean slate, {name}.',
-    'Up before the candles, {name}.',
+  // Time-of-day opener — chosen by the user's current local hour
+  function timeOfDayOpener() {
+    const hr = new Date().getHours();
+    if (hr >= 5  && hr < 12) return 'Good morning';
+    if (hr >= 12 && hr < 14) return 'Good afternoon';   // early afternoon
+    if (hr >= 14 && hr < 18) return 'Afternoon';
+    if (hr >= 18 && hr < 23) return 'Good evening';
+    return 'Late night';
+  }
+
+  // Closing-phrase pools — short, qualitative, never numeric.
+  // Each line is a half-sentence that follows ", {name}. " — it stands on its own visually.
+  const RECAP_POS = [
+    'yesterday went your way — same focus today.',
+    'yesterday delivered — repeat the read.',
+    'good session yesterday — don\'t get clever now.',
+    'yesterday was clean — stay disciplined.',
+    'yesterday paid — earn the next one.',
+    'green yesterday doesn\'t guarantee green today.',
+    'you traded well yesterday — same process.',
+    'yesterday was earned — earn it again.',
+    'good read yesterday — trust the same eyes.',
+    'yesterday\'s edge is yesterday\'s — show it again.',
+    'you did the work yesterday — keep doing it.',
+    'yesterday was patient — be patient again.',
+    'confidence is fine — cockiness isn\'t.',
+    'yesterday rewarded discipline — stay disciplined.',
+    'don\'t chase yesterday\'s feeling.',
+    'one win doesn\'t change the playbook.',
+    'yesterday was solid — protect the streak with patience.',
+    'good work — now reset the dopamine.',
+    'banked yesterday — focus on today.',
+    'a clean day yesterday — keep the criteria tight.',
   ];
-  const GREETINGS_MIDDAY = [
-    'Midday check-in, {name}.',
-    'Lunch break, {name}?',
-    'How\'s the morning treated you, {name}?',
-    'Halfway through the day, {name}.',
+  const RECAP_NEG = [
+    'yesterday stung — don\'t avenge it.',
+    'yesterday didn\'t cooperate — today is a new candle.',
+    'yesterday hurt — take a breath and read.',
+    'rough one yesterday — no tilt today.',
+    'yesterday was tough — process over outcome.',
+    'yesterday\'s loss isn\'t today\'s problem.',
+    'one bad session doesn\'t make a bad trader.',
+    'yesterday tested you — show up anyway.',
+    'risk did its job yesterday — trust it again.',
+    'yesterday is closed — open a clean chart.',
+    'no revenge today — the market won\'t flinch.',
+    'yesterday was a data point, not a verdict.',
+    'losses are tuition — don\'t pay twice.',
+    'yesterday paid for the lesson — apply it.',
+    'shake it off — same plan, sharper eyes.',
+    'one red day is part of the job.',
+    'lost the battle yesterday — win the war today.',
+    'don\'t chase yesterday\'s loss — wait for your setup.',
+    'yesterday was painful — patience is the antidote.',
+    'reset. yesterday doesn\'t care, neither should you.',
   ];
-  const GREETINGS_AFTERNOON = [
-    'Afternoon, {name}.',
-    'Good afternoon, {name}.',
-    'Hope the day\'s going well, {name}.',
-    'Still focused, {name}?',
-    'Steady on, {name}.',
+  const RECAP_BE = [
+    'break-even yesterday — capital preserved.',
+    'yesterday was flat — reset and read.',
+    'no harm yesterday — fresh chart today.',
+    'you saved your stops yesterday — solid.',
+    'yesterday was a non-event — that\'s fine.',
+    'BE days build careers — stay patient.',
+    'yesterday earned you the next opportunity.',
+    'break-even in tough tape is a win.',
+    'no damage yesterday — that\'s a result.',
+    'yesterday was discipline — same again today.',
+    'flat is the new green when conditions are messy.',
+    'capital intact — that\'s the job.',
   ];
-  const GREETINGS_EVENING = [
-    'Evening, {name}.',
-    'Good evening, {name}.',
-    'Winding down, {name}?',
-    'End-of-day review, {name}?',
-    'Reflective hour, {name}.',
-  ];
-  const GREETINGS_LATE_NIGHT = [
-    'Burning the midnight oil, {name}?',
-    'Late night, {name}.',
-    'Quiet hours, {name}.',
-  ];
-  const GREETINGS_GENERAL = [
-    'Hello, {name}.',
-    'Welcome back, {name}.',
-    'Good to see you, {name}.',
-    'Have a great session, {name}.',
-    'Ready to trade, {name}?',
-    'Let\'s do this, {name}.',
-    'Game face on, {name}.',
-    'Eyes on the chart, {name}.',
-    'Process over outcome, {name}.',
-    'Patience first, {name}.',
-    'Discipline wins, {name}.',
-    'Stick to the plan, {name}.',
-    'Wait for your setup, {name}.',
-    'No FOMO, {name}.',
-    'A+ setups only, {name}.',
-    'Trust the process, {name}.',
-    'One trade at a time, {name}.',
-    'Read first, react second, {name}.',
-    'Mind the risk, {name}.',
-    'Small bets, big patience, {name}.',
-    'Edge plus repetition, {name}.',
-    'Show up, {name}.',
-    'Trade what you see, {name}.',
-    'Watch the levels, {name}.',
-    'Let price come to you, {name}.',
-    'Quiet mind, sharp eyes, {name}.',
-    'Stay light on your feet, {name}.',
-    'Honor your stop, {name}.',
-    'Plan the trade, trade the plan, {name}.',
-    'Detach from the outcome, {name}.',
-    'Be water, {name}.',
-    'Boring is good, {name}.',
-    'Take what the market gives you, {name}.',
-    'Sit on your hands if needed, {name}.',
-    'Less is more, {name}.',
-  ];
-  // Context-aware pools — used when there's a recent trade (within 3 days).
-  // After a WIN — warm, understated, don't get cocky.
-  const GREETINGS_AFTER_WIN = [
-    'Nice one yesterday, {name}.',
-    'Last one went your way, {name}. Same setup, same focus.',
-    'Good read last time, {name}.',
-    'Yesterday\'s green doesn\'t guarantee today\'s, {name}.',
-    'Don\'t get clever now, {name}.',
-    'Keep doing what you\'re doing, {name}.',
-    'Banked one. Now bank another, {name}.',
-    'You earned that one, {name}. Earn the next.',
-    'Confidence is fine. Cockiness isn\'t, {name}.',
-    'Reset the dopamine, {name}. New day.',
-    'The market doesn\'t remember your last win, {name}.',
-    'Up one. Doesn\'t mean size up, {name}.',
-    'A win is a data point, {name}. Not a strategy.',
-  ];
-  // After a LOSS — cheeky, dry, never preachy. Take the piss without kicking.
-  const GREETINGS_AFTER_LOSS = [
-    'Back at it, {name}. The market giveth and taketh.',
-    'Yesterday was yesterday, {name}.',
-    'Don\'t avenge it, {name}.',
-    'Same chart, new day, {name}.',
-    'One bad trade isn\'t a bad trader, {name}.',
-    'No revenge, {name}. The market won\'t flinch.',
-    'Shake it off, {name}.',
-    'Even the best lose, {name}. Just don\'t lose twice.',
-    'Risk did its job, {name}. That\'s the point.',
-    'It\'s only -1R, {name}. There are more candles.',
-    'You knew this would happen sometimes, {name}.',
-    'The stop loss exists for a reason, {name}.',
-    'Lost the battle, win the war, {name}.',
-    'No tilt allowed, {name}.',
-    'Was that an A+ setup, {name}? Be honest.',
-    'Yesterday\'s loss isn\'t today\'s problem, {name}.',
-    'Process over outcome, {name}. Even when it stings.',
-    'Take the L, take a breath, {name}.',
-    'Don\'t chase, {name}. It never works.',
-  ];
-  // After a BE — dry, mildly amused, acknowledge the non-event.
-  const GREETINGS_AFTER_BE = [
-    'Break-even isn\'t broken, {name}.',
-    'BE counts as discipline, {name}.',
-    'You saved your stop. That\'s a win, {name}.',
-    'Better than a loss, {name}. Move on.',
-    'No harm, no foul, {name}.',
-    'Capital preserved, {name}. That\'s the job.',
-    'Break-even days build careers, {name}.',
-    'Not every session needs to print, {name}.',
-    'You read it, you exited. Solid, {name}.',
-    'BE in difficult conditions is a win, {name}.',
+  const SIMPLE_TAILS = [
+    'have a great session.',
+    'plenty of clean candles ahead.',
+    'stick to the plan.',
+    'A+ setups only.',
+    'patience first.',
+    'process over outcome.',
+    'one trade at a time.',
+    'quiet mind, sharp eyes.',
+    'wait for your setup.',
+    'eyes on the chart.',
+    'let price come to you.',
+    'no FOMO today.',
+    'discipline wins.',
+    'trade what you see, not what you hope.',
+    'small bets, big patience.',
+    'plan the trade, trade the plan.',
+    'honor your stop.',
+    'mind the risk.',
+    'show up and do the work.',
+    'boring is good.',
   ];
 
-  // Find the most recent trade across currentSeries + history. Returns null if none in last 3 days.
-  function getRecentTradeResult() {
+  // Find the most recent past day (within last 7) that had trades. Returns 'positive' | 'negative' | 'be' | null.
+  function getRecentDayOutcome() {
     const all = (typeof getAllLifetimeTrades === 'function') ? getAllLifetimeTrades() : [];
     if (all.length === 0) return null;
-    const latest = all.slice().sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-    if (!latest || !latest.date) return null;
-    const daysSince = (new Date() - new Date(latest.date)) / (1000 * 60 * 60 * 24);
-    if (daysSince > 3) return null; // too old to comment on
-    return latest.result; // 'Win' | 'Lose' | 'BE'
+    const byDate = {};
+    all.forEach(t => {
+      if (!t.date) return;
+      const d = new Date(t.date);
+      const key = d.toDateString();
+      if (!byDate[key]) byDate[key] = { date: d, trades: [] };
+      byDate[key].trades.push(t);
+    });
+    const sortedDays = Object.values(byDate).sort((a, b) => b.date - a.date);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    for (const day of sortedDays) {
+      const dayMidnight = new Date(day.date); dayMidnight.setHours(0, 0, 0, 0);
+      const daysAgo = Math.round((today - dayMidnight) / (1000 * 60 * 60 * 24));
+      if (daysAgo <= 0) continue;  // skip today
+      if (daysAgo > 7)  return null; // outside the window
+      const net = day.trades.reduce((s, t) => s + tradeNetPL(t), 0);
+      const wins = day.trades.filter(t => t.result === 'Win').length;
+      const losses = day.trades.filter(t => t.result === 'Lose').length;
+      const bes = day.trades.filter(t => t.result === 'BE').length;
+      if (net > 0) return 'positive';
+      if (net < 0) return 'negative';
+      if (bes > 0 && wins === 0 && losses === 0) return 'be';
+      return 'be'; // net 0 but mixed results — treat as BE-flavoured
+    }
+    return null;
   }
 
-  function pickGreetingTemplate() {
-    const hr = new Date().getHours();
-    // 60% chance to pull from the context-aware pool when a recent trade exists
-    const recent = getRecentTradeResult();
-    if (recent && Math.random() < 0.6) {
-      if (recent === 'Win')  return GREETINGS_AFTER_WIN[Math.floor(Math.random() * GREETINGS_AFTER_WIN.length)];
-      if (recent === 'Lose') return GREETINGS_AFTER_LOSS[Math.floor(Math.random() * GREETINGS_AFTER_LOSS.length)];
-      if (recent === 'BE')   return GREETINGS_AFTER_BE[Math.floor(Math.random() * GREETINGS_AFTER_BE.length)];
-    }
-    // Otherwise fall back to time-of-day pool + general
+  function pickTail(outcome) {
     let pool;
-    if (hr >= 5 && hr < 12)       pool = GREETINGS_MORNING.concat(GREETINGS_GENERAL);
-    else if (hr >= 12 && hr < 14) pool = GREETINGS_MIDDAY.concat(GREETINGS_GENERAL);
-    else if (hr >= 14 && hr < 18) pool = GREETINGS_AFTERNOON.concat(GREETINGS_GENERAL);
-    else if (hr >= 18 && hr < 23) pool = GREETINGS_EVENING.concat(GREETINGS_GENERAL);
-    else                          pool = GREETINGS_LATE_NIGHT.concat(GREETINGS_GENERAL);
+    if      (outcome === 'positive') pool = RECAP_POS;
+    else if (outcome === 'negative') pool = RECAP_NEG;
+    else if (outcome === 'be')       pool = RECAP_BE;
+    else                             pool = SIMPLE_TAILS;
     return pool[Math.floor(Math.random() * pool.length)];
   }
-  // Picked once per page load so it doesn't shuffle on every re-render
-  const _greetingTemplate = pickGreetingTemplate();
+
+  // Memoize so re-renders (e.g. after rename) don't reshuffle the line.
+  let _cachedTail = null;
+  let _cachedOpener = null;
 
   function renderBiasGreeting() {
     const el = document.getElementById('bias-greeting');
     if (!el) return;
-    const name = getName() || 'friend';
-    // Render the template with the name wrapped in a clickable span
+    const name = (data.userName && data.userName.trim()) || 'friend';
     const safeName = name.replace(/</g, '&lt;');
-    const html = _greetingTemplate.replace('{name}', `<span class="greet-name" id="greet-name" title="Click to change your name">${safeName}</span>`);
-    el.innerHTML = html;
-    // Wire the click handler for inline rename
+    const nameSpan = `<span class="greet-name" id="greet-name" title="Click to change your name">${safeName}</span>`;
+    if (!_cachedOpener) _cachedOpener = timeOfDayOpener();
+    if (!_cachedTail) {
+      const outcome = getRecentDayOutcome();
+      _cachedTail = pickTail(outcome);
+    }
+    el.innerHTML = `${_cachedOpener}, ${nameSpan}. ${_cachedTail.charAt(0).toUpperCase()}${_cachedTail.slice(1)}`;
     const nameEl = document.getElementById('greet-name');
     if (nameEl) nameEl.addEventListener('click', openInlineNameEdit);
   }
+
   function openInlineNameEdit() {
-    const wrap = document.getElementById('bias-greeting');
-    const current = getName() || '';
-    const inputHtml = _greetingTemplate.replace('{name}', `<input type="text" id="greet-name-input" value="${current.replace(/"/g, '&quot;')}" maxlength="40" />`);
-    wrap.innerHTML = inputHtml;
+    const nameEl = document.getElementById('greet-name');
+    if (!nameEl) return;
+    const current = (data.userName && data.userName.trim()) || '';
+    nameEl.outerHTML = `<input type="text" id="greet-name-input" value="${current.replace(/"/g, '&quot;')}" maxlength="40" />`;
     const input = document.getElementById('greet-name-input');
     input.focus();
     input.select();
