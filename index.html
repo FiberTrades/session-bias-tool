@@ -55,7 +55,7 @@
   .tab.active { color: var(--text); background: var(--bg-elev); }
   .tab.active::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 100%; height: 1px; background: var(--text); }
   .tab .num { font-family: 'Fraunces', serif; font-style: italic; font-size: 13px; margin-right: 6px; opacity: 0.6; }
-  .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin-top: 40px; padding-top: 28px; padding-bottom: 8px; }
+  .meta { display: grid; grid-template-columns: repeat(5, 1fr); gap: 32px; margin-top: 40px; padding-top: 28px; padding-bottom: 8px; }
   .meta-cell { display: flex; flex-direction: column; gap: 8px; }
   .meta-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.35em; color: var(--text-dim); }
   .meta-value { font-family: 'Fraunces', serif; font-size: 22px; letter-spacing: -0.01em; }
@@ -403,6 +403,10 @@
   .btn.danger:hover { background: var(--bad); color: var(--bg); }
   .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: var(--bg); padding: 14px 26px; font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1); z-index: 200; }
   .toast.show { transform: translateX(-50%) translateY(0); }
+  /* Session-alert variant — larger, mixed case, longer message */
+  .toast.session-alert { font-size: 14px; letter-spacing: 0.02em; text-transform: none; padding: 18px 28px; font-family: 'Fraunces', serif; font-weight: 400; }
+  .toast.session-alert.start { background: var(--good); color: var(--bg); }
+  .toast.session-alert.end   { background: var(--info); color: var(--bg); }
   .footer { margin-top: 80px; color: var(--text-dim); font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; text-align: center; }
   .footer .data-actions { margin-top: 14px; display: flex; justify-content: center; gap: 24px; }
   .footer .data-actions a { color: var(--text-dim); cursor: pointer; text-decoration: none; transition: color 200ms; }
@@ -484,6 +488,7 @@
       <div class="meta-cell"><span class="meta-label">Session</span><span class="meta-value meta-editable" id="meta-session" data-field="sessionName" title="Click to edit">London</span></div>
       <div class="meta-cell"><span class="meta-label">Window</span><span class="meta-value meta-editable" id="meta-window" data-field="window" title="Click to edit">08:00 — 10:00</span></div>
       <div class="meta-cell"><span class="meta-label">Date</span><span class="meta-value" id="today">—</span></div>
+      <div class="meta-cell"><span class="meta-label">Time</span><span class="meta-value" id="meta-time">—</span></div>
     </div>
   </header>
 
@@ -1142,6 +1147,95 @@
   const dateStr = today.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' });
   document.getElementById('today').textContent = dateStr;
 
+  // Live ticking clock — updates every second, user's local time (24h format, HH:MM:SS)
+  function renderMetaTime() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('meta-time').textContent = `${hh}:${mm}:${ss}`;
+    checkSessionBoundaryAlerts(now, `${hh}:${mm}`);
+  }
+  renderMetaTime();
+  setInterval(renderMetaTime, 1000);
+
+  // Session boundary alerts: fire once per day when local time reaches windowStart and windowEnd.
+  // Uses date-keyed flags so the alert only fires once even with reloads / multi-tab.
+  function checkSessionBoundaryAlerts(now, hhmm) {
+    if (!data || !data.settings) return;
+    const ws = data.settings.windowStart || '08:00';
+    const we = data.settings.windowEnd   || '10:00';
+    const todayKey = now.toISOString().slice(0, 10);
+    if (hhmm === ws && data._lastSessionStartAlert !== todayKey) {
+      data._lastSessionStartAlert = todayKey;
+      saveData();
+      fireSessionAlert('start');
+    }
+    if (hhmm === we && data._lastSessionEndAlert !== todayKey) {
+      data._lastSessionEndAlert = todayKey;
+      saveData();
+      fireSessionAlert('end');
+    }
+  }
+
+  // Audio context lazily created on first alert (browser autoplay rules require user gesture first;
+  // by the time a session alert fires, the user will have interacted with the page).
+  let _audioCtx = null;
+  function getAudioCtx() {
+    if (!_audioCtx) {
+      try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch { _audioCtx = null; }
+    }
+    return _audioCtx;
+  }
+  // Play a two-tone chime. Ascending (low → high) for start, descending (high → low) for end.
+  function playChime(kind) {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const freqs = kind === 'start' ? [600, 800] : [800, 600];
+    const now = ctx.currentTime;
+    freqs.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const startAt = now + i * 0.25;
+      const stopAt = startAt + 0.22;
+      // Soft fade in + fade out so it doesn't click
+      gain.gain.setValueAtTime(0.0001, startAt);
+      gain.gain.exponentialRampToValueAtTime(0.22, startAt + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+      osc.start(startAt);
+      osc.stop(stopAt + 0.05);
+    });
+  }
+
+  // Show the session-alert variant of the toast (larger, longer-lasting, color-coded)
+  function showSessionToast(message, kind) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('session-alert', kind, 'show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => {
+      toast.classList.remove('show');
+      // Defer the variant-class cleanup until after the slide-out transition completes
+      setTimeout(() => toast.classList.remove('session-alert', 'start', 'end'), 400);
+    }, 5000);
+  }
+
+  function fireSessionAlert(kind) {
+    const name = (data.userName && data.userName.trim()) || '';
+    const personal = name ? `, ${name}` : '';
+    const msg = kind === 'start'
+      ? `Session open — your window is live${personal}.`
+      : `Session closed — step away from the chart${personal}.`;
+    showSessionToast(msg, kind);
+    playChime(kind);
+  }
+
   let data = loadData();
   let calendarMonth = today.getMonth();
   let calendarYear = today.getFullYear();
@@ -1433,6 +1527,8 @@
     if (!Array.isArray(d.weeklyReviews)) d.weeklyReviews = [];
     if (!Array.isArray(d.monthlyReviews)) d.monthlyReviews = [];
     if (d._lastWeeklyPrompt === undefined) d._lastWeeklyPrompt = '';
+    if (d._lastSessionStartAlert === undefined) d._lastSessionStartAlert = '';
+    if (d._lastSessionEndAlert === undefined) d._lastSessionEndAlert = '';
     if (d._skipNudgeDismissed === undefined) d._skipNudgeDismissed = '';
     // Migrate snapshots in stored trades
     [...(d.currentSeries || []), ...(d.history || []).flatMap(s => s.trades || [])].forEach(t => {
@@ -3624,6 +3720,8 @@
   }
   function showToast(msg) {
     const toast = document.getElementById('toast');
+    // Strip any lingering session-alert variant classes in case a session toast was recently shown
+    toast.classList.remove('session-alert', 'start', 'end');
     toast.textContent = msg;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 1800);
