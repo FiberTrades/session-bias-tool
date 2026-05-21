@@ -55,7 +55,7 @@
   .tab.active { color: var(--text); background: var(--bg-elev); }
   .tab.active::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 100%; height: 1px; background: var(--text); }
   .tab .num { font-family: 'Fraunces', serif; font-style: italic; font-size: 13px; margin-right: 6px; opacity: 0.6; }
-  .meta { display: grid; grid-template-columns: repeat(5, 1fr); gap: 32px; margin-top: 40px; padding-top: 28px; padding-bottom: 8px; }
+  .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin-top: 40px; padding-top: 28px; padding-bottom: 8px; }
   .meta-cell { display: flex; flex-direction: column; gap: 8px; }
   .meta-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.35em; color: var(--text-dim); }
   .meta-value { font-family: 'Fraunces', serif; font-size: 22px; letter-spacing: -0.01em; }
@@ -65,6 +65,7 @@
   .meta-edit-wrap input { background: var(--bg-elev); border: 1px solid var(--text-mid); padding: 4px 8px; color: var(--text); font-family: 'Fraunces', serif; font-size: 20px; outline: none; }
   .meta-edit-wrap input[type="time"] { font-size: 14px; padding: 6px 8px; font-family: 'DM Mono', monospace; }
   .meta-edit-wrap button { background: var(--text); color: var(--bg); border: none; padding: 6px 12px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; }
+  .meta-edit-error { margin-top: 8px; font-size: 11px; color: var(--bad); font-family: 'DM Mono', monospace; font-style: normal; letter-spacing: 0; line-height: 1.4; }
   /* Bias-tab greeting — one-line personal opener at top of Bias page */
   .bias-greeting { font-family: 'Fraunces', serif; font-size: 20px; color: var(--text); margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); font-style: italic; letter-spacing: -0.01em; line-height: 1.4; }
   .bias-greeting .greet-name { font-style: normal; cursor: pointer; transition: color 200ms; border-bottom: 1px dashed transparent; padding-bottom: 1px; }
@@ -484,8 +485,7 @@
 
     <div class="meta">
       <div class="meta-cell"><span class="meta-label">Pair</span><span class="meta-value meta-editable" id="meta-pair" data-field="pair" title="Click to edit">EUR/USD</span></div>
-      <div class="meta-cell"><span class="meta-label">Session</span><span class="meta-value meta-editable" id="meta-session" data-field="sessionName" title="Click to edit">London</span></div>
-      <div class="meta-cell"><span class="meta-label">Window</span><span class="meta-value meta-editable" id="meta-window" data-field="window" title="Click to edit">08:00 — 10:00</span></div>
+      <div class="meta-cell"><span class="meta-label">Session</span><span class="meta-value meta-editable" id="meta-session" data-field="sessionName" title="Click to edit. Type e.g. 'London 8-10AM' to set the trading window inline.">London</span></div>
       <div class="meta-cell"><span class="meta-label">Date</span><span class="meta-value" id="today">—</span></div>
       <div class="meta-cell"><span class="meta-label">Time</span><span class="meta-value" id="meta-time">—</span></div>
     </div>
@@ -1246,13 +1246,44 @@
   setInterval(renderMetaTime, 1000);
   let equityMode = 'balance';
 
+  // Parse an embedded time range out of a Session-name string.
+  // Returns { start: 'HH:MM', end: 'HH:MM' } when a valid range is found, otherwise null.
+  // Accepts: '8-10AM', '08:00-10:00', '8:30-10:30', '9 to 11', '1:30PM-3:30PM', '8AM-10AM', etc.
+  function parseSessionTimes(str) {
+    if (!str || typeof str !== 'string') return null;
+    // Regex: capture two time tokens (each: digits, optional :MM, optional AM/PM)
+    // separated by '-', '–', '—', or ' to '.
+    const re = /(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:-|–|—|to)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i;
+    const m = str.match(re);
+    if (!m) return null;
+    let h1 = parseInt(m[1], 10);
+    let mm1 = m[2] ? parseInt(m[2], 10) : 0;
+    const ap1 = (m[3] || '').toLowerCase();
+    let h2 = parseInt(m[4], 10);
+    let mm2 = m[5] ? parseInt(m[5], 10) : 0;
+    const ap2 = (m[6] || '').toLowerCase();
+    // If only the second time has AM/PM, apply it to the first too (common shorthand: "8-10AM")
+    const effAp1 = ap1 || ap2;
+    const effAp2 = ap2 || ap1;
+    function to24(h, ap) {
+      if (!ap) return h;            // no AM/PM → already 24h
+      if (ap === 'am') return h === 12 ? 0 : h;
+      if (ap === 'pm') return h === 12 ? 12 : h + 12;
+      return h;
+    }
+    h1 = to24(h1, effAp1);
+    h2 = to24(h2, effAp2);
+    // Sanity bounds
+    if (h1 < 0 || h1 > 23 || h2 < 0 || h2 > 23 || mm1 < 0 || mm1 > 59 || mm2 < 0 || mm2 > 59) return null;
+    const start = String(h1).padStart(2, '0') + ':' + String(mm1).padStart(2, '0');
+    const end   = String(h2).padStart(2, '0') + ':' + String(mm2).padStart(2, '0');
+    return { start, end };
+  }
+
   // Render configurable meta header values from settings
   function renderMetaHeader() {
     document.getElementById('meta-pair').textContent = data.settings.pair || 'EUR/USD';
     document.getElementById('meta-session').textContent = data.settings.sessionName || 'London';
-    const ws = data.settings.windowStart || '08:00';
-    const we = data.settings.windowEnd || '10:00';
-    document.getElementById('meta-window').textContent = `${ws} — ${we}`;
   }
   renderMetaHeader();
 
@@ -1286,7 +1317,21 @@
         data.settings.windowEnd = we;
       } else {
         const v = (document.getElementById(`meta-input-${field}`).value || '').trim();
-        if (v) data.settings[field] = v;
+        if (!v) return; // empty — keep input open
+        // Session field special-case: REQUIRES an embedded time range. If parsing fails,
+        // show an inline error and keep the input open so the user can fix it.
+        if (field === 'sessionName') {
+          const parsed = parseSessionTimes(v);
+          if (!parsed) {
+            showMetaEditError(el, 'Include a time range, e.g. "London 8-10AM"');
+            return; // don't commit, don't close
+          }
+          data.settings[field] = v;
+          data.settings.windowStart = parsed.start;
+          data.settings.windowEnd   = parsed.end;
+        } else {
+          data.settings[field] = v;
+        }
       }
       saveData();
       el.dataset.editing = '';
@@ -1308,6 +1353,23 @@
         }
       });
     });
+  }
+  // Show a small inline error below the meta-edit input. Auto-clears when the user starts typing.
+  function showMetaEditError(el, message) {
+    // Remove any existing error
+    const existing = el.querySelector('.meta-edit-error');
+    if (existing) existing.remove();
+    const errEl = document.createElement('div');
+    errEl.className = 'meta-edit-error';
+    errEl.textContent = message;
+    el.appendChild(errEl);
+    // Clear on next input event
+    const input = el.querySelector('input');
+    if (input) {
+      const clear = () => { if (errEl.parentNode) errEl.remove(); input.removeEventListener('input', clear); };
+      input.addEventListener('input', clear);
+      input.focus();
+    }
   }
 
   // ----------------------------------------------------------------------------
@@ -1446,10 +1508,22 @@
     if (!d.settings) d.settings = { startingBalance: 10000, beThreshold: 10 };
     if (d.settings.beThreshold === undefined) d.settings.beThreshold = 10;
     if (d.settings.pair === undefined) d.settings.pair = 'EUR/USD';
-    if (d.settings.sessionName === undefined) d.settings.sessionName = 'London';
+    if (d.settings.sessionName === undefined) d.settings.sessionName = 'London 8-10AM';
     if (d.settings.windowStart === undefined) d.settings.windowStart = '08:00';
     if (d.settings.windowEnd === undefined) d.settings.windowEnd = '10:00';
     if (d.settings.sessionDayCutoff === undefined) d.settings.sessionDayCutoff = '22:00';
+    // One-time backfill: if existing sessionName has no embedded time range, append the current window.
+    if (!d._sessionNameTimesBackfilled) {
+      try {
+        if (typeof parseSessionTimes === 'function') {
+          const parsed = parseSessionTimes(d.settings.sessionName);
+          if (!parsed) {
+            d.settings.sessionName = `${d.settings.sessionName} ${d.settings.windowStart}-${d.settings.windowEnd}`;
+          }
+        }
+      } catch {}
+      d._sessionNameTimesBackfilled = true;
+    }
     if (!d.review) d.review = newReviewBlank();
     if (!d.bias) d.bias = newBiasBlank();
     if (!d.currentSeries) d.currentSeries = [];
