@@ -1148,16 +1148,18 @@
   document.getElementById('today').textContent = dateStr;
 
   // Live ticking clock — updates every second, user's local time (24h format, HH:MM:SS)
+  // Definition only — first call deferred until after data = loadData() runs below,
+  // because the boundary-check reads data.settings.
   function renderMetaTime() {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
     const ss = String(now.getSeconds()).padStart(2, '0');
     document.getElementById('meta-time').textContent = `${hh}:${mm}:${ss}`;
-    checkSessionBoundaryAlerts(now, `${hh}:${mm}`);
+    if (typeof data !== 'undefined' && data && data.settings) {
+      checkSessionBoundaryAlerts(now, `${hh}:${mm}`);
+    }
   }
-  renderMetaTime();
-  setInterval(renderMetaTime, 1000);
 
   // Session boundary alerts: fire once per day when local time reaches windowStart and windowEnd.
   // Uses date-keyed flags so the alert only fires once even with reloads / multi-tab.
@@ -1240,6 +1242,9 @@
   let calendarMonth = today.getMonth();
   let calendarYear = today.getFullYear();
   let yearGlanceYear = today.getFullYear();
+  // Now that `data` exists, kick off the live clock + boundary-alert ticker
+  renderMetaTime();
+  setInterval(renderMetaTime, 1000);
   let equityMode = 'balance';
 
   // Render configurable meta header values from settings
