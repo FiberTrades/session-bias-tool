@@ -59,8 +59,8 @@
   .meta-cell { display: flex; flex-direction: column; gap: 8px; }
   .meta-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.35em; color: var(--text-dim); }
   .meta-value { font-family: 'Fraunces', serif; font-size: 22px; letter-spacing: -0.01em; }
-  .meta-value.meta-editable { cursor: pointer; border-bottom: 1px dashed transparent; transition: border-color 200ms, color 200ms; padding-bottom: 2px; }
-  .meta-value.meta-editable:hover { border-bottom-color: var(--text-mid); color: var(--text); }
+  .meta-value.meta-editable { cursor: pointer; transition: color 200ms; }
+  .meta-value.meta-editable:hover { color: var(--text-mid); }
   .meta-edit-wrap { display: inline-flex; align-items: center; gap: 8px; }
   .meta-edit-wrap input { background: var(--bg-elev); border: 1px solid var(--text-mid); padding: 4px 8px; color: var(--text); font-family: 'Fraunces', serif; font-size: 20px; outline: none; }
   .meta-edit-wrap input[type="time"] { font-size: 14px; padding: 6px 8px; font-family: 'DM Mono', monospace; }
@@ -1194,8 +1194,10 @@
       if (typeof renderStats === 'function') renderStats();
       if (document.getElementById('page-trades').classList.contains('active') && typeof renderTradesStats === 'function') renderTradesStats();
     }
-    el.querySelector('#meta-edit-done').addEventListener('click', commit);
+    el.querySelector('#meta-edit-done').addEventListener('click', e => { e.stopPropagation(); commit(); });
+    // Stop input clicks from bubbling to parent (would re-trigger edit-open)
     el.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('click', e => e.stopPropagation());
       inp.addEventListener('keydown', e => {
         if (e.key === 'Enter') commit();
         else if (e.key === 'Escape') {
