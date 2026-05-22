@@ -368,7 +368,7 @@
   .modal-stat .v.good { color: var(--good); }
   .modal-stat .v.bad  { color: var(--bad); }
   .modal-trades { margin-top: 16px; }
-  .modal-trade-row { display: grid; grid-template-columns: 28px 140px 70px 80px 60px 110px 70px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 4px; font-size: 11px; width: fit-content; max-width: 100%; cursor: pointer; transition: background 150ms; }
+  .modal-trade-row { display: grid; grid-template-columns: 28px 140px 70px 80px 60px 60px 110px 70px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 4px; font-size: 11px; width: fit-content; max-width: 100%; cursor: pointer; transition: background 150ms; }
   .modal-trade-row.headers { cursor: default; }
   .modal-trade-row:not(.headers):hover { background: var(--border-2); }
   .modal-trade-cell { background: var(--bg); padding: 10px 10px; }
@@ -472,7 +472,7 @@
     .year-months { grid-template-columns: repeat(6, 1fr); }
     .modal-stats { grid-template-columns: 1fr 1fr; }
     .modal-trade-row { grid-template-columns: 22px 1fr 60px 50px 60px; }
-    .modal-trade-row .modal-trade-cell:nth-child(6), .modal-trade-row .modal-trade-cell:nth-child(7) { display: none; }
+    .modal-trade-row .modal-trade-cell:nth-child(6), .modal-trade-row .modal-trade-cell:nth-child(7), .modal-trade-row .modal-trade-cell:nth-child(8) { display: none; }
     .tv-row { grid-template-columns: 80px 60px 70px 50px 70px 40px; font-size: 10px; }
     .tv-row .tv-cell:nth-child(4), .tv-row .tv-cell:nth-child(6), .tv-row .tv-cell:nth-child(8) { display: none; }
     .edit-trade-form { grid-template-columns: 1fr; gap: 6px 0; }
@@ -1029,10 +1029,8 @@
       <div class="label">R-Multiple</div>
       <div class="field"><input id="edit-r" type="number" step="any" placeholder="e.g. 3.96" /></div>
 
-      <div id="edit-potr-row" style="display:none;">
-        <div class="label">Potential R <span style="color:var(--text-dim);font-size:10px;text-transform:none;letter-spacing:0;">(how far the move actually went)</span></div>
-        <div class="field"><input id="edit-potr" type="number" step="any" placeholder="e.g. 5 (optional)" /></div>
-      </div>
+      <div class="label edit-potr-row" style="display:none;">Potential R <span style="color:var(--text-dim);font-size:10px;text-transform:none;letter-spacing:0;">(how far the move actually went)</span></div>
+      <div class="field edit-potr-row" style="display:none;"><input id="edit-potr" type="number" step="any" placeholder="e.g. 5 (optional)" /></div>
 
       <div class="label">Side</div>
       <div class="field"><select id="edit-side">
@@ -3530,6 +3528,7 @@
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Side</div>
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Result</div>
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">R</div>
+      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;" title="Potential R — how far the move actually went">Pot R</div>
       <div class="modal-trade-cell right" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Net £</div>
       <div class="modal-trade-cell right" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Hold</div>
     </div>`;
@@ -3539,12 +3538,18 @@
       const cls = t.result === 'Win' ? 'good' : t.result === 'Lose' ? 'bad' : 'be';
       const tagCls = t.result === 'Win' ? 'win' : t.result === 'Lose' ? 'lose' : 'be';
       const time = t.entryTime && t.exitTime ? `${t.entryTime} – ${t.exitTime}` : (t.entryTime || '—');
+      // Potential R column — only meaningful for Wins. Show value if logged, else "—".
+      const potR = (t.result === 'Win' && typeof t.potentialR === 'number' && !isNaN(t.potentialR))
+        ? t.potentialR.toFixed(2)
+        : '—';
+      const potRCls = (t.result === 'Win' && typeof t.potentialR === 'number' && !isNaN(t.potentialR)) ? '' : 'be'; // dim for non-Win or unlogged
       tHtml += `<div class="modal-trade-row" data-id="${t.id}" title="Click to edit">
         <div class="modal-trade-cell center">${i + 1}</div>
         <div class="modal-trade-cell">${time}</div>
         <div class="modal-trade-cell center">${t.side || '—'}</div>
         <div class="modal-trade-cell center"><span class="modal-tag ${tagCls}">${t.result}</span></div>
         <div class="modal-trade-cell center">${t.r !== undefined && t.r !== null ? (typeof t.r === 'number' ? t.r.toFixed(2) : t.r) : '—'}</div>
+        <div class="modal-trade-cell center ${potRCls}">${potR}</div>
         <div class="modal-trade-cell right ${cls}">${fmtMoney(tn)}</div>
         <div class="modal-trade-cell right">${formatMinutes(hm)}</div>
       </div>`;
@@ -3669,7 +3674,7 @@
     });
     document.getElementById('edit-r').value = t.r != null ? t.r : '';
     document.getElementById('edit-potr').value = t.potentialR != null ? t.potentialR : '';
-    document.getElementById('edit-potr-row').style.display = (t.result === 'Win') ? '' : 'none';
+    document.querySelectorAll('.edit-potr-row').forEach(el => { el.style.display = (t.result === 'Win') ? '' : 'none'; });
     document.getElementById('edit-side').value = t.side || '';
     document.getElementById('edit-type').value = t.type || '';
     document.getElementById('edit-entry').value = t.entryTime || '';
@@ -3712,7 +3717,7 @@
     btn.addEventListener('click', () => {
       editingResult = btn.dataset.result;
       document.querySelectorAll('.edit-result-toggle button').forEach(b => b.classList.toggle('active', b === btn));
-      document.getElementById('edit-potr-row').style.display = (editingResult === 'Win') ? '' : 'none';
+      document.querySelectorAll('.edit-potr-row').forEach(el => { el.style.display = (editingResult === 'Win') ? '' : 'none'; });
       if (editingResult !== 'Win') document.getElementById('edit-potr').value = '';
       updateEditNetPL();
     });
@@ -4258,6 +4263,40 @@
     'good work — now reset the dopamine.',
     'banked yesterday — focus on today.',
     'a clean day yesterday — keep the criteria tight.',
+    'yesterday you read it right.',
+    'the tape gave, you took — fair trade.',
+    'fills were kind yesterday — don\'t expect them today.',
+    'yesterday\'s ticket is closed — next setup, please.',
+    'execution was on yesterday — same hands today.',
+    'the chart was friendly — don\'t mistake it for forever.',
+    'good day yesterday. now act like it never happened.',
+    'yesterday was a "yes" — wait for the next clear yes.',
+    'patient wins yesterday — patient eyes today.',
+    'yesterday was a job done. show up for work again.',
+    'green yesterday is a tax break, not a license.',
+    'you found the setup yesterday. find the next one.',
+    'yesterday\'s gains pay for tomorrow\'s losses — be ready for both.',
+    'a win is feedback, not a trophy. yesterday was feedback.',
+    'the market complimented you yesterday. don\'t propose marriage.',
+    'yesterday: A+. today: also A+ or sit out.',
+    'won yesterday because you waited. wait again.',
+    'yesterday earned a small smile. keep the rest.',
+    'right read, right trigger, right size yesterday. encore.',
+    'banked. cooled. ready.',
+    'profits aren\'t personality — keep the ego flat.',
+    'you took what was offered. don\'t demand more today.',
+    'good entries yesterday. trust the same filters.',
+    'the chart paid the rent yesterday. landlord is fair, not generous.',
+    'one good day doesn\'t mean two — it means one good day.',
+    'yesterday\'s win is already priced in. today is fresh.',
+    'yesterday: clean execution. today: same recipe.',
+    'the read was right yesterday. honor the same process.',
+    'profits compound — but only if discipline does.',
+    'you won the right way yesterday. that\'s the actual win.',
+    'good fills yesterday — don\'t force them today.',
+    'patience paid yesterday. patience pays tomorrow.',
+    'banked yesterday — now play defense.',
+    'one in the books. cool head for the next.',
   ];
   const RECAP_NEG = [
     'yesterday stung — don\'t avenge it.',
@@ -4280,6 +4319,41 @@
     'don\'t chase yesterday\'s loss — wait for your setup.',
     'yesterday was painful — patience is the antidote.',
     'reset. yesterday doesn\'t care, neither should you.',
+    'the chart owed you nothing yesterday. still doesn\'t.',
+    'yesterday stopped you out. the stop did its job.',
+    'red ink yesterday is just red ink. write fresh today.',
+    'every trader has yesterdays like that.',
+    'yesterday was a lesson disguised as a loss.',
+    'one bad fill, one bad read — doesn\'t define you.',
+    'the market took a slice yesterday. it always does, eventually.',
+    'yesterday was a haircut, not a beheading.',
+    'red day, calm head. that\'s the only choice.',
+    'yesterday hurt. so does revenge trading. choose.',
+    'losses sharpen edges. yesterday sharpened something.',
+    'the tape ran against you. fine. wait for it to come back.',
+    'yesterday: a tuition payment to the market.',
+    'no rebuilds today. just one good setup.',
+    'sit on your hands until conviction returns.',
+    'yesterday was rough. the next trade isn\'t a rescue mission.',
+    'red yesterday doesn\'t require red today.',
+    'losing is half the game. you played it.',
+    'breathe. read. wait. nothing more.',
+    'yesterday\'s loss is paid in full. don\'t pay interest.',
+    'one stopout doesn\'t change your edge.',
+    'the market doesn\'t apologize. don\'t expect it to.',
+    'yesterday was honest feedback. take it.',
+    'no chase. no force. no revenge. just patience.',
+    'yesterday\'s -1R is yesterday\'s. don\'t carry it.',
+    'tough session. log it, learn, move on.',
+    'a loss is a loss is a loss. one is fine.',
+    'the loss did its work. now you do yours.',
+    'red yesterday isn\'t a curse — it\'s a candle.',
+    'losses are part of the spec. read the manual.',
+    'yesterday: stopped. today: clear-eyed.',
+    'the stop saved you. thank it and move on.',
+    'one tough day. now show up like a professional.',
+    'yesterday was the price of admission.',
+    'no doubling. no widening. no narrative. just the plan.',
   ];
   const RECAP_BE = [
     'break-even yesterday — capital preserved.',
@@ -4294,6 +4368,24 @@
     'yesterday was discipline — same again today.',
     'flat is the new green when conditions are messy.',
     'capital intact — that\'s the job.',
+    'yesterday: capital alive. that\'s enough.',
+    'flat day, sharp eyes. trade ready.',
+    'yesterday you read the room and stepped aside. good.',
+    'no fireworks yesterday. no scars either.',
+    'BE means you protected the account. respect that.',
+    'yesterday was a chess move, not a checkers brawl.',
+    'flat yesterday. you didn\'t feed the market — well done.',
+    'the chart didn\'t talk yesterday. you didn\'t shout. good match.',
+    'capital live, edge intact. that\'s a successful session.',
+    'no edge yesterday, no risk taken. that\'s the discipline most miss.',
+    'yesterday: clean exit. today: clean read.',
+    'flat is information too. file it.',
+    'you stepped away from a fight yesterday. that\'s a skill.',
+    'the market offered nothing. you accepted nothing. fair.',
+    'BE means you read the conditions right. trust that read again.',
+    'a flat day in messy tape is a quiet win.',
+    'yesterday: composed. today: same.',
+    'no story to write from yesterday. that\'s a good chapter.',
   ];
   const SIMPLE_TAILS = [
     'have a great session.',
@@ -4316,6 +4408,21 @@
     'mind the risk.',
     'show up and do the work.',
     'boring is good.',
+    'the best trade is sometimes no trade.',
+    'wait for conviction.',
+    'one good setup is enough.',
+    'read first, react second.',
+    'sit with the chart, not against it.',
+    'no force, no chase.',
+    'the market will give you a chance.',
+    'sharpen the criteria, not the size.',
+    'patience is a position.',
+    'trade your levels, not your feelings.',
+    'less is more.',
+    'cool head, clear chart.',
+    'good entries beat smart exits.',
+    'wait for the setup to come to you.',
+    'execution over prediction.',
   ];
 
   // Find the most recent past day (within last 7) that had trades. Returns 'positive' | 'negative' | 'be' | null.
