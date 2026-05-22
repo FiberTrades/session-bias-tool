@@ -3417,21 +3417,17 @@
       <div class="history-cell">W / L / BE</div>
       <div class="history-cell right">Net R</div>
     </div>`;
-    // Render one breakdown row. Empty rows render very compactly + dimmed so the eye skips.
+    // Render one breakdown row. No empty/filled split — the "0" / "—" placeholders tell the story.
+    // (Previously used an `empty` class which collided with the global .empty empty-state card style.)
     const rowFor = (labelText, s) => {
-      const isEmpty = s.count === 0;
-      const wrCell = s.wr !== null ? `${s.wr}%` : `<span style="color:var(--text-dim);">—</span>`;
-      const wlbeCell = isEmpty
-        ? `<span style="color:var(--text-dim);">0 / 0 / 0</span>`
-        : `<span class="wlbe-w">${s.w}</span><span class="wlbe-sep">/</span><span class="wlbe-l">${s.l}</span><span class="wlbe-sep">/</span><span class="wlbe-be">${s.be}</span>`;
-      const netStr = isEmpty ? '—' : fmtNetUnit(s);
-      const netCls = isEmpty ? '' : netUnitCls(s);
-      return `<div class="history-row${isEmpty ? ' empty' : ''}">
+      const wrCell = s.wr !== null ? `${s.wr}%` : `—`;
+      const wlbeCell = `<span class="wlbe-w">${s.w}</span><span class="wlbe-sep">/</span><span class="wlbe-l">${s.l}</span><span class="wlbe-sep">/</span><span class="wlbe-be">${s.be}</span>`;
+      return `<div class="history-row">
         <div class="history-cell label">${labelText}</div>
         <div class="history-cell">${s.count}</div>
         <div class="history-cell">${wrCell}</div>
         <div class="history-cell">${wlbeCell}</div>
-        <div class="history-cell right ${netCls}">${netStr}</div>
+        <div class="history-cell right ${netUnitCls(s)}">${fmtNetUnit(s)}</div>
       </div>`;
     };
 
