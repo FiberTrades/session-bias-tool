@@ -170,7 +170,15 @@
   .stats-summary { margin-top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
   .stats-summary-2col { grid-template-columns: repeat(2, 1fr); }
   .stats-summary-3col { grid-template-columns: repeat(3, 1fr); }
+  .stats-summary-4col { grid-template-columns: repeat(4, 1fr); }
   .stats-summary-6col { grid-template-columns: repeat(3, 1fr); }
+  /* Net/Gross P&L cell — toggle styling inside the label */
+  .pnl-toggle { display: inline-flex; align-items: center; gap: 6px; }
+  .pnl-toggle-opt { cursor: pointer; transition: color 200ms; padding: 1px 2px; }
+  .pnl-toggle-opt:not(.active) { color: var(--text-dim); opacity: 0.5; }
+  .pnl-toggle-opt:not(.active):hover { color: var(--text-mid); opacity: 0.9; }
+  .pnl-toggle-opt.active { color: var(--text-dim); opacity: 1; cursor: default; }
+  .pnl-toggle-sep { color: var(--border-2); }
   .stat-value.dd { color: var(--bad); }
   .stat-value.dd.zero { color: var(--good); }
   .stat-cell { background: var(--bg); padding: 26px 18px; text-align: center; position: relative; }
@@ -781,8 +789,6 @@
       <div class="stat-cell"><div class="stat-tooltip">Total R left on the table across wins in your current series. Potential R minus actual R captured. Only counts wins with Potential R logged.</div><div class="stat-label">R Left (Series)</div><div class="stat-value" id="stat-rleft">—</div></div>
     </div>
 
-    <div id="series-mfe"></div>
-
     <div class="current-series">
       <div class="current-series-header">
         <div class="current-series-title">Current Series</div>
@@ -792,21 +798,6 @@
       <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-top:8px;" id="current-tally">No trades logged yet</div>
       <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;font-style:italic;">Click any trade dot to edit or delete</div>
     </div>
-
-    <section>
-      <div class="section-header"><span class="section-num">—</span><span class="section-title">Lifetime Totals</span></div>
-      <p class="section-hint">Across every trade ever logged.</p>
-      <div class="stats-summary" style="margin-top:0;">
-        <div class="stat-cell"><div class="stat-tooltip">Number of complete series of 10 trades you've finished.</div><div class="stat-label">Total Series</div><div class="stat-value" id="lt-series">0</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) across all trades. BEs excluded.</div><div class="stat-label">Win Rate</div><div class="stat-value" id="lt-winrate">—</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Net R across all trades ever logged.</div><div class="stat-label">Total R</div><div class="stat-value" id="lt-total">0</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R. Above 1.5 = solid edge.</div><div class="stat-label">Profit Factor</div><div class="stat-value" id="lt-pf">—</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Average R of all winning trades.</div><div class="stat-label">Avg R per Win</div><div class="stat-value" id="lt-avgwin">—</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Average R per trade across all trades.</div><div class="stat-label">Expectancy</div><div class="stat-value" id="lt-exp">—</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Total R left on the table across all winning trades ever logged. Potential R minus actual R captured. Only counts wins with Potential R logged.</div><div class="stat-label">R Left</div><div class="stat-value" id="lt-rleft">—</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Best and worst completed series in net R.</div><div class="stat-label">Best / Worst</div><div class="stat-value medium" id="lt-extremes">—</div></div>
-      </div>
-    </section>
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title">Series History</span></div>
@@ -829,13 +820,25 @@
       <span class="defaults-label" style="font-size:8px;margin-left:auto;">Risk &amp; Costs defaults are set in Review tab</span>
     </div>
 
-    <div class="stats-summary stats-summary-6col" style="margin-top:24px;">
-      <div class="stat-cell"><div class="stat-tooltip">Net profit/loss across every trade you've ever logged. Already accounts for risk, R-multiple, and costs (commissions + spread).</div><div class="stat-label">Net P&L</div><div class="stat-value" id="kpi-netpl">£0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Profit before any costs are deducted. The "ideal" outcome if you paid zero commission and zero spread.</div><div class="stat-label">Gross P&L</div><div class="stat-value medium" id="kpi-gross">£0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label">Total Costs</div><div class="stat-value medium" id="kpi-costs">£0</div></div>
+    <div class="stats-summary stats-summary-4col" style="margin-top:24px;">
       <div class="stat-cell"><div class="stat-tooltip">Your current account balance: Starting Balance (set above) plus Net P&L.</div><div class="stat-label">Account Balance</div><div class="stat-value medium" id="kpi-balance">£0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R across all trades. Above 1.5 = solid edge.</div><div class="stat-label">Profit Factor</div><div class="stat-value" id="kpi-pf">—</div></div>
+      <div class="stat-cell" id="kpi-pnl-cell">
+        <div class="stat-tooltip">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap.</div>
+        <div class="stat-label">
+          <span class="pnl-toggle">
+            <span class="pnl-toggle-opt" data-mode="net">Net P&L</span>
+            <span class="pnl-toggle-sep">·</span>
+            <span class="pnl-toggle-opt" data-mode="gross">Gross P&L</span>
+          </span>
+        </div>
+        <div class="stat-value" id="kpi-pnl">£0</div>
+      </div>
+      <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label">Total Costs</div><div class="stat-value medium" id="kpi-costs">£0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) across every trade ever logged. BEs excluded.</div><div class="stat-label">Win Rate</div><div class="stat-value" id="kpi-winrate">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Net R across every trade ever logged.</div><div class="stat-label">Total R</div><div class="stat-value" id="kpi-totalr">0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Total R left on the table across all winning trades ever logged. Potential R minus actual R captured. Only counts wins with Potential R logged.</div><div class="stat-label">R Left</div><div class="stat-value" id="kpi-rleft">—</div></div>
       <div class="stat-cell"><div class="stat-tooltip">Average R per trade across all trades. Positive = profitable system.</div><div class="stat-label">Expectancy</div><div class="stat-value" id="kpi-exp">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R across all trades. Above 1.5 = solid edge.</div><div class="stat-label">Profit Factor</div><div class="stat-value" id="kpi-pf">—</div></div>
     </div>
 
     <div class="chart-card">
@@ -922,16 +925,8 @@
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title">Trade Time Analysis</span></div>
-      <p class="section-hint">Performance by 15-minute slot within your session window. Trades outside the window are grouped separately.</p>
+      <p class="section-hint">When you trade best, worst, and most often. Bucket size adapts to your sample size — narrower as you log more trades.</p>
       <div id="time-analysis-summary"></div>
-      <div id="time-analysis-table" class="time-analysis-table"></div>
-    </section>
-
-    <section>
-      <div class="section-header"><span class="section-num">—</span><span class="section-title">Trade Duration Analysis</span></div>
-      <p class="section-hint">Performance by hold time. Tells you which holding durations are profitable for your style.</p>
-      <div id="duration-analysis-summary"></div>
-      <div id="duration-analysis-table" class="time-analysis-table"></div>
     </section>
 
     <section>
@@ -1526,6 +1521,7 @@
     if (d.settings.windowStart === undefined) d.settings.windowStart = '08:00';
     if (d.settings.windowEnd === undefined) d.settings.windowEnd = '10:00';
     if (d.settings.sessionDayCutoff === undefined) d.settings.sessionDayCutoff = '22:00';
+    if (d.settings.pnlView === undefined) d.settings.pnlView = 'net';
     // One-time backfill: if existing sessionName has no embedded time range, append the current window.
     if (!d._sessionNameTimesBackfilled) {
       try {
@@ -2516,7 +2512,6 @@
   });
   function renderStats() {
     const all = getAllLifetimeTrades();
-    const totalSeries = data.history.length;
 
     // Compute a stats bundle from any trade array — used for both current-series and lifetime grids.
     function computeStatsBundle(trades) {
@@ -2564,9 +2559,7 @@
     }
 
     const cur = computeStatsBundle(data.currentSeries || []);
-    const lt  = computeStatsBundle(all);
     applyBundleToGrid(cur, 'stat');
-    applyBundleToGrid(lt,  'lt');
 
     // R Left (Series) — scoped to current series only
     const currentSeriesWins = (data.currentSeries || []).filter(t => t.result === 'Win');
@@ -2581,38 +2574,6 @@
       rLeftEl.textContent = sign + seriesRLeft.toFixed(2) + 'R';
       rLeftEl.className = 'stat-value' + (seriesRLeft > 0.5 ? ' bad' : '');
     }
-
-    // Lifetime-only stats: Total Series, R Left, Best/Worst
-    document.getElementById('lt-series').textContent = totalSeries;
-
-    // Lifetime R Left on Table — across all logged wins ever
-    const allWins = all.filter(t => t.result === 'Win');
-    const ltRLeftTracked = allWins.filter(t => typeof t.potentialR === 'number' && !isNaN(t.potentialR));
-    const ltRLeft = ltRLeftTracked.reduce((s, t) => s + ((t.potentialR || 0) - (parseFloat(t.r) || 0)), 0);
-    const ltRLeftEl = document.getElementById('lt-rleft');
-    if (ltRLeftTracked.length === 0) {
-      ltRLeftEl.textContent = '—';
-      ltRLeftEl.className = 'stat-value';
-    } else {
-      const sign = ltRLeft >= 0 ? '+' : '';
-      ltRLeftEl.textContent = sign + ltRLeft.toFixed(2) + 'R';
-      ltRLeftEl.className = 'stat-value' + (ltRLeft > 0.5 ? ' bad' : '');
-    }
-
-    let bestR = null, worstR = null;
-    data.history.forEach(s => {
-      const r = calcSeriesStats(s.trades).netR;
-      if (bestR === null || r > bestR) bestR = r;
-      if (worstR === null || r < worstR) worstR = r;
-    });
-    const extEl = document.getElementById('lt-extremes');
-    if (bestR === null) { extEl.textContent = '—'; extEl.className = 'stat-value medium'; }
-    else { extEl.innerHTML = `<span style="color:var(--good);">+${bestR.toFixed(1)}R</span> / <span style="color:var(--bad);">${worstR.toFixed(1)}R</span>`; extEl.className = 'stat-value medium'; }
-
-    // R Left On Table block — across all lifetime wins (uses allWins declared above)
-    const seriesMfe = computeMfeStats(allWins);
-    const seriesMfeEl = document.getElementById('series-mfe');
-    if (seriesMfeEl) seriesMfeEl.innerHTML = renderMfeBlock(seriesMfe);
 
     const cs = data.currentSeries;
     document.getElementById('current-progress').textContent = cs.length + ' / 10';
@@ -2703,6 +2664,18 @@
     if (document.getElementById('page-trades').classList.contains('active')) renderTradesStats();
   });
 
+  // Net / Gross P&L toggle inside the Statistics tab KPI grid. Event delegated to handle clicks on either label.
+  document.getElementById('kpi-pnl-cell').addEventListener('click', e => {
+    const opt = e.target.closest('.pnl-toggle-opt');
+    if (!opt) return;
+    const mode = opt.dataset.mode; // 'net' | 'gross'
+    if (mode === data.settings.pnlView) return; // already active — nothing to do
+    data.settings.pnlView = mode;
+    saveData();
+    // Re-render the tab (recomputes everything; cheap)
+    renderTradesStats();
+  });
+
   function sideStats(trades) {
     const w = trades.filter(t => t.result === 'Win').length;
     const l = trades.filter(t => t.result === 'Lose').length;
@@ -2725,13 +2698,22 @@
     const costsSum = all.reduce((s,t) => s + tradeCosts(t), 0);
     const netSum = grossSum - costsSum;
     const balance = (data.settings.startingBalance || 0) + netSum;
-    const netEl = document.getElementById('kpi-netpl');
-    netEl.textContent = fmtMoney(netSum);
-    netEl.className = 'stat-value' + (netSum > 0 ? ' good' : netSum < 0 ? ' bad' : '');
-    document.getElementById('kpi-gross').textContent = fmtMoney(grossSum);
-    document.getElementById('kpi-gross').className = 'stat-value medium' + (grossSum > 0 ? ' good' : grossSum < 0 ? ' bad' : '');
-    document.getElementById('kpi-costs').textContent = fmtMoney(costsSum, { noSign: true });
     document.getElementById('kpi-balance').textContent = fmtMoney(balance, { noSign: true });
+    document.getElementById('kpi-costs').textContent = fmtMoney(costsSum, { noSign: true });
+
+    // Net / Gross P&L paired cell — toggle state from data.settings.pnlView
+    function renderPnlCell() {
+      const mode = data.settings.pnlView === 'gross' ? 'gross' : 'net';
+      const val  = mode === 'gross' ? grossSum : netSum;
+      const pnlEl = document.getElementById('kpi-pnl');
+      pnlEl.textContent = fmtMoney(val);
+      pnlEl.className = 'stat-value' + (val > 0 ? ' good' : val < 0 ? ' bad' : '');
+      // Highlight active toggle option
+      document.querySelectorAll('#kpi-pnl-cell .pnl-toggle-opt').forEach(el => {
+        el.classList.toggle('active', el.dataset.mode === mode);
+      });
+    }
+    renderPnlCell();
 
     // Profit Factor + Expectancy (R-based, lifetime)
     const winRSum  = wins.reduce((s, t) => s + (parseFloat(t.r) || 0), 0);
@@ -2747,6 +2729,29 @@
     const expEl = document.getElementById('kpi-exp');
     if (expVal === null) { expEl.textContent = '—'; expEl.className = 'stat-value'; }
     else { expEl.textContent = (expVal >= 0 ? '+' : '') + expVal.toFixed(2) + 'R'; expEl.className = 'stat-value' + (expVal > 0 ? ' good' : expVal < 0 ? ' bad' : ''); }
+
+    // Win Rate (lifetime, BEs excluded)
+    const decisive = wins.length + losses.length;
+    const wrVal = decisive > 0 ? Math.round(wins.length / decisive * 100) : null;
+    const wrEl = document.getElementById('kpi-winrate');
+    if (wrVal === null) { wrEl.textContent = '—'; wrEl.className = 'stat-value'; }
+    else { wrEl.textContent = wrVal + '%'; wrEl.className = 'stat-value' + (wrVal >= 60 ? ' good' : wrVal >= 40 ? '' : ' bad'); }
+
+    // Total R (lifetime)
+    const totalREl = document.getElementById('kpi-totalr');
+    if (all.length === 0) { totalREl.textContent = '0'; totalREl.className = 'stat-value'; }
+    else { totalREl.textContent = (totalR >= 0 ? '+' : '') + totalR.toFixed(1) + 'R'; totalREl.className = 'stat-value' + (totalR > 0 ? ' good' : totalR < 0 ? ' bad' : ''); }
+
+    // R Left (lifetime) — sum of (potentialR - r) across wins with logged Potential R
+    const ltRLeftTracked = wins.filter(t => typeof t.potentialR === 'number' && !isNaN(t.potentialR));
+    const ltRLeft = ltRLeftTracked.reduce((s, t) => s + ((t.potentialR || 0) - (parseFloat(t.r) || 0)), 0);
+    const rLeftEl = document.getElementById('kpi-rleft');
+    if (ltRLeftTracked.length === 0) { rLeftEl.textContent = '—'; rLeftEl.className = 'stat-value'; }
+    else {
+      const sign = ltRLeft >= 0 ? '+' : '';
+      rLeftEl.textContent = sign + ltRLeft.toFixed(2) + 'R';
+      rLeftEl.className = 'stat-value' + (ltRLeft > 0.5 ? ' bad' : '');
+    }
 
     const totalWinR = wins.reduce((s,t) => s + t.r, 0);
     const totalLossR = losses.length;
@@ -2889,7 +2894,6 @@
     updateExpandButton('expand-mindset',  mindsetRows.length, tagExpanded.mindset);
 
     renderTimeAnalysis(all);
-    renderDurationAnalysis(all);
 
     drawEquityChart(all);
   }
@@ -3085,13 +3089,17 @@
   // Trade Time Analysis: 15-min buckets within configurable window + outside.
   // ============================================================================
   function renderTimeAnalysis(trades) {
-    const tableEl   = document.getElementById('time-analysis-table');
+    const tableEl   = document.getElementById('time-analysis-table'); // may be null — table removed from markup
     const summaryEl = document.getElementById('time-analysis-summary');
-    if (!tableEl || !summaryEl) return;
+    if (!summaryEl) return;
 
     const ws = parseHHMM(data.settings.windowStart || '08:00');
     const we = parseHHMM(data.settings.windowEnd   || '10:00');
-    const BUCKET = 15;
+    // Adaptive bucket size: wider buckets at low sample sizes (less noise), narrower as data grows.
+    // Sample tradeable trades — anything with an entry time that falls in or near the window.
+    const tradesWithTime = trades.filter(t => tradeEntryMinutes(t) != null);
+    const totalCount = tradesWithTime.length;
+    const BUCKET = totalCount < 30 ? 30 : totalCount < 150 ? 15 : 5;
     const inWindowBuckets = [];
     for (let m = ws; m < we; m += BUCKET) {
       inWindowBuckets.push({
@@ -3119,156 +3127,131 @@
     renderAnalysisOutput(inWindowBuckets, outside, tableEl, summaryEl, 'time');
   }
 
-  // ============================================================================
-  // Trade Duration Analysis: buckets by hold time (entry → exit).
-  // ============================================================================
-  function renderDurationAnalysis(trades) {
-    const tableEl   = document.getElementById('duration-analysis-table');
-    const summaryEl = document.getElementById('duration-analysis-summary');
-    if (!tableEl || !summaryEl) return;
 
-    // Hold time in minutes. Bucket edges (in minutes): 0, 1, 2, 5, 10, 30, 60, 120, 240, ∞
-    const bucketDefs = [
-      { key: '<1m',       lo: 0,    hi: 1    },
-      { key: '1–1:59m',   lo: 1,    hi: 2    },
-      { key: '2–4:59m',   lo: 2,    hi: 5    },
-      { key: '5–9:59m',   lo: 5,    hi: 10   },
-      { key: '10–29:59m', lo: 10,   hi: 30   },
-      { key: '30–59:59m', lo: 30,   hi: 60   },
-      { key: '1–1:59h',   lo: 60,   hi: 120  },
-      { key: '2–3:59h',   lo: 120,  hi: 240  },
-      { key: '4h+',       lo: 240,  hi: Infinity }
-    ];
-    const buckets = bucketDefs.map(b => ({ key: b.key, lo: b.lo, hi: b.hi, trades: [], wins: 0, losses: 0, bes: 0, net: 0, totalR: 0 }));
-    const noTime  = { key: 'No hold time logged', lo: -1, hi: -1, trades: [], wins: 0, losses: 0, bes: 0, net: 0, totalR: 0 };
+  // Honest rendering: best/worst only declared when the data supports it.
+  // - ≥5 trades per bucket minimum (or ≥5 decided for win-rate ranking)
+  // - Best vs worst must differ by ≥0.5R avg to count as a real difference
+  // - When data is insufficient, show a concrete countdown ("Need X more trades")
+  const MIN_TRADES_PER_BUCKET = 5;
+  const MIN_AVG_R_GAP = 0.5;
 
-    trades.forEach(t => {
-      const entry = parseHHMM(t.entryTime), exit = parseHHMM(t.exitTime);
-      if (entry == null || exit == null) {
-        noTime.trades.push(t);
-        if (t.result === 'Win') { noTime.wins++; noTime.totalR += (parseFloat(t.r) || 0); }
-        else if (t.result === 'Lose') { noTime.losses++; noTime.totalR -= 1; }
-        else if (t.result === 'BE')   { noTime.bes++; }
-        noTime.net += tradeNetPL(t);
-        return;
-      }
-      let dur = exit - entry;
-      if (dur < 0) dur += 24 * 60; // crossed midnight
-      const b = buckets.find(b => dur >= b.lo && dur < b.hi);
-      if (b) {
-        b.trades.push(t);
-        if (t.result === 'Win') { b.wins++; b.totalR += (parseFloat(t.r) || 0); }
-        else if (t.result === 'Lose') { b.losses++; b.totalR -= 1; }
-        else if (t.result === 'BE')   { b.bes++; }
-        b.net += tradeNetPL(t);
-      }
-    });
-
-    renderAnalysisOutput(buckets, noTime, tableEl, summaryEl, 'duration');
-  }
-
-  // Shared rendering for both analyses: 4 hero KPI cards + summary table.
   function renderAnalysisOutput(buckets, extraBucket, tableEl, summaryEl, kind) {
-    // Compute hero KPIs
     const bucketsWithData = buckets.filter(b => b.trades.length > 0);
     const allBuckets = bucketsWithData.concat(extraBucket && extraBucket.trades.length > 0 ? [extraBucket] : []);
     if (allBuckets.length === 0) {
-      summaryEl.innerHTML = '';
-      tableEl.innerHTML = `<div class="time-analysis-empty">No trades to analyze yet.</div>`;
+      summaryEl.innerHTML = '<div class="time-analysis-empty">No trades to analyze yet.</div>';
       return;
     }
-    // "Avg R per trade" for ranking
-    const ranked = allBuckets.map(b => ({ ...b, avg: b.trades.length > 0 ? b.totalR / b.trades.length : 0 }));
-    const best     = ranked.slice().sort((a, b) => b.avg - a.avg)[0];
-    const worst    = ranked.slice().sort((a, b) => a.avg - b.avg)[0];
-    const mostUsed = ranked.slice().sort((a, b) => b.trades.length - a.trades.length)[0];
-    const bestWR   = ranked.filter(b => (b.wins + b.losses) >= 3).slice().sort((a, b) => {
-      const wrA = b.wins / Math.max(1, a.wins + a.losses);
-      const wrB = a.wins / Math.max(1, b.wins + b.losses);
-      return wrA - wrB; // sort with the higher actual WR first
-    });
-    // Recompute properly: sort by WR descending among reliable buckets
-    const reliable = ranked.filter(b => (b.wins + b.losses) >= 3);
-    reliable.sort((a, b) => {
-      const wrA = a.wins / (a.wins + a.losses);
-      const wrB = b.wins / (b.wins + b.losses);
-      return wrB - wrA;
-    });
-    const topWR = reliable[0] || null;
 
-    const labelBest    = kind === 'time' ? 'Best slot'    : 'Best duration';
-    const labelWorst   = kind === 'time' ? 'Worst slot'   : 'Worst duration';
-    const labelMost    = kind === 'time' ? 'Most active slot' : 'Most active duration';
-    const labelWR      = 'Best win rate';
+    // Eligible buckets for best/worst ranking — at least MIN_TRADES_PER_BUCKET trades each
+    const eligible = allBuckets
+      .filter(b => b.trades.length >= MIN_TRADES_PER_BUCKET)
+      .map(b => ({ ...b, avg: b.totalR / b.trades.length }));
+
+    // Reliable buckets for win-rate ranking — at least MIN_TRADES_PER_BUCKET DECIDED (W+L) trades
+    const reliable = allBuckets.filter(b => (b.wins + b.losses) >= MIN_TRADES_PER_BUCKET);
+
+    // Determine if there's a meaningful best/worst distinction
+    let best = null, worst = null, consistent = false;
+    if (eligible.length >= 2) {
+      const sorted = eligible.slice().sort((a, b) => b.avg - a.avg);
+      const top = sorted[0];
+      const bottom = sorted[sorted.length - 1];
+      if ((top.avg - bottom.avg) >= MIN_AVG_R_GAP) {
+        best = top;
+        worst = bottom;
+      } else {
+        consistent = true; // performance roughly flat across slots — no meaningful winner
+      }
+    } else if (eligible.length === 1) {
+      // Only one bucket qualifies. Show it as best, but no worst comparison possible yet.
+      best = { ...eligible[0] };
+    }
+
+    const mostUsed = allBuckets.slice().sort((a, b) => b.trades.length - a.trades.length)[0];
+
+    let topWR = null;
+    if (reliable.length > 0) {
+      reliable.sort((a, b) => {
+        const wrA = a.wins / (a.wins + a.losses);
+        const wrB = b.wins / (b.wins + b.losses);
+        return wrB - wrA;
+      });
+      topWR = reliable[0];
+    }
+
+    // Countdown: how many more trades does the user need before a verdict appears?
+    // Pick the bucket with the most trades (closest to threshold) and report the gap.
+    function tradesNeededForBestWorst() {
+      if (allBuckets.length === 0) return MIN_TRADES_PER_BUCKET;
+      const closest = allBuckets.slice().sort((a, b) => b.trades.length - a.trades.length)[0];
+      return Math.max(1, MIN_TRADES_PER_BUCKET - closest.trades.length);
+    }
+    function tradesNeededForWR() {
+      if (allBuckets.length === 0) return MIN_TRADES_PER_BUCKET;
+      const closest = allBuckets.slice().sort((a, b) => (b.wins + b.losses) - (a.wins + a.losses))[0];
+      return Math.max(1, MIN_TRADES_PER_BUCKET - (closest.wins + closest.losses));
+    }
+
+    const labelBest = kind === 'time' ? 'Best slot'  : 'Best duration';
+    const labelWorst = kind === 'time' ? 'Worst slot' : 'Worst duration';
+    const labelMost = kind === 'time' ? 'Most active slot' : 'Most active duration';
 
     function netHtml(b) {
       const netStr = (b.net >= 0 ? '+' : '-') + '£' + Math.abs(b.net).toFixed(2);
       const cls = b.net > 0 ? 'good' : b.net < 0 ? 'bad' : '';
       return `${b.trades.length} trade${b.trades.length === 1 ? '' : 's'} <span class="pl ${cls}">${netStr}</span>`;
     }
-    const bestWRStr = topWR ? Math.round(topWR.wins / (topWR.wins + topWR.losses) * 100) + '%' : '—';
-
-    summaryEl.innerHTML = `<div class="time-hero-grid">
-      <div class="time-hero-cell">
-        <div class="time-hero-label"><span class="time-hero-icon good">↑</span>${labelBest}</div>
-        <div class="time-hero-value">${best.key}</div>
-        <div class="time-hero-sub">${netHtml(best)}</div>
-      </div>
-      <div class="time-hero-cell">
-        <div class="time-hero-label"><span class="time-hero-icon bad">↓</span>${labelWorst}</div>
-        <div class="time-hero-value">${worst.key}</div>
-        <div class="time-hero-sub">${netHtml(worst)}</div>
-      </div>
-      <div class="time-hero-cell">
-        <div class="time-hero-label"><span class="time-hero-icon info">◆</span>${labelMost}</div>
-        <div class="time-hero-value">${mostUsed.key}</div>
-        <div class="time-hero-sub">${netHtml(mostUsed)}</div>
-      </div>
-      <div class="time-hero-cell">
-        <div class="time-hero-label"><span class="time-hero-icon good">★</span>${labelWR}</div>
-        <div class="time-hero-value">${topWR ? topWR.key : '—'}</div>
-        <div class="time-hero-sub">${topWR ? bestWRStr + ' across ' + (topWR.wins + topWR.losses) + ' decided' : 'Need ≥3 decided trades in a bucket'}</div>
-      </div>
-    </div>`;
-
-    // Render table — only buckets that have data (no empty rows for unused buckets)
-    let rows = `<div class="time-analysis-row header">
-      <div>${kind === 'time' ? 'Slot' : 'Duration'}</div>
-      <div style="text-align:right;">Trades</div>
-      <div style="text-align:right;">Net P&L</div>
-      <div style="text-align:right;">Win %</div>
-      <div style="text-align:right;">Avg Win</div>
-      <div style="text-align:right;">Avg Loss</div>
-    </div>`;
-
-    function avgFor(arr) {
-      if (arr.length === 0) return 0;
-      const sum = arr.reduce((s, t) => s + tradeNetPL(t), 0);
-      return sum / arr.length;
-    }
-    function row(b) {
-      const decided = b.wins + b.losses;
-      const wr = decided > 0 ? Math.round(b.wins / decided * 100) + '%' : '—';
-      const netStr = (b.net >= 0 ? '+' : '-') + '£' + Math.abs(b.net).toFixed(2);
-      const netCls = b.net > 0 ? 'good' : b.net < 0 ? 'bad' : 'be';
-      const winTrades = b.trades.filter(t => t.result === 'Win');
-      const loseTrades = b.trades.filter(t => t.result === 'Lose');
-      const avgWin = avgFor(winTrades);
-      const avgLoss = avgFor(loseTrades);
-      const avgWinStr = winTrades.length > 0 ? '+£' + avgWin.toFixed(2) : '—';
-      const avgLossStr = loseTrades.length > 0 ? '-£' + Math.abs(avgLoss).toFixed(2) : '—';
-      return `<div class="time-analysis-row">
-        <div class="label">${b.key}</div>
-        <div class="num">${b.trades.length}</div>
-        <div class="num ${netCls}">${netStr}</div>
-        <div class="num">${wr}</div>
-        <div class="num ${winTrades.length > 0 ? 'good' : 'dim'}">${avgWinStr}</div>
-        <div class="num ${loseTrades.length > 0 ? 'bad' : 'dim'}">${avgLossStr}</div>
+    function emptyCell(label, icon, iconCls, hint) {
+      return `<div class="time-hero-cell">
+        <div class="time-hero-label"><span class="time-hero-icon ${iconCls}">${icon}</span>${label}</div>
+        <div class="time-hero-value">—</div>
+        <div class="time-hero-sub">${hint}</div>
       </div>`;
     }
-    bucketsWithData.forEach(b => rows += row(b));
-    if (extraBucket && extraBucket.trades.length > 0) rows += row(extraBucket);
-    tableEl.innerHTML = rows;
+    function valueCell(label, icon, iconCls, value, sub) {
+      return `<div class="time-hero-cell">
+        <div class="time-hero-label"><span class="time-hero-icon ${iconCls}">${icon}</span>${label}</div>
+        <div class="time-hero-value">${value}</div>
+        <div class="time-hero-sub">${sub}</div>
+      </div>`;
+    }
+
+    // Build best/worst cells
+    let bestCell, worstCell;
+    if (consistent) {
+      // Performance is flat — be honest about it instead of fabricating a winner
+      bestCell = valueCell(labelBest, '↑', 'good', 'Even', 'Performance is consistent across slots');
+      worstCell = valueCell(labelWorst, '↓', 'bad', 'Even', 'No slot is meaningfully worse than others');
+    } else if (best && worst) {
+      bestCell = valueCell(labelBest, '↑', 'good', best.key, netHtml(best));
+      worstCell = valueCell(labelWorst, '↓', 'bad', worst.key, netHtml(worst));
+    } else if (best && !worst) {
+      // Only one eligible bucket — show it but explain there's no comparison yet
+      bestCell = valueCell(labelBest, '↑', 'good', best.key, netHtml(best));
+      const need = tradesNeededForBestWorst();
+      worstCell = emptyCell(labelWorst, '↓', 'bad', `Need ${need} more trade${need === 1 ? '' : 's'} in another slot`);
+    } else {
+      // No eligible buckets yet
+      const need = tradesNeededForBestWorst();
+      bestCell = emptyCell(labelBest, '↑', 'good', `Need ${need} more trade${need === 1 ? '' : 's'} to know`);
+      worstCell = emptyCell(labelWorst, '↓', 'bad', `Need ${need} more trade${need === 1 ? '' : 's'} to know`);
+    }
+
+    // Most active — always shown if any trades exist
+    const mostCell = valueCell(labelMost, '◆', 'info', mostUsed.key, netHtml(mostUsed));
+
+    // Best win rate
+    let wrCell;
+    if (topWR) {
+      const wr = Math.round(topWR.wins / (topWR.wins + topWR.losses) * 100);
+      wrCell = valueCell('Best win rate', '★', 'good', topWR.key, `${wr}% across ${topWR.wins + topWR.losses} decided`);
+    } else {
+      const need = tradesNeededForWR();
+      wrCell = emptyCell('Best win rate', '★', 'good', `Need ${need} more decided trade${need === 1 ? '' : 's'} in one slot`);
+    }
+
+    summaryEl.innerHTML = `<div class="time-hero-grid">${bestCell}${worstCell}${mostCell}${wrCell}</div>`;
   }
   function renderTradeView() {
     renderYearGlance();
@@ -4354,25 +4337,47 @@
       const daysAgo = Math.round((today - dayMidnight) / (1000 * 60 * 60 * 24));
       if (daysAgo <= 0) continue;  // skip today
       if (daysAgo > 7)  return null; // outside the window
-      const net = day.trades.reduce((s, t) => s + tradeNetPL(t), 0);
       const wins = day.trades.filter(t => t.result === 'Win').length;
       const losses = day.trades.filter(t => t.result === 'Lose').length;
       const bes = day.trades.filter(t => t.result === 'BE').length;
-      if (net > 0) return 'positive';
-      if (net < 0) return 'negative';
-      if (bes > 0 && wins === 0 && losses === 0) return 'be';
-      return 'be'; // net 0 but mixed results — treat as BE-flavoured
+      // Decide tone primarily on trade results (not P&L) — a winning trade with a tiny net negative
+      // from costs shouldn't read as "yesterday stung". Honor what you did, not just what you netted.
+      if (wins > 0 && losses === 0) return 'positive';   // any wins, no losses → positive
+      if (losses > 0 && wins === 0) return 'negative';   // any losses, no wins → negative
+      if (wins === 0 && losses === 0 && bes > 0) return 'be'; // pure BE day
+      // Mixed day (both wins and losses present) — use total R, not net £, as a fairer tiebreaker
+      const totalR = day.trades.reduce((s, t) => {
+        if (t.result === 'Win')  return s + (parseFloat(t.r) || 0);
+        if (t.result === 'Lose') return s - 1;
+        return s;
+      }, 0);
+      if (totalR >= 0.5) return 'positive';
+      if (totalR <= -0.5) return 'negative';
+      return 'be'; // close to even — BE-flavoured tone
     }
     return null;
   }
 
+  // Deterministic hash for date-seeded picks. Same input always yields the same number.
+  // This way the greeting stays consistent throughout a given day no matter how often you reload,
+  // and changes naturally the next day.
+  function hashStr(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+  function todayKey() {
+    return new Date().toDateString();
+  }
   function pickTail(outcome) {
     let pool;
     if      (outcome === 'positive') pool = RECAP_POS;
     else if (outcome === 'negative') pool = RECAP_NEG;
     else if (outcome === 'be')       pool = RECAP_BE;
     else                             pool = SIMPLE_TAILS;
-    return pool[Math.floor(Math.random() * pool.length)];
+    // Seed by today's date + outcome label so the line is stable across reloads on the same day
+    const idx = hashStr(todayKey() + ':' + (outcome || 'none')) % pool.length;
+    return pool[idx];
   }
 
   // Memoize so re-renders (e.g. after rename) don't reshuffle the line.
