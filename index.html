@@ -170,6 +170,7 @@
   .stats-summary { margin-top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
   .stats-summary-2col { grid-template-columns: repeat(2, 1fr); }
   .stats-summary-3col { grid-template-columns: repeat(3, 1fr); }
+  .stats-summary-6col { grid-template-columns: repeat(3, 1fr); }
   .stat-value.dd { color: var(--bad); }
   .stat-value.dd.zero { color: var(--good); }
   .stat-cell { background: var(--bg); padding: 26px 18px; text-align: center; position: relative; }
@@ -772,17 +773,15 @@
   </div>
 
   <div class="page" id="page-stats">
-    <p style="font-family:'Fraunces',serif;font-style:italic;color:var(--text-mid);font-size:15px;margin-top:24px;">Lifetime statistics across every trade ever logged.</p>
+    <p style="font-family:'Fraunces',serif;font-style:italic;color:var(--text-mid);font-size:15px;margin-top:24px;">Live statistics across your current series of 10.</p>
 
-    <div class="stats-summary">
-      <div class="stat-cell"><div class="stat-tooltip">Number of complete series of 10 trades you've finished.</div><div class="stat-label">Total Series</div><div class="stat-value" id="stat-series">0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses). BEs excluded.</div><div class="stat-label">Win Rate</div><div class="stat-value" id="stat-winrate">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Net R across all trades.</div><div class="stat-label">Total R</div><div class="stat-value" id="stat-total">0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R. Above 1.5 = solid edge.</div><div class="stat-label">Profit Factor</div><div class="stat-value" id="stat-pf">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Average R of your winning trades only.</div><div class="stat-label">Avg R per Win</div><div class="stat-value" id="stat-avgwin">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Average R per trade. Positive = profitable system.</div><div class="stat-label">Expectancy</div><div class="stat-value" id="stat-exp">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Consecutive wins or losses at the tail of history.</div><div class="stat-label">Current Streak</div><div class="stat-value" id="stat-streak">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Best and worst completed series in net R.</div><div class="stat-label">Best / Worst</div><div class="stat-value medium" id="stat-extremes">—</div></div>
+    <div class="stats-summary stats-summary-6col">
+      <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) in your current series. BEs excluded.</div><div class="stat-label">Win Rate</div><div class="stat-value" id="stat-winrate">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Net R across your current series of 10.</div><div class="stat-label">Total R</div><div class="stat-value" id="stat-total">0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Winning R ÷ losing R in current series. Above 1.5 = solid edge.</div><div class="stat-label">Profit Factor</div><div class="stat-value" id="stat-pf">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Average R of winning trades in current series.</div><div class="stat-label">Avg R per Win</div><div class="stat-value" id="stat-avgwin">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Average R per trade in current series. Positive = profitable system.</div><div class="stat-label">Expectancy</div><div class="stat-value" id="stat-exp">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Total R left on the table across wins in your current series. Potential R minus actual R captured. Only counts wins with Potential R logged.</div><div class="stat-label">R Left (Series)</div><div class="stat-value" id="stat-rleft">—</div></div>
     </div>
 
     <div id="series-mfe"></div>
@@ -796,6 +795,21 @@
       <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-top:8px;" id="current-tally">No trades logged yet</div>
       <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;font-style:italic;">Click any trade dot to edit or delete</div>
     </div>
+
+    <section>
+      <div class="section-header"><span class="section-num">—</span><span class="section-title">Lifetime Totals</span></div>
+      <p class="section-hint">Across every trade ever logged.</p>
+      <div class="stats-summary" style="margin-top:0;">
+        <div class="stat-cell"><div class="stat-tooltip">Number of complete series of 10 trades you've finished.</div><div class="stat-label">Total Series</div><div class="stat-value" id="lt-series">0</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) across all trades. BEs excluded.</div><div class="stat-label">Win Rate</div><div class="stat-value" id="lt-winrate">—</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Net R across all trades ever logged.</div><div class="stat-label">Total R</div><div class="stat-value" id="lt-total">0</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R. Above 1.5 = solid edge.</div><div class="stat-label">Profit Factor</div><div class="stat-value" id="lt-pf">—</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Average R of all winning trades.</div><div class="stat-label">Avg R per Win</div><div class="stat-value" id="lt-avgwin">—</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Average R per trade across all trades.</div><div class="stat-label">Expectancy</div><div class="stat-value" id="lt-exp">—</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Consecutive wins or losses at the tail of history.</div><div class="stat-label">Current Streak</div><div class="stat-value" id="lt-streak">—</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Best and worst completed series in net R.</div><div class="stat-label">Best / Worst</div><div class="stat-value medium" id="lt-extremes">—</div></div>
+      </div>
+    </section>
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title">Series History</span></div>
@@ -2504,17 +2518,73 @@
   function renderStats() {
     const all = getAllLifetimeTrades();
     const totalSeries = data.history.length;
-    const totalTrades = all.length;
-    const wins = all.filter(t => t.result === 'Win').length;
-    const losses = all.filter(t => t.result === 'Lose').length;
-    const decisive = wins + losses;
-    const wr = decisive > 0 ? Math.round(wins/decisive * 100) : null;
-    let grossWin = 0, grossLoss = 0;
-    all.forEach(t => { if (t.result === 'Win') grossWin += t.r; if (t.result === 'Lose') grossLoss += 1; });
-    const totalR = grossWin - grossLoss;
-    const pf = grossLoss > 0 ? grossWin/grossLoss : (grossWin > 0 ? Infinity : null);
-    const avgWin = wins > 0 ? grossWin/wins : null;
-    const exp = totalTrades > 0 ? totalR/totalTrades : null;
+
+    // Compute a stats bundle from any trade array — used for both current-series and lifetime grids.
+    function computeStatsBundle(trades) {
+      const wins = trades.filter(t => t.result === 'Win').length;
+      const losses = trades.filter(t => t.result === 'Lose').length;
+      const decisive = wins + losses;
+      const wr = decisive > 0 ? Math.round(wins/decisive * 100) : null;
+      let grossWin = 0, grossLoss = 0;
+      trades.forEach(t => { if (t.result === 'Win') grossWin += (parseFloat(t.r) || 0); if (t.result === 'Lose') grossLoss += 1; });
+      const totalR = grossWin - grossLoss;
+      const pf = grossLoss > 0 ? grossWin/grossLoss : (grossWin > 0 ? Infinity : null);
+      const avgWin = wins > 0 ? grossWin/wins : null;
+      const exp = trades.length > 0 ? totalR/trades.length : null;
+      return { total: trades.length, wins, losses, wr, totalR, pf, avgWin, exp };
+    }
+
+    // Apply a computed bundle to a grid using an id prefix (e.g. 'stat' or 'lt').
+    function applyBundleToGrid(b, prefix) {
+      const elWr = document.getElementById(`${prefix}-winrate`);
+      if (elWr) {
+        elWr.textContent = b.wr !== null ? b.wr + '%' : '—';
+        elWr.className = 'stat-value' + (b.wr !== null ? (b.wr >= 60 ? ' good' : b.wr >= 40 ? '' : ' bad') : '');
+      }
+      const elTotal = document.getElementById(`${prefix}-total`);
+      if (elTotal) {
+        elTotal.textContent = b.total > 0 ? (b.totalR >= 0 ? '+' : '') + b.totalR.toFixed(1) + 'R' : '0';
+        elTotal.className = 'stat-value' + (b.totalR > 0 ? ' good' : b.totalR < 0 ? ' bad' : '');
+      }
+      const elPf = document.getElementById(`${prefix}-pf`);
+      if (elPf) {
+        if (b.pf === null) { elPf.textContent = '—'; elPf.className = 'stat-value'; }
+        else if (b.pf === Infinity) { elPf.textContent = '∞'; elPf.className = 'stat-value good'; }
+        else { elPf.textContent = b.pf.toFixed(2); elPf.className = 'stat-value' + (b.pf >= 1.5 ? ' good' : b.pf < 1 ? ' bad' : ''); }
+      }
+      const elAvgWin = document.getElementById(`${prefix}-avgwin`);
+      if (elAvgWin) {
+        elAvgWin.textContent = b.avgWin !== null ? '+' + b.avgWin.toFixed(2) + 'R' : '—';
+        elAvgWin.className = 'stat-value' + (b.avgWin !== null ? ' good' : '');
+      }
+      const elExp = document.getElementById(`${prefix}-exp`);
+      if (elExp) {
+        elExp.textContent = b.exp !== null ? (b.exp >= 0 ? '+' : '') + b.exp.toFixed(2) + 'R' : '—';
+        elExp.className = 'stat-value' + (b.exp !== null ? (b.exp > 0 ? ' good' : b.exp < 0 ? ' bad' : '') : '');
+      }
+    }
+
+    const cur = computeStatsBundle(data.currentSeries || []);
+    const lt  = computeStatsBundle(all);
+    applyBundleToGrid(cur, 'stat');
+    applyBundleToGrid(lt,  'lt');
+
+    // R Left (Series) — scoped to current series only
+    const currentSeriesWins = (data.currentSeries || []).filter(t => t.result === 'Win');
+    const seriesRLeftTracked = currentSeriesWins.filter(t => typeof t.potentialR === 'number' && !isNaN(t.potentialR));
+    const seriesRLeft = seriesRLeftTracked.reduce((s, t) => s + ((t.potentialR || 0) - (parseFloat(t.r) || 0)), 0);
+    const rLeftEl = document.getElementById('stat-rleft');
+    if (seriesRLeftTracked.length === 0) {
+      rLeftEl.textContent = '—';
+      rLeftEl.className = 'stat-value';
+    } else {
+      const sign = seriesRLeft >= 0 ? '+' : '';
+      rLeftEl.textContent = sign + seriesRLeft.toFixed(2) + 'R';
+      rLeftEl.className = 'stat-value' + (seriesRLeft > 0.5 ? ' bad' : '');
+    }
+
+    // Lifetime-only stats: Total Series, Current Streak, Best/Worst
+    document.getElementById('lt-series').textContent = totalSeries;
 
     let streak = 0, streakType = null;
     for (let i = all.length - 1; i >= 0; i--) {
@@ -2524,38 +2594,21 @@
       else if (t.result === streakType) streak += 1;
       else break;
     }
-    let bestR = null, worstR = null;
-    data.history.forEach(s => {
-      const r = calcSeriesStats(s.trades).netR;
-      if (bestR === null || r > bestR) bestR = r;
-      if (worstR === null || r < worstR) worstR = r;
-    });
-
-    document.getElementById('stat-series').textContent = totalSeries;
-    const wrEl = document.getElementById('stat-winrate');
-    wrEl.textContent = wr !== null ? wr + '%' : '—';
-    wrEl.className = 'stat-value' + (wr !== null ? (wr >= 60 ? ' good' : wr >= 40 ? '' : ' bad') : '');
-    const totalEl = document.getElementById('stat-total');
-    totalEl.textContent = totalTrades > 0 ? (totalR >= 0 ? '+' : '') + totalR.toFixed(1) + 'R' : '0';
-    totalEl.className = 'stat-value' + (totalR > 0 ? ' good' : totalR < 0 ? ' bad' : '');
-    const pfEl = document.getElementById('stat-pf');
-    if (pf === null) { pfEl.textContent = '—'; pfEl.className = 'stat-value'; }
-    else if (pf === Infinity) { pfEl.textContent = '∞'; pfEl.className = 'stat-value good'; }
-    else { pfEl.textContent = pf.toFixed(2); pfEl.className = 'stat-value' + (pf >= 1.5 ? ' good' : pf < 1 ? ' bad' : ''); }
-    const avgWinEl = document.getElementById('stat-avgwin');
-    avgWinEl.textContent = avgWin !== null ? '+' + avgWin.toFixed(2) + 'R' : '—';
-    avgWinEl.className = 'stat-value' + (avgWin !== null ? ' good' : '');
-    const expEl = document.getElementById('stat-exp');
-    expEl.textContent = exp !== null ? (exp >= 0 ? '+' : '') + exp.toFixed(2) + 'R' : '—';
-    expEl.className = 'stat-value' + (exp !== null ? (exp > 0 ? ' good' : exp < 0 ? ' bad' : '') : '');
-    const streakEl = document.getElementById('stat-streak');
+    const streakEl = document.getElementById('lt-streak');
     if (streak === 0 || streakType === null) { streakEl.textContent = '—'; streakEl.className = 'stat-value'; }
     else {
       const sym = streakType === 'Win' ? 'W' : 'L';
       streakEl.textContent = streak + sym;
       streakEl.className = 'stat-value' + (streakType === 'Win' ? ' good' : ' bad');
     }
-    const extEl = document.getElementById('stat-extremes');
+
+    let bestR = null, worstR = null;
+    data.history.forEach(s => {
+      const r = calcSeriesStats(s.trades).netR;
+      if (bestR === null || r > bestR) bestR = r;
+      if (worstR === null || r < worstR) worstR = r;
+    });
+    const extEl = document.getElementById('lt-extremes');
     if (bestR === null) { extEl.textContent = '—'; extEl.className = 'stat-value medium'; }
     else { extEl.innerHTML = `<span style="color:var(--good);">+${bestR.toFixed(1)}R</span> / <span style="color:var(--bad);">${worstR.toFixed(1)}R</span>`; extEl.className = 'stat-value medium'; }
 
