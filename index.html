@@ -143,6 +143,11 @@
   .potr-page-btn:hover:not(:disabled) { color: var(--text); border-color: var(--text-mid); }
   .potr-page-btn:disabled { opacity: 0.35; cursor: default; }
   .potr-page-info { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.05em; }
+  /* Summary row + show/hide trades toggle */
+  .potr-summary-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .potr-summary-row .potr-summary { flex: 1; min-width: 0; }
+  .potr-toggle-btn { background: transparent; border: none; color: var(--text-dim); padding: 4px 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; cursor: pointer; transition: color 150ms; white-space: nowrap; text-transform: uppercase; }
+  .potr-toggle-btn:hover { color: var(--text); }
   @media (max-width: 700px) {
     .potr-empty, .potr-rec-block, .potr-summary, .potr-trade-table, .potr-sim-note { margin-left: 0; }
     .potr-rec-block { padding: 12px 14px; }
@@ -330,44 +335,49 @@
   }
   #type-breakdown .history-row, #side-breakdown .history-row, #dow-breakdown .history-row {
     display: grid;
-    grid-template-columns: 130px 90px 100px 140px minmax(140px, 1fr);
+    grid-template-columns: 130px 80px 90px 140px minmax(140px, 1fr);
     gap: 0;
     background: transparent;
     border: none;
     border-bottom: 1px solid var(--border);
     margin-bottom: 0;
     align-items: center;
-    min-height: 56px;
   }
   #type-breakdown .history-list > div:last-child,
   #side-breakdown .history-list > div:last-child,
   #dow-breakdown  .history-list > div:last-child { border-bottom: none; }
-  /* Header row */
+  /* Header row — tight */
   #type-breakdown .history-row.headers, #side-breakdown .history-row.headers, #dow-breakdown .history-row.headers {
-    background: var(--bg-elev); min-height: 36px;
+    background: transparent;
+    border-bottom: 1px solid var(--border-2);
   }
   #type-breakdown .history-row.headers .history-cell,
   #side-breakdown .history-row.headers .history-cell,
   #dow-breakdown  .history-row.headers .history-cell {
-    padding: 0 18px; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); background: transparent;
+    padding: 8px 16px; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); background: transparent;
   }
-  /* Data row */
+  /* Data row — tighter padding, no min-height bloat */
   #type-breakdown .history-row:not(.headers) .history-cell,
   #side-breakdown .history-row:not(.headers) .history-cell,
   #dow-breakdown  .history-row:not(.headers) .history-cell {
-    padding: 14px 18px; background: transparent; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text);
+    padding: 11px 16px; background: transparent; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text);
   }
-  /* Empty row — dim everything so the eye skips past */
+  /* Empty row — dim AND very compact so the eye skips past */
   #type-breakdown .history-row.empty, #side-breakdown .history-row.empty, #dow-breakdown .history-row.empty {
-    opacity: 0.4;
+    opacity: 0.32;
   }
-  /* Day/Side/Type label — editorial italic Fraunces, no longer all-caps */
+  #type-breakdown .history-row.empty .history-cell,
+  #side-breakdown .history-row.empty .history-cell,
+  #dow-breakdown  .history-row.empty .history-cell {
+    padding: 5px 16px;
+  }
+  /* Day/Side/Type label — Fraunces italic, slightly smaller */
   #type-breakdown .history-cell.label, #side-breakdown .history-cell.label, #dow-breakdown .history-cell.label {
-    font-family: 'Fraunces', serif; font-style: italic; font-size: 15px; color: var(--text); letter-spacing: 0; text-transform: none; text-align: left;
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; color: var(--text); letter-spacing: 0; text-transform: none; text-align: left;
   }
-  /* Net R — large, Fraunces, the headline metric */
+  /* Net R — Fraunces, the headline metric */
   #type-breakdown .history-cell.right, #side-breakdown .history-cell.right, #dow-breakdown .history-cell.right {
-    font-family: 'Fraunces', serif; font-size: 20px; text-align: right; font-style: normal;
+    font-family: 'Fraunces', serif; font-size: 18px; text-align: right; font-style: normal;
   }
   #type-breakdown .history-cell.pl-good, #side-breakdown .history-cell.pl-good, #dow-breakdown .history-cell.pl-good { color: var(--good); font-weight: normal; }
   #type-breakdown .history-cell.pl-bad,  #side-breakdown .history-cell.pl-bad,  #dow-breakdown .history-cell.pl-bad  { color: var(--bad);  font-weight: normal; }
@@ -377,10 +387,6 @@
   .wlbe-l  { color: var(--bad); }
   .wlbe-be { color: var(--text-mid); }
   .wlbe-sep { color: var(--text-dim); padding: 0 4px; }
-  /* Subtle WR bar visual under the percentage */
-  .wr-cell { display: flex; flex-direction: column; gap: 4px; }
-  .wr-bar { height: 2px; background: var(--border); position: relative; }
-  .wr-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; background: var(--text-mid); }
   /* Default styling kept for legacy callers (unscoped .history-row instances) */
   .history-cell { background: var(--bg); padding: 14px 14px; font-size: 12px; }
   .history-cell.label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; font-size: 10px; }
@@ -1869,6 +1875,7 @@
     if (d.settings.potRPeriod === undefined) d.settings.potRPeriod = 'all';
     if (d.settings.potRPeriodFrom === undefined) d.settings.potRPeriodFrom = '';
     if (d.settings.potRPeriodTo === undefined) d.settings.potRPeriodTo = '';
+    if (d.settings.potrShowTable === undefined) d.settings.potrShowTable = true;
     // One-time backfill: if existing sessionName has no embedded time range, append the current window.
     if (!d._sessionNameTimesBackfilled) {
       try {
@@ -3374,13 +3381,10 @@
       <div class="history-cell">W / L / BE</div>
       <div class="history-cell right">Net R</div>
     </div>`;
-    // Render one breakdown row. Dims the entire row when no trades are present.
+    // Render one breakdown row. Empty rows render very compactly + dimmed so the eye skips.
     const rowFor = (labelText, s) => {
       const isEmpty = s.count === 0;
-      const wrPct = s.wr !== null ? s.wr : 0;
-      const wrCell = s.wr !== null
-        ? `<div class="wr-cell"><div>${s.wr}%</div><div class="wr-bar"><div class="wr-bar-fill" style="width:${wrPct}%;"></div></div></div>`
-        : `<div style="color:var(--text-dim);">—</div>`;
+      const wrCell = s.wr !== null ? `${s.wr}%` : `<span style="color:var(--text-dim);">—</span>`;
       const wlbeCell = isEmpty
         ? `<span style="color:var(--text-dim);">0 / 0 / 0</span>`
         : `<span class="wlbe-w">${s.w}</span><span class="wlbe-sep">/</span><span class="wlbe-l">${s.l}</span><span class="wlbe-sep">/</span><span class="wlbe-be">${s.be}</span>`;
@@ -3899,17 +3903,34 @@
       </div>
       ${navHtml}`;
 
+    const showTable = data.settings.potrShowTable !== false;
+    const toggleLabel = showTable ? 'Hide trades' : `Show ${totalRows} trade${totalRows === 1 ? '' : 's'}`;
+    const summaryRowHtml = `
+      <div class="potr-summary-row">
+        ${summaryLine}
+        <button type="button" class="potr-toggle-btn" id="potr-toggle-table">${toggleLabel}</button>
+      </div>`;
+
     simWrap.innerHTML = `
       <div class="potr-rec-block">
         <div class="potr-rec-title">Should I hold winners longer?</div>
         ${renderRec(recR)}
         ${renderRec(recPips)}
       </div>
-      ${summaryLine}
-      ${tableHtml}
-      <div class="potr-sim-note">These numbers show the theoretical ceiling — what was technically available if you'd timed exits perfectly. They don't account for slippage, hesitation, and missed reversals when holding for longer. Treat as an upper bound, not a goal.</div>
+      ${summaryRowHtml}
+      ${showTable ? tableHtml : ''}
+      ${showTable ? '<div class="potr-sim-note">These numbers show the theoretical ceiling — what was technically available if you\'d timed exits perfectly. They don\'t account for slippage, hesitation, and missed reversals when holding for longer. Treat as an upper bound, not a goal.</div>' : ''}
     `;
 
+    // Toggle button — flip the setting and re-render.
+    const toggleBtn = document.getElementById('potr-toggle-table');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        data.settings.potrShowTable = !showTable;
+        saveData();
+        renderPotentialRAnalysis(allTradesRaw);
+      });
+    }
     // Wire up: clicking any per-trade row opens that day's modal.
     simWrap.querySelectorAll('.potr-trade-row[data-date-key]').forEach(row => {
       row.addEventListener('click', () => {
