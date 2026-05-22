@@ -134,10 +134,12 @@
   .import-mt5-btn { background: transparent; border: 1px solid var(--text-mid); color: var(--text); padding: 8px 16px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: all 200ms; }
   .import-mt5-btn:hover { background: var(--text); color: var(--bg); }
   .trades-wrap { margin-left: 60px; }
-  .trade-row, .trade-row-headers { display: grid; grid-template-columns: 32px 75px 60px 80px 130px 70px 88px 88px 95px 95px 26px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 6px; width: fit-content; max-width: 100%; }
+  .trade-row, .trade-row-headers { display: grid; grid-template-columns: 32px 75px 60px 90px 130px 80px 88px 88px 95px 95px 26px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 6px; width: fit-content; max-width: 100%; }
   .trade-row-headers { margin-bottom: 4px; }
   .trade-header-cell { background: var(--bg-elev); padding: 8px 8px; font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); text-align: center; }
   .trade-cell { background: var(--bg); padding: 8px 8px; display: flex; align-items: center; }
+  /* Empty Potential R cell on non-Win rows — same width but no visible cell, so it reads as a gap */
+  .trade-cell.empty { background: var(--border); padding: 0; }
   .trade-num { font-family: 'Fraunces', serif; font-style: italic; font-size: 16px; color: var(--text-mid); justify-content: center; }
   .trade-select, .trade-input { width: 100%; background: transparent; color: var(--text); border: none; font-family: 'DM Mono', monospace; font-size: 11px; outline: none; }
   .trade-select { cursor: pointer; letter-spacing: 0.03em; }
@@ -2104,7 +2106,7 @@
           <option value="">—</option><option value="Win">Win</option><option value="Lose">Lose</option><option value="BE">BE</option>
         </select></div>
         <div class="trade-cell"><input class="trade-input r-input" type="text" inputmode="decimal" placeholder="R" /></div>
-        <div class="trade-cell"><input class="trade-input pot-r-input" type="text" inputmode="decimal" placeholder="R" title="Potential R — how far the move actually went (only for Wins)" /></div>
+        <div class="trade-cell pot-r-cell"></div>
         <div class="trade-cell"><select class="trade-select type-select">
           <option value="">—</option><option value="Reaction">Reaction</option><option value="Continuation">Continuation</option>
         </select></div>
@@ -2120,11 +2122,27 @@
       wrap.appendChild(row);
       row.querySelector('.result-select').value = t.result || '';
       row.querySelector('.r-input').value = t.r || '';
-      // Potential R: only meaningful for Wins. Disable + clear visual on non-Win rows.
-      const potREl = row.querySelector('.pot-r-input');
-      potREl.value = (t.result === 'Win' && t.potentialR != null) ? t.potentialR : '';
-      potREl.disabled = (t.result !== 'Win');
-      potREl.style.opacity = (t.result === 'Win') ? '1' : '0.35';
+      // Potential R: cell only renders an input when Result = Win. For other results the cell is visually
+      // empty (no dash, no border, no background) but still occupies its grid slot so columns stay aligned.
+      const potCell = row.querySelector('.pot-r-cell');
+      function renderPotRCell() {
+        const tr = data.review.trades[idx];
+        if (tr.result === 'Win') {
+          potCell.classList.remove('empty');
+          potCell.innerHTML = `<input class="trade-input pot-r-input" type="text" inputmode="decimal" placeholder="R" title="Potential R — how far the move actually went" />`;
+          const inp = potCell.querySelector('.pot-r-input');
+          inp.value = tr.potentialR != null ? tr.potentialR : '';
+          inp.addEventListener('input', e => {
+            const v = e.target.value.trim();
+            data.review.trades[idx].potentialR = (v && !isNaN(parseFloat(v))) ? parseFloat(v) : null;
+            saveData();
+          });
+        } else {
+          potCell.classList.add('empty');
+          potCell.innerHTML = '';
+        }
+      }
+      renderPotRCell();
       row.querySelector('.type-select').value = t.type || '';
       row.querySelector('.side-select').value = t.side || '';
       row.querySelector('.entry-input').value = t.entryTime || '';
@@ -2158,25 +2176,13 @@
 
       row.querySelector('.result-select').addEventListener('change', e => {
         data.review.trades[idx].result = e.target.value;
-        // When result changes away from Win, clear Potential R; toggle the input's disabled state.
-        if (e.target.value !== 'Win') {
-          data.review.trades[idx].potentialR = null;
-          potREl.value = '';
-          potREl.disabled = true;
-          potREl.style.opacity = '0.35';
-        } else {
-          potREl.disabled = false;
-          potREl.style.opacity = '1';
-        }
+        // When result changes away from Win, clear Potential R from data
+        if (e.target.value !== 'Win') data.review.trades[idx].potentialR = null;
+        // Re-render the Pot R cell (swaps between input and dash)
+        renderPotRCell();
         lightUpdate();
       });
       row.querySelector('.r-input').addEventListener('input', e => { data.review.trades[idx].r = e.target.value.trim(); lightUpdate(); });
-      potREl.addEventListener('input', e => {
-        if (data.review.trades[idx].result !== 'Win') return; // gated
-        const v = e.target.value.trim();
-        data.review.trades[idx].potentialR = (v && !isNaN(parseFloat(v))) ? parseFloat(v) : null;
-        saveData();
-      });
       row.querySelector('.type-select').addEventListener('change', e => { data.review.trades[idx].type = e.target.value; renderReviewPreview(); saveData(); });
       row.querySelector('.side-select').addEventListener('change', e => { data.review.trades[idx].side = e.target.value; renderReviewPreview(); saveData(); });
       row.querySelector('.entry-input').addEventListener('input', e => { data.review.trades[idx].entryTime = e.target.value; saveData(); });
