@@ -85,6 +85,9 @@
   .section-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 22px; letter-spacing: -0.01em; }
   .section-hint { font-size: 11px; color: var(--text-dim); margin-bottom: 24px; margin-left: 60px; letter-spacing: 0.08em; text-transform: uppercase; }
   .potr-empty { color: var(--text-dim); font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; margin: 0 0 24px 60px; }
+  /* Reflective question shown beneath the greeting in week/month/day review modals.
+     Visually distinct from the greeting — Fraunces italic, slightly larger, with a left accent. */
+  .review-reflection { font-family: 'Fraunces', serif; font-style: italic; font-size: 15px; color: var(--text); line-height: 1.5; margin: 0 0 22px 0; padding-left: 14px; border-left: 2px solid var(--text-mid); }
   /* Info tip — small "?" icon with hover-revealed long text. Used to declutter
      section hints throughout the app: collapse paragraphs of explainer text into
      a tooltip behind a single discoverable icon. */
@@ -5405,10 +5408,109 @@
     </div>`;
   }
 
+  // ============================================================================
+  // Review-modal greetings — separate from the daily Bias greetings.
+  // Pools are categorized by period performance and include lots of reflective
+  // questions. Picked deterministically by titleText so the same review always
+  // opens with the same line (no churn across re-opens), but each week/month
+  // gets a different one.
+  // ============================================================================
+  const PERIOD_GREET_BIG_WIN = [
+    "Strong {p}, {n}. Don't let it inflate your sizing.",
+    "Big {p}, {n} — was the size as deliberate as the wins?",
+    "{n}, standout {p}. The lesson here matters as much as in a loss.",
+    "{n}, banked. Now — process or market generosity?",
+    "Green and loud, {n}. Was discipline as loud?",
+    "{n}, a {p} to remember. Don't anchor next {p} to this one.",
+  ];
+  const PERIOD_GREET_POSITIVE = [
+    "Green {p}, {n}. Was it the process or the market?",
+    "Nice {p}, {n} — which trade did you almost talk yourself out of?",
+    "Solid {p}, {n}. Did your discipline match the result?",
+    "{n}, profitable {p}. Which decision are you most proud of?",
+    "Profitable {p}, {n}. Be honest — luck or skill?",
+    "{n}, numbers look good. Did the process feel as clean?",
+    "{n}, a winning {p}. Which trade do you wish you'd held longer?",
+    "{n}, you cleared a profit. Anything you'd quietly change?",
+    "Green ink, {n}. Was sizing right for your edge?",
+    "{n}, this {p} went your way. What was the common thread across the wins?",
+    "{n}, you took what was offered. Did you ask for more than you should have?",
+    "{n}, a good {p} — but were the bad trades small enough?",
+    "Profit secured, {n}. What did your worst trade tell you?",
+  ];
+  const PERIOD_GREET_FLAT = [
+    "Even {p}, {n}. Controlled hold or missed edge?",
+    "{n}, near flat. Grind or survival?",
+    "Break-even {p}, {n}. What does that tell you?",
+    "{n}, you ended where you started. Was the process moving in the right direction?",
+    "Flat {p}, {n}. Boring is not the same as bad — was this boring or stuck?",
+  ];
+  const PERIOD_GREET_NEGATIVE = [
+    "Tough {p}, {n}. Where did you drift from your plan?",
+    "{n}, the market was unkind. Were you unkind to yourself too?",
+    "Red {p}, {n}. What's the one rule you'd reinstate?",
+    "{n}, losses sting. Did you stay process-focused or get reactive?",
+    "Difficult {p}, {n}. Inside your variance — or breaking it?",
+    "{n}, which trade set the wrong tone for the {p}?",
+    "{n}, take the data. Setup wrong or execution wrong?",
+    "Hard {p}, {n}. What would tomorrow-you tell today-you?",
+    "{n}, losing {p}s happen. Did anything you did make it worse?",
+    "{n}, sit with it. What's the lesson, not the regret?",
+    "{n}, the screen owes you nothing. What did you owe the plan?",
+    "{n}, was it one bad trade or one bad week of decisions?",
+    "Red {p}, {n}. Did you size up to escape or size down to survive?",
+  ];
+  const PERIOD_GREET_BIG_LOSS = [
+    "Heavy {p}, {n}. Step away before reviewing tomorrow.",
+    "{n}, a hard {p}. Don't try to win it back. Read this slowly.",
+    "{n}, breathe. The market will be there. What broke?",
+    "{n}, sometimes the {p} just hands you a bill. Don't double down on it.",
+    "Painful {p}, {n}. The worst thing now is acting before reading.",
+  ];
+  const PERIOD_GREET_EMPTY = [
+    "Quiet {p}, {n}. Patience or hesitation?",
+    "Zero trades, {n}. Setups absent or were you?",
+    "{n}, no trades this {p}. Sometimes that's discipline. Was it?",
+    "{n}, the screens stayed quiet. By choice or by mood?",
+    "{n}, you skipped the whole {p}. Was there nothing there or were you not looking?",
+  ];
+  const PERIOD_GREET_REFLECTIVE = [
+    "{n}, was your best trade your best decision?",
+    "{n}, if you re-ran this {p} cold, would you do it the same?",
+    "Quick check, {n} — plan or feeling?",
+    "{n}, which trade made you proud and which made you grimace?",
+    "{n}, what trade pattern keeps showing up — wins or losses?",
+    "{n}, were the losses inside your edge or outside it?",
+    "{n}, did you size your conviction or size your hope?",
+    "{n}, were you trading the chart or trading your P&L?",
+    "{n}, what's one thing you'd tell yourself before next {p}?",
+    "{n}, did you respect the bell — entries and exits both?",
+  ];
+
+  function pickPeriodGreeting(stats, n, period, seedKey) {
+    let pool;
+    if (stats.totalTrades === 0) {
+      pool = PERIOD_GREET_EMPTY;
+    } else if (stats.totalR >= 5) {
+      pool = [...PERIOD_GREET_BIG_WIN, ...PERIOD_GREET_POSITIVE, ...PERIOD_GREET_REFLECTIVE];
+    } else if (stats.totalR <= -3) {
+      pool = [...PERIOD_GREET_BIG_LOSS, ...PERIOD_GREET_NEGATIVE, ...PERIOD_GREET_REFLECTIVE];
+    } else if (stats.totalR > 0) {
+      pool = [...PERIOD_GREET_POSITIVE, ...PERIOD_GREET_REFLECTIVE];
+    } else if (stats.totalR < 0) {
+      pool = [...PERIOD_GREET_NEGATIVE, ...PERIOD_GREET_REFLECTIVE];
+    } else {
+      pool = [...PERIOD_GREET_FLAT, ...PERIOD_GREET_REFLECTIVE];
+    }
+    const idx = hashStr((seedKey || '') + ':' + (stats.totalR || 0).toFixed(1)) % pool.length;
+    return pool[idx].replace(/\{n\}/g, n || 'trader').replace(/\{p\}/g, period);
+  }
+
   function fillReviewModalBody(stats, titleText, greetingNoun, monthRange) {
     document.getElementById('review-modal-title').textContent = titleText;
     const n = getName();
-    const greeting = n ? `Here's how your ${greetingNoun} went, ${n}.` : `Here's how your ${greetingNoun} went.`;
+    const greeting   = pickPeriodGreeting(stats, n, greetingNoun, titleText);
+    const reflection = pickReviewReflection(greetingNoun, stats);
 
     // P&L breakdown — match daily modal exactly: Gross + Costs as separate cards.
     const grossStr = (stats.gross >= 0 ? '+' : '-') + '£' + Math.abs(stats.gross || 0).toFixed(2);
@@ -5434,7 +5536,8 @@
 
     const monthlyExtra = (greetingNoun === 'month' && monthRange) ? renderMonthlyInsights(monthRange.start, monthRange.end) : '';
     document.getElementById('review-modal-body').innerHTML = `
-      <p style="color:var(--text-mid);font-size:13px;margin-bottom:20px;">${greeting}</p>
+      <p style="color:var(--text-mid);font-size:13px;margin-bottom:8px;">${greeting}</p>
+      <p class="review-reflection">${reflection}</p>
       <div class="modal-stats" style="margin-top:0;margin-bottom:20px;">
         <div class="modal-stat"><div class="label">W / L / BE</div><div class="v">${stats.wins} / ${stats.losses} / ${stats.bes}</div></div>
         <div class="modal-stat"><div class="label">Gross P&L</div><div class="v ${grossCls}">${grossStr}</div></div>
@@ -5948,13 +6051,51 @@
   });
 
   // Time-of-day opener — chosen by the user's current local hour
+  // Pool of opener phrases per time-of-day slot. One is picked date-deterministically so the
+  // opener stays stable through the day but varies across days.
+  const TIME_OPENERS = {
+    morning: [
+      'Good morning', 'Morning', 'Up early', 'Bright and early', 'Coffee in hand',
+      'Morning, trader', 'New day, new candles', 'Markets are watching', 'Eyes open',
+      'Welcome back', 'Pre-market check-in', 'Charts up', 'Fresh start',
+      'Sunrise session', 'Day one of today', 'Hello again', 'First light',
+      'Morning ritual', 'Cup of patience', 'Mornin\''
+    ],
+    earlyAft: [
+      'Good afternoon', 'Lunch-time check-in', 'Half the day in', 'Past noon',
+      'Mid-day reset', 'Afternoon already', 'Lunch session', 'Hello again',
+      'Halfway home', 'Noon-ish check-in'
+    ],
+    afternoon: [
+      'Afternoon', 'Mid-session', 'Hello again', 'Past noon', 'Afternoon check-in',
+      'Still here', 'Back at the screens', 'Welcome back', 'Session in progress',
+      'Charts open', 'Round two', 'Resuming'
+    ],
+    evening: [
+      'Good evening', 'Evening', 'After-hours', 'Day winding down', 'Evening, trader',
+      'Hello again', 'Post-session', 'Markets quieter now', 'End-of-day check-in',
+      'Day\'s tail', 'Closing in on the close', 'Welcome back'
+    ],
+    lateNight: [
+      'Late night', 'Burning the midnight oil', 'Still here', 'Night owl',
+      'After hours', 'Quiet time', 'The candles are sleeping', 'Lights low',
+      'Tomorrow\'s prep?', 'Past bedtime'
+    ]
+  };
+
   function timeOfDayOpener() {
     const hr = new Date().getHours();
-    if (hr >= 5  && hr < 12) return 'Good morning';
-    if (hr >= 12 && hr < 14) return 'Good afternoon';   // early afternoon
-    if (hr >= 14 && hr < 18) return 'Afternoon';
-    if (hr >= 18 && hr < 23) return 'Good evening';
-    return 'Late night';
+    let pool;
+    if      (hr >= 5  && hr < 12) pool = TIME_OPENERS.morning;
+    else if (hr >= 12 && hr < 14) pool = TIME_OPENERS.earlyAft;
+    else if (hr >= 14 && hr < 18) pool = TIME_OPENERS.afternoon;
+    else if (hr >= 18 && hr < 23) pool = TIME_OPENERS.evening;
+    else                           pool = TIME_OPENERS.lateNight;
+    // Hash the date + hour-slot so different slots within the same day get different picks
+    // (helpful if the user comes back later — opener won't repeat verbatim).
+    const slotKey = `${todayKey()}:opener:${hr < 12 ? 'm' : hr < 14 ? 'ea' : hr < 18 ? 'a' : hr < 23 ? 'e' : 'ln'}`;
+    const idx = hashStr(slotKey) % pool.length;
+    return pool[idx];
   }
 
   // Closing-phrase pools — short, qualitative, never numeric.
@@ -6142,6 +6283,740 @@
     'execution over prediction.',
   ];
 
+  // ===========================================================================
+  // Reflective question pools — used by the bias-page opener and review modals.
+  // These prompt thinking rather than narrate. Some are stat-aware (filled with
+  // actual recent numbers), most are evergreen.
+  // ===========================================================================
+
+  // Generic bias-page questions. Picked occasionally instead of a recap line —
+  // gets the user thinking before the session starts.
+  const BIAS_QUESTIONS = [
+    "what's the one trade you don't want to take today?",
+    "what would a clean session look like for you today?",
+    "have you noticed a pattern in your last few losses?",
+    "what's the warning sign you'll watch for today?",
+    "if you bend a rule today, which one will it be?",
+    "what trade are you most tempted to chase today?",
+    "are you scanning for setups or hoping for them?",
+    "your last win — what was the trigger you trusted?",
+    "what's the question you wish you'd asked before your last loss?",
+    "if you had to skip a trade today, what would the signal be?",
+    "what did yesterday teach you that you'll apply today?",
+    "which of your rules has the most slippage in your hands?",
+    "your A+ setup — when did you last see it?",
+    "what trade have you been taking too often that hasn't paid?",
+    "where in your process are you weakest right now?",
+    "what would patient look like for you in the first hour?",
+    "if a fellow trader watched your screen today, what would impress them?",
+    "what's one habit you want to reinforce this session?",
+    "which trade from this week do you want to repeat?",
+    "what's one criteria you could add to tighten your setup?",
+    "if today goes wrong, what'll be the first sign?",
+    "are you trading the chart or your account balance?",
+    "what bias did you bring into this morning?",
+    "what's the worst thing that could happen today — how would you react?",
+    "where do you usually exit too early?",
+    "what's the one thing you wish you'd done differently last session?",
+    "if you only took one trade today, which setup would it be?",
+    "what story is your last loss telling you?",
+    "what would you tell a friend trading your account right now?",
+    "where's your edge clearest these days?",
+    "what makes a setup A+ vs B+ for you?",
+    "what conditions historically eat your stops?",
+    "what's the indicator on your screen you trust most? least?",
+    "if you had to journal one sentence after every trade, what would it be?",
+    "what mood are you in — and how does it usually trade?",
+    "name the trade you would never take again. why?",
+    "what's the trade that would make today a great day?",
+    "what's a habit you've fallen out of that you want back?",
+    "how would last week's you advise this morning's you?",
+    "what's the smallest discipline you can practice this hour?",
+  ];
+
+  // Performance-aware questions — each function takes a recent-stats snapshot
+  // and returns either a question string or null (if its preconditions aren't met).
+  // The picker only chooses from ones that returned a question.
+  const PERFORMANCE_QUESTIONS = [
+    // === Streak questions ===
+    s => (s.curStreak >= 5 && s.streakKind === 'Win')
+      ? `${s.curStreak} wins in a row. is this conviction or running hot?`
+      : null,
+    s => (s.curStreak === 3 && s.streakKind === 'Win')
+      ? `three wins in a row. are you sizing up or holding the line?`
+      : null,
+    s => (s.curStreak === 4 && s.streakKind === 'Win')
+      ? `four straight wins. don't let dopamine drive the next entry.`
+      : null,
+    s => (s.curStreak === 2 && s.streakKind === 'Win')
+      ? `two in a row. still hunting the same setup or drifting?`
+      : null,
+    s => (s.curStreak >= 6 && s.streakKind === 'Win')
+      ? `${s.curStreak}-trade win streak. write down the setup before it disappears.`
+      : null,
+    s => (s.curStreak >= 5 && s.streakKind === 'Lose')
+      ? `${s.curStreak} losses in a row. step back — what's changed in the tape?`
+      : null,
+    s => (s.curStreak === 3 && s.streakKind === 'Lose')
+      ? `three losses in a row. what setup keeps offering and keeps failing?`
+      : null,
+    s => (s.curStreak === 4 && s.streakKind === 'Lose')
+      ? `four straight stops. when do you call a timeout?`
+      : null,
+    s => (s.curStreak === 2 && s.streakKind === 'Lose')
+      ? `two losses back-to-back. is the setup wrong or are you?`
+      : null,
+    s => (s.curStreak >= 6 && s.streakKind === 'Lose')
+      ? `${s.curStreak} losses in a row. seriously — close the platform.`
+      : null,
+    s => (s.curStreak >= 3 && s.streakKind === 'BE')
+      ? `${s.curStreak} BE trades in a row. choppy tape or noisy management?`
+      : null,
+
+    // === Recent 10 win-rate ===
+    s => (s.recent10WR != null && s.recent10WR >= 70 && s.recent10Decided >= 6)
+      ? `last 10 trades: ${s.recent10WR}% wins. is this real edge or hot streak?`
+      : null,
+    s => (s.recent10WR != null && s.recent10WR >= 80 && s.recent10Decided >= 6)
+      ? `${s.recent10WR}% WR in your last 10. what filter is doing the heavy lifting right now?`
+      : null,
+    s => (s.recent10WR != null && s.recent10WR <= 30 && s.recent10Decided >= 6)
+      ? `last 10 trades have been bumpy (${s.recent10WR}% WR). what's the common thread?`
+      : null,
+    s => (s.recent10WR != null && s.recent10WR <= 20 && s.recent10Decided >= 6)
+      ? `${s.recent10WR}% WR over 10. tape changed, or did your filter loosen?`
+      : null,
+    s => (s.recent10WR != null && s.recent10WR >= 40 && s.recent10WR <= 60 && s.recent10Decided >= 8)
+      ? `last 10 hovering around ${s.recent10WR}% — coin-flip territory. where's the edge gone?`
+      : null,
+    s => (s.avgRLast10 != null && s.avgRLast10 >= 1.5 && s.recent10Decided >= 6)
+      ? `averaging +${s.avgRLast10.toFixed(2)}R per trade over the last 10. what changed that you want to lock in?`
+      : null,
+    s => (s.avgRLast10 != null && s.avgRLast10 <= -0.3 && s.recent10Decided >= 6)
+      ? `last 10 averaging ${s.avgRLast10.toFixed(2)}R per trade. what's the cheapest thing you could stop doing?`
+      : null,
+
+    // === Last 7 days ===
+    s => (s.last7Count >= 3 && s.last7TotalR >= 5)
+      ? `+${s.last7TotalR.toFixed(1)}R last 7 days. what read keeps showing up?`
+      : null,
+    s => (s.last7Count >= 3 && s.last7TotalR <= -3)
+      ? `${s.last7TotalR.toFixed(1)}R last 7 days. what would you stop doing first?`
+      : null,
+    s => (s.last7Count >= 5 && s.last7TotalR >= 8)
+      ? `${s.last7Count} trades this week and +${s.last7TotalR.toFixed(1)}R in the bank. did you trade your plan or did the market gift it?`
+      : null,
+    s => (s.last7Count >= 5 && Math.abs(s.last7TotalR) < 1)
+      ? `${s.last7Count} trades, basically flat (${s.last7TotalR.toFixed(1)}R). a lot of motion, very little net. what's that telling you?`
+      : null,
+    s => (s.last7Count >= 8)
+      ? `${s.last7Count} trades in 7 days. is the volume serving your edge or eroding it?`
+      : null,
+
+    // === Inactivity ===
+    s => (s.daysSinceLastTrade != null && s.daysSinceLastTrade >= 7)
+      ? `${s.daysSinceLastTrade} days since your last trade. discipline or fear?`
+      : null,
+    s => (s.daysSinceLastTrade != null && s.daysSinceLastTrade >= 3 && s.daysSinceLastTrade < 7)
+      ? `${s.daysSinceLastTrade} days off. when's the last time you saw your A+ setup?`
+      : null,
+    s => (s.daysSinceLastTrade != null && s.daysSinceLastTrade >= 14)
+      ? `${s.daysSinceLastTrade} days away from the screen. what brought you back today?`
+      : null,
+
+    // === Sample size milestones ===
+    s => (s.totalTrades > 0 && s.totalTrades < 10)
+      ? `${s.totalTrades} trade${s.totalTrades === 1 ? '' : 's'} logged so far. what would 'one rule per week' look like?`
+      : null,
+    s => (s.totalTrades >= 10 && s.totalTrades < 25)
+      ? `you're ${s.totalTrades} trades in. what pattern do you already see in your wins?`
+      : null,
+    s => (s.totalTrades >= 25 && s.totalTrades < 50)
+      ? `${s.totalTrades} trades. enough to start trusting the patterns — which one stands out?`
+      : null,
+    s => (s.totalTrades >= 50 && s.totalTrades < 100)
+      ? `${s.totalTrades} trades logged. what's the rule you've stopped breaking?`
+      : null,
+    s => (s.totalTrades >= 100)
+      ? `${s.totalTrades} trades deep. what's the question your data is begging you to ask?`
+      : null,
+
+    // === Capture rate ===
+    s => (s.captureRPct != null && s.captureRPct < 40 && s.trackedRWins >= 3)
+      ? `you're capturing ${s.captureRPct.toFixed(0)}% of available R. what's making you exit early?`
+      : null,
+    s => (s.captureRPct != null && s.captureRPct >= 75 && s.trackedRWins >= 5)
+      ? `${s.captureRPct.toFixed(0)}% R capture across ${s.trackedRWins} wins. that's strong holding — keep it.`
+      : null,
+    s => (s.captureRPct != null && s.captureRPct >= 50 && s.captureRPct < 75 && s.trackedRWins >= 5)
+      ? `${s.captureRPct.toFixed(0)}% capture across ${s.trackedRWins} wins. middle of the pack — what's the smallest thing that gets you to 70%?`
+      : null,
+    s => (s.captureRPct != null && s.captureRPct < 25 && s.trackedRWins >= 5)
+      ? `only ${s.captureRPct.toFixed(0)}% of R captured across ${s.trackedRWins} wins. you're calling the direction right and bailing too fast — what changes today?`
+      : null,
+
+    // === Streak transitions ===
+    s => (s.lastResultWasLossAfterStreak)
+      ? `first loss after a streak. what felt different about the read?`
+      : null,
+    s => (s.lastResultWasWinAfterStreak)
+      ? `first win after a rough patch. what came back into focus?`
+      : null,
+
+    // === Side bias ===
+    s => (s.sideImbalance >= 0.75 && s.last30Count >= 10)
+      ? `${Math.round(s.sideImbalance * 100)}% of your last 30 trades were ${s.dominantSide}. is that the market or your bias?`
+      : null,
+    s => (s.sideImbalance >= 0.85 && s.last30Count >= 15)
+      ? `you're almost exclusively trading ${s.dominantSide.toLowerCase()}s lately (${Math.round(s.sideImbalance * 100)}% of 30). when did you last take the other side seriously?`
+      : null,
+
+    // === Standout trades ===
+    s => (s.last30Wins >= 1 && s.biggestWinR >= 5)
+      ? `your biggest recent win was +${s.biggestWinR.toFixed(1)}R. can you describe that setup in one sentence?`
+      : null,
+    s => (s.last30Wins >= 1 && s.biggestWinR >= 10)
+      ? `+${s.biggestWinR.toFixed(1)}R on a single trade recently. would you take that same setup smaller, or the same size again?`
+      : null,
+    s => (s.last30Wins >= 3 && s.biggestWinR >= 4)
+      ? `biggest recent win was +${s.biggestWinR.toFixed(1)}R. what told you to hold, and would you hear it again?`
+      : null,
+
+    // === Recent micro-trend (last 3) ===
+    s => (s.last3W === 3)
+      ? `three wins in your last three trades. what specifically are you doing right?`
+      : null,
+    s => (s.last3L === 3)
+      ? `last three trades all losses. before the next entry — what's the criteria that has to be met?`
+      : null,
+    s => (s.last3W === 2 && s.last3L === 1)
+      ? `last three: 2-1 your way. the one that didn't work — was it a different setup or the same one mis-timed?`
+      : null,
+
+    // === BE rate ===
+    s => (s.last30BeRate != null && s.last30BeRate >= 40 && s.last30Count >= 10)
+      ? `${s.last30BeRate.toFixed(0)}% of your last 30 trades were BE. moving stops too aggressively, or is the tape just chop?`
+      : null,
+    s => (s.last30BeRate != null && s.last30BeRate >= 25 && s.last30BeRate < 40 && s.last30Count >= 15)
+      ? `BE rate sitting at ${s.last30BeRate.toFixed(0)}%. those are the trades you read right but didn't get paid for — what would let them breathe?`
+      : null,
+
+    // === Profit factor ===
+    s => (s.last30ProfitFactor != null && s.last30ProfitFactor !== Infinity && s.last30ProfitFactor >= 2 && s.last30Count >= 10)
+      ? `profit factor of ${s.last30ProfitFactor.toFixed(2)} over the last 30. that's serious — are you sizing for it?`
+      : null,
+    s => (s.last30ProfitFactor != null && s.last30ProfitFactor < 1 && s.last30Count >= 15)
+      ? `profit factor under 1 over 30 trades. losses are out-weighing wins — is the cut too late or the take too early?`
+      : null,
+    s => (s.last30ProfitFactor === Infinity && s.last30Count >= 8)
+      ? `zero losses over your last ${s.last30Count} trades. extraordinary — or are stops too tight to ever hit?`
+      : null,
+
+    // === Biggest loss / risk perception ===
+    s => (s.biggestLossR <= -3 && s.last30Count >= 10)
+      ? `biggest recent hit was ${s.biggestLossR.toFixed(1)}R — bigger than a single stop. was risk sized right or did it slip?`
+      : null,
+
+    // === Generic reflection prompts triggered by stats but stat-light ===
+    s => (s.last30Count >= 20)
+      ? `${s.last30Count} trades in the last 30 days. what feels like edge vs what feels like activity?`
+      : null,
+    s => (s.recent10Decided >= 8)
+      ? `looking at just the last 10 decided trades — which one would you happily take again?`
+      : null,
+    s => (s.last7Count >= 4 && s.last7TotalR > 0)
+      ? `you're net positive on the week (+${s.last7TotalR.toFixed(1)}R). what would protecting it look like today?`
+      : null,
+    s => (s.last7Count >= 4 && s.last7TotalR < 0)
+      ? `net negative on the week (${s.last7TotalR.toFixed(1)}R). does that change today's filter or just today's size?`
+      : null,
+  ];
+
+  // Recent-stats snapshot used by PERFORMANCE_QUESTIONS preconditions. All
+  // fields may be null/undefined when there isn't enough data yet — the
+  // template functions guard against that.
+  function getRecentSnapshot() {
+    const all = (typeof getAllLifetimeTrades === 'function') ? getAllLifetimeTrades() : [];
+    if (all.length === 0) return null;
+    const sorted = all.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Last 10 trades — most recent
+    const recent10 = sorted.slice(-10);
+    const recent10W = recent10.filter(t => t.result === 'Win').length;
+    const recent10L = recent10.filter(t => t.result === 'Lose').length;
+    const recent10Decided = recent10W + recent10L;
+    const recent10WR = recent10Decided > 0 ? Math.round((recent10W / recent10Decided) * 100) : null;
+
+    // Last 7 days
+    const now = new Date();
+    const sevenAgo = new Date(now); sevenAgo.setDate(sevenAgo.getDate() - 7);
+    const last7 = sorted.filter(t => new Date(t.date) >= sevenAgo);
+    const last7TotalR = last7.reduce((s, t) => {
+      if (t.result === 'Win')  return s + (parseFloat(t.r) || 0);
+      if (t.result === 'Lose') return s - 1;
+      return s;
+    }, 0);
+
+    // Last 30 days
+    const thirtyAgo = new Date(now); thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+    const last30 = sorted.filter(t => new Date(t.date) >= thirtyAgo);
+    const last30Wins = last30.filter(t => t.result === 'Win').length;
+    const longs30 = last30.filter(t => t.side === 'Long').length;
+    const shorts30 = last30.filter(t => t.side === 'Short').length;
+    const sideImbalance = (longs30 + shorts30) === 0 ? 0
+      : Math.max(longs30, shorts30) / (longs30 + shorts30);
+    const dominantSide = longs30 >= shorts30 ? 'Long' : 'Short';
+
+    // Biggest recent win (last 30d)
+    const wins30 = last30.filter(t => t.result === 'Win');
+    const biggestWinR = wins30.length > 0
+      ? Math.max(...wins30.map(t => parseFloat(t.r) || 0))
+      : 0;
+
+    // Current streak (from latest backwards)
+    let curStreak = 0, streakKind = '';
+    if (sorted.length > 0) {
+      streakKind = sorted[sorted.length - 1].result;
+      for (let i = sorted.length - 1; i >= 0; i--) {
+        if (sorted[i].result === streakKind) curStreak++;
+        else break;
+      }
+    }
+    // First-trade-after-streak markers
+    const lastResultWasLossAfterStreak = (sorted.length >= 4
+      && sorted[sorted.length - 1].result === 'Lose'
+      && sorted[sorted.length - 2].result === 'Win'
+      && sorted[sorted.length - 3].result === 'Win'
+      && sorted[sorted.length - 4].result === 'Win');
+    const lastResultWasWinAfterStreak = (sorted.length >= 4
+      && sorted[sorted.length - 1].result === 'Win'
+      && sorted[sorted.length - 2].result === 'Lose'
+      && sorted[sorted.length - 3].result === 'Lose'
+      && sorted[sorted.length - 4].result === 'Lose');
+
+    // Days since last trade
+    const lastDate = sorted[sorted.length - 1].date ? new Date(sorted[sorted.length - 1].date) : null;
+    const daysSinceLastTrade = lastDate
+      ? Math.floor((now - lastDate) / (1000 * 60 * 60 * 24))
+      : null;
+
+    // Capture rate (R only — across tracked wins lifetime)
+    const trackedRWinsList = sorted.filter(t => t.result === 'Win'
+      && typeof t.potentialR === 'number' && !isNaN(t.potentialR));
+    const trackedRWins = trackedRWinsList.length;
+    let captureRPct = null;
+    if (trackedRWins > 0) {
+      const captured  = trackedRWinsList.reduce((s, t) => s + (parseFloat(t.r) || 0), 0);
+      const potential = trackedRWinsList.reduce((s, t) => s + t.potentialR, 0);
+      captureRPct = potential === 0 ? null : (captured / potential) * 100;
+    }
+
+    // Last 3 trades — very-recent micro-trend
+    const last3 = sorted.slice(-3);
+    const last3W = last3.filter(t => t.result === 'Win').length;
+    const last3L = last3.filter(t => t.result === 'Lose').length;
+
+    // Avg R over last 10
+    const recent10TotalR = recent10.reduce((s, t) => {
+      if (t.result === 'Win')  return s + (parseFloat(t.r) || 0);
+      if (t.result === 'Lose') return s - 1;
+      return s;
+    }, 0);
+    const avgRLast10 = recent10.length > 0 ? recent10TotalR / recent10.length : null;
+
+    // Best / worst single trade in last 30
+    const last30R = last30.map(t => {
+      if (t.result === 'Win')  return parseFloat(t.r) || 0;
+      if (t.result === 'Lose') return -1;
+      return 0;
+    });
+    const biggestLossR = last30R.length > 0 ? Math.min(...last30R) : 0;
+
+    // Profit factor over last 30
+    const last30GrossWin  = last30R.filter(r => r > 0).reduce((a, b) => a + b, 0);
+    const last30GrossLoss = -last30R.filter(r => r < 0).reduce((a, b) => a + b, 0);
+    const last30ProfitFactor = last30GrossLoss > 0 ? last30GrossWin / last30GrossLoss
+                              : (last30GrossWin > 0 ? Infinity : null);
+
+    // Recent BE rate — high BE % can indicate over-cautious management or chop conditions
+    const last30Be = last30.filter(t => t.result === 'BE').length;
+    const last30BeRate = last30.length > 0 ? (last30Be / last30.length) * 100 : null;
+
+    return {
+      totalTrades: sorted.length,
+      recent10Decided, recent10WR, avgRLast10,
+      last7Count: last7.length, last7TotalR,
+      last30Count: last30.length, last30Wins, last30Be, last30BeRate, last30ProfitFactor,
+      sideImbalance, dominantSide,
+      biggestWinR, biggestLossR,
+      curStreak, streakKind,
+      last3W, last3L,
+      lastResultWasLossAfterStreak, lastResultWasWinAfterStreak,
+      daysSinceLastTrade,
+      trackedRWins, captureRPct
+    };
+  }
+
+  function pickPerformanceQuestion() {
+    const s = getRecentSnapshot();
+    if (!s) return null;
+    const eligible = PERFORMANCE_QUESTIONS
+      .map(fn => { try { return fn(s); } catch (_) { return null; } })
+      .filter(Boolean);
+    if (eligible.length === 0) return null;
+    // Date-seeded so the question stays stable through the day, varies across days.
+    const idx = hashStr(todayKey() + ':perfq') % eligible.length;
+    return eligible[idx];
+  }
+
+  // ===========================================================================
+  // Review-modal greeting + reflective question pools — per period.
+  // ===========================================================================
+  const REVIEW_GREETINGS = {
+    day: [
+      "Here's how your day went",
+      "Session complete",
+      "Day in the books",
+      "Trading day done",
+      "End of session",
+      "Day wrapped",
+      "Here's the day's tape",
+      "Session recap",
+      "Done for the day",
+      "Day's done — let's review",
+      "Pencils down — here's the read",
+      "Closing bell — here's your day",
+      "Day complete. Eyes here",
+      "Closed out — here's the post-mortem",
+      "Lights off — let's look at the candles",
+      "Day's chart, signed and dated",
+      "Here's what the session said",
+      "Session over — sit down with it",
+      "End of tape. Let's read it",
+      "Today's story, here it is",
+      "Charts off, journal on",
+      "Day's verdict",
+      "Today's hand, played and graded",
+      "Eyes on yesterday's you",
+      "Session closed — let's audit",
+      "Here's how today wrote itself",
+      "End of session. Honest look",
+      "Day filed. Let's check it",
+      "Bells rung — here's the read",
+      "Today's tape, here for review",
+      "Session over. Reflect with me",
+      "Closed and journaled — here's the day",
+      "Day done. Let's grade it"
+    ],
+    week: [
+      "Here's how your week went",
+      "Week's done — let's look at it",
+      "Five sessions in the books",
+      "End of the trading week",
+      "Friday's close — here's the week",
+      "Week wrapped",
+      "Week's tape, ready to review",
+      "Week in review",
+      "Trading week complete",
+      "Week's done. Sit down with it",
+      "Pencils down for the week",
+      "Five days, here's what they say",
+      "Week's edge — here's the read",
+      "Week complete. Let's break it down",
+      "Closing the week — here's the chart",
+      "Five sessions, one honest look",
+      "Week's verdict, here it is",
+      "Friday filing — here's the week",
+      "Week on the table, let's examine",
+      "Trading week, signed and sealed",
+      "Five days of tape, here for review",
+      "Weekend reset starts with this",
+      "Week's chart, week's lessons",
+      "Sit with the week — here's the data",
+      "Week's record — let's read it together",
+      "Friday's audit",
+      "Five sessions deep. What's the read?",
+      "Week filed. Let's check the bias",
+      "Week complete. Eyes here",
+      "Week's hand, played out",
+      "Looking back across five days",
+      "Trading week's tape, here it is"
+    ],
+    month: [
+      "Here's how your month went",
+      "Month's done. Time to look at it",
+      "Month in review",
+      "Month closed out",
+      "Trading month complete",
+      "Month's chart — here it is",
+      "End of the month",
+      "Month wrapped",
+      "Month's tape, ready to review",
+      "Looking back at the month",
+      "Month's edge — let's see it",
+      "Month complete. Big picture time",
+      "Closing the month",
+      "Pencils down for the month",
+      "Twenty-ish sessions, here's the read",
+      "Month's verdict, here it is",
+      "Calendar flip — let's audit",
+      "Month on the table",
+      "Month's record, ready for review",
+      "Zoom out — here's the month",
+      "Step back — here's thirty-ish days",
+      "Month's lessons, written in trades",
+      "Month complete. What's the story?",
+      "Big-picture read of the month",
+      "Month signed and dated",
+      "Page turning — here's the month's page",
+      "Long-arc view — here's the month",
+      "Month's hand, played in full",
+      "Looking back across twenty sessions",
+      "Month's tape, end-to-end",
+      "Calendar closed. Let's read it",
+      "Month filed — let's reflect"
+    ]
+  };
+
+  const REVIEW_REFLECTIONS = {
+    day: [
+      "what's the one trade you'd remove and still call this a complete session?",
+      "did you trade your plan or did the chart trade you?",
+      "which decision today felt automatic? which felt forced?",
+      "if you replayed this day, what changes?",
+      "was your first trade your best read of the day?",
+      "what would you tell a friend who copied your session?",
+      "which entry today did you most trust? which did you doubt?",
+      "where did you wait well? where did you chase?",
+      "what's the trade you took that you shouldn't have?",
+      "what's the trade you didn't take that you should have?",
+      "if you'd skipped your worst trade, what does the day look like?",
+      "what felt patient today? what felt impatient?",
+      "did size stay constant or did emotion creep in?",
+      "what read from today do you want to remember next week?",
+      "if the market handed you a do-over, which trade?",
+      "what conditions were you fading vs riding?",
+      "where did discipline win today? where did it slip?",
+      "what's the story this day tells about your edge?",
+      "happy with how you exited the wins?",
+      "happy with how you respected the losses?",
+      "what was the energy at your first entry — calm or itchy?",
+      "did the chart match your pre-session bias?",
+      "which trade today felt cleanest from setup to exit?",
+      "what would your past-week self say about today?",
+      "what surprised you about price action today?",
+      "if your stop hit, did the chart prove it right?",
+      "where did your read drift mid-session?",
+      "what was the easiest trade of the day? the hardest?",
+      "did fatigue or hunger shape any decisions late?",
+      "what's the one improvement you can make tomorrow morning?",
+      "did you stick to your max-trades limit, or push it?",
+      "if you'd traded half-size all day, would the result still feel right?",
+      "what was the chart trying to tell you that you didn't hear?",
+      "which exit feels best in hindsight? which feels worst?",
+      "did you trust the level or talk yourself out of it?",
+      "what's the trade you knew was wrong before clicking?",
+      "would a colleague have taken the same trades?",
+      "what was your mental state at the close — sharp or fried?",
+      "if today were every day, where would your account be in a month?",
+      "what's the smallest thing about today you'd bottle?"
+    ],
+    week: [
+      "what pattern in your wins this week is worth bottling?",
+      "if you only kept your best 3 trades from this week, would it still be green?",
+      "where did you trade with conviction? where did you hope?",
+      "did you take any trades this week that broke your rules?",
+      "what setup paid the most? what setup cost the most?",
+      "which day this week was 'you at your best'?",
+      "what condition appeared often that you kept fading wrong?",
+      "if you removed your worst day, what does the week say?",
+      "what's the question you'll bring into next week?",
+      "what's one rule you bent that you want to tighten?",
+      "which day were you most patient? least patient?",
+      "what felt like edge this week? what felt like luck?",
+      "where in your process is the biggest leak right now?",
+      "would you copy this week's process again?",
+      "what trade do you most want to forget? most want to repeat?",
+      "if you traded a smaller account, would you have done anything different?",
+      "what surprised you about the tape this week?",
+      "what part of your morning prep paid off?",
+      "where did fatigue change your reads?",
+      "what's the smallest change you could make for next week that compounds?",
+      "did your win-rate match how good the reads felt?",
+      "what was the average quality of your setups this week — A, B, or C?",
+      "if a stranger reviewed this week, what would they flag first?",
+      "did costs eat too much of the upside this week?",
+      "which day's chart would you screenshot for your future self?",
+      "what's a trade you took on Monday's energy that wouldn't have flown on Friday?",
+      "did the week feel like trading or grinding?",
+      "what side of the market (long/short) was kinder this week — and why?",
+      "what's the one habit this week that you want to keep practicing?",
+      "did you journal in real time or only after?",
+      "what's the trade idea you brought into Monday and never deployed?",
+      "where did boredom push you into a trade?",
+      "did your best trade come from setup or from sticking with a runner?",
+      "what's the lesson the market taught you with the least pain?",
+      "if next week is just this week again, are you happy?"
+    ],
+    month: [
+      "this month, where was your edge clearest?",
+      "which day this month best represents the trader you want to be?",
+      "if you removed your worst day, what does the month look like?",
+      "what would you tell yourself at the start of this month, knowing what you know now?",
+      "what's the pattern in your best trades this month?",
+      "what's the pattern in your worst trades?",
+      "what habit did you build this month that you want to keep?",
+      "what habit did you slip on?",
+      "what's the question you avoided answering this month?",
+      "if you wrote a one-line lesson from this month, what would it be?",
+      "what trade type paid most? which paid least?",
+      "which day-of-week was your edge strongest? weakest?",
+      "did your process drift this month, or stay tight?",
+      "what's something you said you'd do differently and didn't?",
+      "what's something you actually changed and stuck with?",
+      "if next month is half as good as this one, are you proud?",
+      "if next month is twice as good, what would have to change?",
+      "what surprised you about your own behavior this month?",
+      "where did discipline pay this month? where did it cost you?",
+      "if you could only keep one chart pattern from this month, which?",
+      "did the second half of the month look different from the first?",
+      "what's the rule you've quietly stopped breaking?",
+      "what's the rule you keep promising to keep — and don't?",
+      "if a mentor sat with you over this month's data, what's the first thing they'd point to?",
+      "did size scale with conviction this month, or with hope?",
+      "which week was your worst week — what was unique about it?",
+      "did this month change your view of your edge?",
+      "what process improvement compounded across the month?",
+      "if you taught a new trader using only your good days, what would you cover?",
+      "what session habit had the biggest dollar impact this month?",
+      "did you trade more, less, or about right for the conditions?",
+      "what's the chart you'll remember from this month in a year?",
+      "what's the trade you'll wince at in a year?",
+      "if you removed all your sub-1R wins, does your number change much?",
+      "which week made you think 'this is it' — and was it?"
+    ]
+  };
+
+  function pickReviewGreeting(period, name) {
+    const pool = REVIEW_GREETINGS[period] || REVIEW_GREETINGS.day;
+    // Seed by today's date + period so it stays stable on reload but varies across visits.
+    const idx = hashStr(new Date().toDateString() + ':rev-greet-' + period) % pool.length;
+    return pool[idx] + (name ? `, ${name}.` : '.');
+  }
+
+  function pickReviewReflection(period, stats) {
+    // Stat-aware reflections fire first when their preconditions match.
+    // Each is opt-in based on what the day/week/month actually looked like.
+    // Stats fields available: totalTrades, wins, losses, bes, wr, totalR, totalPips,
+    //                         gross, net, costs, mfe (with trackedR, totalLeftR etc.)
+    if (stats) {
+      const aware = pickStatAwareReflection(period, stats);
+      if (aware) return aware;
+    }
+    const pool = REVIEW_REFLECTIONS[period] || REVIEW_REFLECTIONS.day;
+    const idx = hashStr(new Date().toDateString() + ':rev-reflect-' + period) % pool.length;
+    return pool[idx];
+  }
+
+  // Stat-aware reflection picker — gathers all matching conditions, then date-seeds the pick
+  // so reloads on the same day stay stable.
+  function pickStatAwareReflection(period, s) {
+    const candidates = [];
+
+    // === DAY ===
+    if (period === 'day') {
+      if (s.totalTrades === 1 && s.wins === 1)
+        candidates.push("one trade, one win. what made today's read worth pulling the trigger?");
+      if (s.totalTrades === 1 && s.losses === 1)
+        candidates.push("one trade, one loss. was the setup wrong or was the timing off?");
+      if (s.totalTrades === 1 && s.bes === 1)
+        candidates.push("one trade, BE. did you read it right and manage it cautiously, or did you blink?");
+      if (s.losses >= 3 && s.wins === 0)
+        candidates.push(`${s.losses} losses today and no wins. what condition kept appearing that you kept trying to fade?`);
+      if (s.bes >= 2 && s.wins === 0 && s.losses === 0)
+        candidates.push(`${s.bes} BE trades, no decisive moves. was the chart noise or were you noise?`);
+      if (s.wins >= 3 && s.losses === 0)
+        candidates.push(`${s.wins} wins, no losses today. is this a clean read or a kind tape?`);
+      if (s.wins >= 4)
+        candidates.push(`${s.wins} winners today. which one was the cleanest setup? which would you take again at half-size?`);
+      if (s.wins >= 1 && s.losses >= 1 && s.totalR > 0 && s.totalR >= 2)
+        candidates.push(`+${s.totalR.toFixed(1)}R day with mixed results. what's the one win that carried the day — and would you find it again?`);
+      if (s.totalR <= -2)
+        candidates.push(`${s.totalR.toFixed(1)}R red today. before tomorrow — what's the criteria that has to be met to click again?`);
+      if (s.totalR >= 5)
+        candidates.push(`+${s.totalR.toFixed(1)}R today. write down the conditions that lined up — they may not repeat.`);
+      if (s.totalTrades >= 5 && Math.abs(s.totalR) < 0.5)
+        candidates.push(`${s.totalTrades} trades, basically flat. a lot of motion for nothing — what was your filter doing today?`);
+      if (s.mfe && s.mfe.trackedR > 0 && s.mfe.avgLeftR > 1.5)
+        candidates.push(`you left an average +${s.mfe.avgLeftR.toFixed(1)}R on the table per winning trade today. early exits — fear, fatigue, or formula?`);
+      if (s.mfe && s.mfe.trackedR > 0 && s.mfe.avgLeftR < 0.5 && s.wins >= 2)
+        candidates.push(`tight capture today — you took most of what was on offer. write down what kept you in.`);
+      if (s.wins >= 1 && s.gross > 0 && s.costs / s.gross > 0.15)
+        candidates.push(`costs ate ${((s.costs / s.gross) * 100).toFixed(0)}% of the gross today. spread, slippage, over-trading — which one bit hardest?`);
+      if (s.bes >= 1 && s.wins >= 1 && s.losses === 0)
+        candidates.push(`${s.wins} win${s.wins===1?'':'s'} and ${s.bes} BE${s.bes===1?'':'s'} today. were the BEs managed-out winners or trades that never went anywhere?`);
+    }
+
+    // === WEEK ===
+    if (period === 'week') {
+      if (s.totalTrades === 0)
+        candidates.push("no trades this week. discipline, or was the setup never there?");
+      if (s.totalTrades >= 1 && s.totalTrades <= 2)
+        candidates.push(`only ${s.totalTrades} trade${s.totalTrades===1?'':'s'} this week. were you patient or were you scared?`);
+      if (s.wins >= 5 && s.losses === 0)
+        candidates.push(`${s.wins} wins, zero losses this week. is this a pattern or a streak?`);
+      if (s.losses >= 5 && s.wins <= 1)
+        candidates.push(`${s.losses} losses this week and barely a win. step back — has the tape changed, or has your filter loosened?`);
+      if (s.totalR >= 8)
+        candidates.push(`+${s.totalR.toFixed(1)}R on the week. what conditions made it easy — and are they likely to repeat?`);
+      if (s.totalR <= -5)
+        candidates.push(`${s.totalR.toFixed(1)}R week. what's the smallest change that would have saved 1-2R?`);
+      if (s.totalTrades >= 10)
+        candidates.push(`${s.totalTrades} trades this week. that's high frequency — was it edge or activity?`);
+      if (s.bes >= 4)
+        candidates.push(`${s.bes} BE trades this week. moving stops too quickly, or did the tape just keep stalling?`);
+      if (s.mfe && s.mfe.trackedR >= 2 && s.mfe.totalLeftR >= 4)
+        candidates.push(`+${s.mfe.totalLeftR.toFixed(1)}R left on the table this week across ${s.mfe.trackedR} winners. is your exit rule too tight, or is the urge to bank just stronger than the rule?`);
+      if (s.mfe && s.mfe.trackedR >= 3 && s.mfe.avgLeftR < 0.3)
+        candidates.push(`barely any R left on the table across your wins this week — that's exceptional holding. what kept you in?`);
+      if (s.wins >= 1 && s.totalR > 0 && s.wins >= s.losses)
+        candidates.push(`positive week. of all the wins, which one would you teach a junior trader?`);
+      if (s.gross > 0 && s.costs / s.gross > 0.2)
+        candidates.push(`costs took ${((s.costs / s.gross) * 100).toFixed(0)}% of gross this week. is the trade frequency justified by the edge?`);
+    }
+
+    // === MONTH ===
+    if (period === 'month') {
+      if (s.totalTrades < 5)
+        candidates.push(`only ${s.totalTrades} trades this month. were you waiting for A+, or hesitating?`);
+      if (s.totalTrades >= 30)
+        candidates.push(`${s.totalTrades} trades this month — that's a sample. what's the most common shape of a loss?`);
+      if (s.totalR >= 15)
+        candidates.push(`+${s.totalR.toFixed(1)}R for the month. genuinely impressive — what habit do you want to lock in before the next month?`);
+      if (s.totalR <= -10)
+        candidates.push(`${s.totalR.toFixed(1)}R this month. before next month opens — what's the one thing that needs to change?`);
+      if (s.wins >= 1 && s.losses >= 1 && s.wins / (s.wins + s.losses) >= 0.7 && s.totalTrades >= 10)
+        candidates.push(`${Math.round((s.wins / (s.wins + s.losses)) * 100)}% win rate over the month — high. is the risk-to-reward keeping pace, or are wins small?`);
+      if (s.wins >= 1 && s.losses >= 1 && s.wins / (s.wins + s.losses) <= 0.4 && s.totalR >= 2 && s.totalTrades >= 10)
+        candidates.push(`low win-rate (${Math.round((s.wins / (s.wins + s.losses)) * 100)}%) but you're net positive. you're winning by R-multiple, not frequency. comfortable with that, or unsettled?`);
+      if (s.mfe && s.mfe.trackedR >= 5 && s.mfe.avgLeftR >= 1)
+        candidates.push(`averaging +${s.mfe.avgLeftR.toFixed(1)}R left on the table per win across ${s.mfe.trackedR} tracked wins this month. that's the headline. what's the smallest exit-rule change that could move that number?`);
+      if (s.bes >= 6)
+        candidates.push(`${s.bes} BE trades this month. they cost nothing but they cost something — what would a tighter or looser stop have done?`);
+      if (s.totalTrades >= 15 && Math.abs(s.totalR) < 2)
+        candidates.push(`${s.totalTrades} trades and basically flat on R. lots of motion, very little progress — what would 'fewer, better' look like in practice?`);
+      if (s.totalTrades >= 20 && s.gross > 0)
+        candidates.push(`${s.totalTrades} trades, +£${s.gross.toFixed(0)} gross. is the activity justified by the result, or could half the volume have produced more?`);
+      if (s.wins >= 5 && s.losses === 0)
+        candidates.push(`${s.wins} wins, zero losses this month. extraordinary — or are stops never getting hit because they're too tight?`);
+    }
+
+    if (candidates.length === 0) return null;
+    const idx = hashStr(new Date().toDateString() + ':rev-reflect-stat-' + period) % candidates.length;
+    return candidates[idx];
+  }
+
+
   // Find the most recent past day (within last 7) that had trades. Returns 'positive' | 'negative' | 'be' | null.
   function getRecentDayOutcome() {
     const all = (typeof getAllLifetimeTrades === 'function') ? getAllLifetimeTrades() : [];
@@ -6194,6 +7069,22 @@
     return new Date().toDateString();
   }
   function pickTail(outcome) {
+    // Roll a date-seeded "what kind of tail" choice. Performance questions get the
+    // biggest slice now — when there's an eligible stat-aware question, we want to
+    // surface it more often (per user request: more questions about recent results).
+    //   0–5 (60%): try a performance-aware question (falls through if no signal)
+    //   6   (10%): pick a generic bias question
+    //   7–9 (30%): pick from the outcome-flavoured recap pools
+    const roll = hashStr(todayKey() + ':tail-bucket') % 10;
+    if (roll <= 5) {
+      const pq = pickPerformanceQuestion();
+      if (pq) return pq;
+      // Fall through if no eligible perf question
+    }
+    if (roll === 6) {
+      const idx = hashStr(todayKey() + ':biasq') % BIAS_QUESTIONS.length;
+      return BIAS_QUESTIONS[idx];
+    }
     let pool;
     if      (outcome === 'positive') pool = RECAP_POS;
     else if (outcome === 'negative') pool = RECAP_NEG;
