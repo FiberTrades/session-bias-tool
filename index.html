@@ -134,7 +134,7 @@
   .import-mt5-btn { background: transparent; border: 1px solid var(--text-mid); color: var(--text); padding: 8px 16px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: all 200ms; }
   .import-mt5-btn:hover { background: var(--text); color: var(--bg); }
   .trades-wrap { margin-left: 60px; }
-  .trade-row, .trade-row-headers { display: grid; grid-template-columns: 32px 90px 60px 130px 90px 88px 88px 65px 65px 95px 95px 26px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 6px; width: fit-content; max-width: 100%; }
+  .trade-row, .trade-row-headers { display: grid; grid-template-columns: 32px 75px 60px 60px 100px 70px 88px 88px 65px 65px 95px 95px 26px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 6px; width: fit-content; max-width: 100%; }
   .trade-row-headers { margin-bottom: 4px; }
   .trade-header-cell { background: var(--bg-elev); padding: 8px 8px; font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); text-align: center; }
   .trade-cell { background: var(--bg); padding: 8px 8px; display: flex; align-items: center; }
@@ -268,6 +268,14 @@
   .tag-leaderboard-expand { margin-top: 10px; width: 100%; background: transparent; border: 1px dashed var(--border-2); padding: 12px 16px; color: var(--text-dim); cursor: pointer; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; transition: all 200ms; }
   .tag-leaderboard-expand:hover { border-color: var(--text-mid); color: var(--text); }
   .tag-leaderboard-expand.hidden { display: none; }
+  /* MFE — R Left On Table block inside day/week/month review modals */
+  .mfe-block { margin-top: 18px; padding: 14px 18px; background: var(--bg-elev); border: 1px solid var(--border-2); }
+  .mfe-title { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+  .mfe-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .mfe-cell { display: flex; flex-direction: column; gap: 4px; }
+  .mfe-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
+  .mfe-value { font-family: 'Fraunces', serif; font-size: 18px; color: var(--text); }
+  .mfe-value.bad { color: var(--bad); }
   .chart-card { margin-top: 28px; padding: 22px; border: 1px solid var(--border-2); background: var(--bg-elev); }
   .chart-card-title { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
   .chart-card-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
@@ -599,6 +607,7 @@
           <div class="trade-header-cell">#</div>
           <div class="trade-header-cell">Result</div>
           <div class="trade-header-cell">R</div>
+          <div class="trade-header-cell">Pot R</div>
           <div class="trade-header-cell">Type</div>
           <div class="trade-header-cell">Side</div>
           <div class="trade-header-cell">Entry</div>
@@ -776,6 +785,8 @@
       <div class="stat-cell"><div class="stat-tooltip">Best and worst completed series in net R.</div><div class="stat-label">Best / Worst</div><div class="stat-value medium" id="stat-extremes">—</div></div>
     </div>
 
+    <div id="series-mfe"></div>
+
     <div class="current-series">
       <div class="current-series-header">
         <div class="current-series-title">Current Series</div>
@@ -812,17 +823,6 @@
       <div class="stat-cell"><div class="stat-tooltip">Profit before any costs are deducted. The "ideal" outcome if you paid zero commission and zero spread.</div><div class="stat-label">Gross P&L</div><div class="stat-value medium" id="kpi-gross">£0</div></div>
       <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label">Total Costs</div><div class="stat-value medium" id="kpi-costs">£0</div></div>
       <div class="stat-cell"><div class="stat-tooltip">Your current account balance: Starting Balance (set above) plus Net P&L.</div><div class="stat-label">Account Balance</div><div class="stat-value medium" id="kpi-balance">£0</div></div>
-    </div>
-
-    <div class="stats-summary stats-summary-2col" style="margin-top:16px;">
-      <div class="stat-cell"><div class="stat-tooltip">How far below today's session-day opening balance your account has dipped. Session day starts at 22:00 London. Resets each session day. Stays at £0 if today's worst point is still above the opening balance.</div><div class="stat-label">Drawdown — Today</div><div class="stat-value medium" id="kpi-dd-today">£0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">How far below your all-time peak balance you currently are. Stays at £0 if you're currently at an all-time high.</div><div class="stat-label">Drawdown — Overall</div><div class="stat-value medium" id="kpi-dd-overall">£0</div></div>
-    </div>
-
-    <div class="stats-summary stats-summary-3col" style="margin-top:16px;">
-      <div class="stat-cell"><div class="stat-tooltip">Average additional R the price moved beyond your exit on winning trades — Maximum Favorable Excursion (MFE). Tracks how much R you typically leave on the table. Only includes wins where you logged this value.</div><div class="stat-label">Avg R Left On Table</div><div class="stat-value medium" id="kpi-mfe-avg">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Total additional R you would have captured across all logged wins if you had held to each move's full extension.</div><div class="stat-label">Total R Left</div><div class="stat-value medium" id="kpi-mfe-total">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Number of winning trades with MFE logged out of total wins. Higher coverage = more reliable averages.</div><div class="stat-label">Wins Tracked</div><div class="stat-value medium" id="kpi-mfe-count">—</div></div>
     </div>
 
     <div class="chart-card">
@@ -985,6 +985,7 @@
       </div>
     </div>
     <div class="modal-stats" id="modal-stats"></div>
+    <div id="modal-mfe"></div>
     <div class="modal-section-title">Trades <span style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;font-family:'DM Mono',monospace;font-style:normal;font-weight:300;margin-left:12px;">— click any row to edit or delete</span></div>
     <div class="modal-trades" id="modal-trades"></div>
     <div id="modal-bias-section"></div>
@@ -1020,9 +1021,9 @@
       <div class="label">R-Multiple</div>
       <div class="field"><input id="edit-r" type="number" step="any" placeholder="e.g. 3.96" /></div>
 
-      <div id="edit-mfe-row" style="display:none;">
-        <div class="label">Extra R left on table <span style="color:var(--text-dim);font-size:10px;text-transform:none;letter-spacing:0;">(MFE beyond your exit)</span></div>
-        <div class="field"><input id="edit-mfe" type="number" step="any" min="0" placeholder="e.g. 1.5 (optional)" /></div>
+      <div id="edit-potr-row" style="display:none;">
+        <div class="label">Potential R <span style="color:var(--text-dim);font-size:10px;text-transform:none;letter-spacing:0;">(how far the move actually went)</span></div>
+        <div class="field"><input id="edit-potr" type="number" step="any" placeholder="e.g. 5 (optional)" /></div>
       </div>
 
       <div class="label">Side</div>
@@ -1608,6 +1609,19 @@
     if (d._lastSessionStartAlert === undefined) d._lastSessionStartAlert = '';
     if (d._lastSessionEndAlert === undefined) d._lastSessionEndAlert = '';
     if (d._skipNudgeDismissed === undefined) d._skipNudgeDismissed = '';
+    // One-time conversion: old MFE field ("extra R beyond exit") → new potentialR ("how far the move went total")
+    // potentialR = r + mfe. Only valid on Wins.
+    if (!d._mfeToPotentialR) {
+      const allTrades = [...(d.currentSeries || []), ...(d.history || []).flatMap(s => s.trades || []), ...((d.review && d.review.trades) || [])];
+      allTrades.forEach(t => {
+        if (t.result === 'Win' && typeof t.mfe === 'number' && !isNaN(t.mfe) && t.potentialR == null) {
+          const baseR = parseFloat(t.r) || 0;
+          t.potentialR = baseR + t.mfe;
+        }
+        delete t.mfe;
+      });
+      d._mfeToPotentialR = true;
+    }
     // Migrate snapshots in stored trades
     [...(d.currentSeries || []), ...(d.history || []).flatMap(s => s.trades || [])].forEach(t => {
       if (t.biasSnap)   migrateTvLinks(t.biasSnap);
@@ -2092,6 +2106,7 @@
           <option value="">—</option><option value="Win">Win</option><option value="Lose">Lose</option><option value="BE">BE</option>
         </select></div>
         <div class="trade-cell"><input class="trade-input r-input" type="text" inputmode="decimal" placeholder="R" /></div>
+        <div class="trade-cell"><input class="trade-input pot-r-input" type="text" inputmode="decimal" placeholder="R" title="Potential R — how far the move actually went (only for Wins)" /></div>
         <div class="trade-cell"><select class="trade-select type-select">
           <option value="">—</option><option value="Reaction">Reaction</option><option value="Continuation">Continuation</option>
         </select></div>
@@ -2109,6 +2124,11 @@
       wrap.appendChild(row);
       row.querySelector('.result-select').value = t.result || '';
       row.querySelector('.r-input').value = t.r || '';
+      // Potential R: only meaningful for Wins. Disable + clear visual on non-Win rows.
+      const potREl = row.querySelector('.pot-r-input');
+      potREl.value = (t.result === 'Win' && t.potentialR != null) ? t.potentialR : '';
+      potREl.disabled = (t.result !== 'Win');
+      potREl.style.opacity = (t.result === 'Win') ? '1' : '0.35';
       row.querySelector('.type-select').value = t.type || '';
       row.querySelector('.side-select').value = t.side || '';
       row.querySelector('.entry-input').value = t.entryTime || '';
@@ -2142,8 +2162,27 @@
       const lightUpdate = () => { refresh(); renderReviewPreview(); saveData(); };
       const fullUpdate  = () => { renderTrades(); renderReviewPreview(); saveData(); };
 
-      row.querySelector('.result-select').addEventListener('change', e => { data.review.trades[idx].result = e.target.value; lightUpdate(); });
+      row.querySelector('.result-select').addEventListener('change', e => {
+        data.review.trades[idx].result = e.target.value;
+        // When result changes away from Win, clear Potential R; toggle the input's disabled state.
+        if (e.target.value !== 'Win') {
+          data.review.trades[idx].potentialR = null;
+          potREl.value = '';
+          potREl.disabled = true;
+          potREl.style.opacity = '0.35';
+        } else {
+          potREl.disabled = false;
+          potREl.style.opacity = '1';
+        }
+        lightUpdate();
+      });
       row.querySelector('.r-input').addEventListener('input', e => { data.review.trades[idx].r = e.target.value.trim(); lightUpdate(); });
+      potREl.addEventListener('input', e => {
+        if (data.review.trades[idx].result !== 'Win') return; // gated
+        const v = e.target.value.trim();
+        data.review.trades[idx].potentialR = (v && !isNaN(parseFloat(v))) ? parseFloat(v) : null;
+        saveData();
+      });
       row.querySelector('.type-select').addEventListener('change', e => { data.review.trades[idx].type = e.target.value; renderReviewPreview(); saveData(); });
       row.querySelector('.side-select').addEventListener('change', e => { data.review.trades[idx].side = e.target.value; renderReviewPreview(); saveData(); });
       row.querySelector('.entry-input').addEventListener('input', e => { data.review.trades[idx].entryTime = e.target.value; saveData(); });
@@ -2522,6 +2561,12 @@
     if (bestR === null) { extEl.textContent = '—'; extEl.className = 'stat-value medium'; }
     else { extEl.innerHTML = `<span style="color:var(--good);">+${bestR.toFixed(1)}R</span> / <span style="color:var(--bad);">${worstR.toFixed(1)}R</span>`; extEl.className = 'stat-value medium'; }
 
+    // R Left On Table block — across all lifetime wins
+    const allWins = all.filter(t => t.result === 'Win');
+    const seriesMfe = computeMfeStats(allWins);
+    const seriesMfeEl = document.getElementById('series-mfe');
+    if (seriesMfeEl) seriesMfeEl.innerHTML = renderMfeBlock(seriesMfe);
+
     const cs = data.currentSeries;
     document.getElementById('current-progress').textContent = cs.length + ' / 10';
     const dotsWrap = document.getElementById('current-dots');
@@ -2640,73 +2685,6 @@
     document.getElementById('kpi-gross').className = 'stat-value medium' + (grossSum > 0 ? ' good' : grossSum < 0 ? ' bad' : '');
     document.getElementById('kpi-costs').textContent = fmtMoney(costsSum, { noSign: true });
     document.getElementById('kpi-balance').textContent = fmtMoney(balance, { noSign: true });
-
-    // Overall drawdown: how far below the all-time peak balance we currently sit.
-    // Walk trades chronologically to find peak balance, then subtract current balance.
-    const sortedByDate = all.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
-    const startBal = data.settings.startingBalance || 0;
-    let runningBal = startBal;
-    let peakBal = startBal;
-    sortedByDate.forEach(t => {
-      runningBal += tradeGross(t) - tradeCosts(t);
-      if (runningBal > peakBal) peakBal = runningBal;
-    });
-    const overallDD = Math.max(0, peakBal - balance);
-
-    // Daily (session-day) drawdown: session day starts at user-configured cutoff time (local).
-    // - Find the most recent cutoff (yesterday's if local time is before cutoff, otherwise today's).
-    // - Sum P&L of trades dated BEFORE that cutoff to get today's session-day opening balance.
-    // - Walk trades dated AT or AFTER that cutoff tracking the running balance and its minimum.
-    function getLatestSessionCutoff() {
-      const cutoffStr = data.settings.sessionDayCutoff || '22:00';
-      const [hh, mm] = cutoffStr.split(':').map(Number);
-      const now = new Date();
-      const cutoff = new Date(now);
-      cutoff.setHours(hh || 22, mm || 0, 0, 0);
-      if (now < cutoff) cutoff.setDate(cutoff.getDate() - 1);
-      return cutoff;
-    }
-    const cutoff = getLatestSessionCutoff();
-    let openingBal = startBal;
-    let minBalToday = null;
-    let runBal = startBal;
-    sortedByDate.forEach(t => {
-      const td = new Date(t.date);
-      const pnl = tradeGross(t) - tradeCosts(t);
-      if (td < cutoff) {
-        openingBal += pnl;
-        runBal = openingBal;
-      } else {
-        runBal += pnl;
-        if (minBalToday === null || runBal < minBalToday) minBalToday = runBal;
-      }
-    });
-    const dailyDD = minBalToday === null ? 0 : Math.max(0, openingBal - minBalToday);
-
-    const ddTodayEl = document.getElementById('kpi-dd-today');
-    ddTodayEl.textContent = dailyDD === 0 ? '£0' : '-' + fmtMoney(dailyDD, { noSign: true });
-    ddTodayEl.className = 'stat-value medium dd' + (dailyDD === 0 ? ' zero' : '');
-
-    const ddOverallEl = document.getElementById('kpi-dd-overall');
-    ddOverallEl.textContent = overallDD === 0 ? '£0' : '-' + fmtMoney(overallDD, { noSign: true });
-    ddOverallEl.className = 'stat-value medium dd' + (overallDD === 0 ? ' zero' : '');
-
-    // MFE stats: how much extra R the move went beyond your exit on tracked wins.
-    const winsWithMfe = wins.filter(t => typeof t.mfe === 'number' && !isNaN(t.mfe));
-    const mfeSum = winsWithMfe.reduce((s, t) => s + (t.mfe || 0), 0);
-    const mfeAvg = winsWithMfe.length > 0 ? mfeSum / winsWithMfe.length : 0;
-    const mfeAvgEl = document.getElementById('kpi-mfe-avg');
-    if (winsWithMfe.length === 0) {
-      mfeAvgEl.textContent = '—';
-      mfeAvgEl.className = 'stat-value medium';
-    } else {
-      mfeAvgEl.textContent = '+' + mfeAvg.toFixed(2) + 'R';
-      mfeAvgEl.className = 'stat-value medium' + (mfeAvg > 0.05 ? ' bad' : '');  // "bad" because leaving R is undesirable
-    }
-    const mfeTotalEl = document.getElementById('kpi-mfe-total');
-    mfeTotalEl.textContent = winsWithMfe.length === 0 ? '—' : '+' + mfeSum.toFixed(1) + 'R';
-    mfeTotalEl.className = 'stat-value medium' + (mfeSum > 0.5 ? ' bad' : '');
-    document.getElementById('kpi-mfe-count').textContent = winsWithMfe.length === 0 ? '—' : `${winsWithMfe.length} / ${wins.length}`;
 
     const totalWinR = wins.reduce((s,t) => s + t.r, 0);
     const totalLossR = losses.length;
@@ -3286,9 +3264,6 @@
     wrap.querySelectorAll('.year-month').forEach(el => {
       el.addEventListener('click', () => {
         const m = parseInt(el.dataset.month);
-        calendarYear = yearGlanceYear;
-        calendarMonth = m;
-        renderCalendar();
         openMonthlyReviewModal(yearGlanceYear, m);
       });
     });
@@ -3498,6 +3473,12 @@
       <div class="modal-stat"><div class="label">Gross P&L</div><div class="v ${gross > 0 ? 'good' : gross < 0 ? 'bad' : ''}">${fmtMoney(gross)}</div></div>
       <div class="modal-stat"><div class="label">Costs</div><div class="v">${fmtMoney(costs, { noSign: true })}</div></div>`;
 
+    // R Left On Table block for this day's wins
+    const dayMfeWins = dayTrades.filter(t => t.result === 'Win');
+    const dayMfe = computeMfeStats(dayMfeWins);
+    const mfeContainer = document.getElementById('modal-mfe');
+    if (mfeContainer) mfeContainer.innerHTML = renderMfeBlock(dayMfe);
+
     let tHtml = `<div class="modal-trade-row headers" style="background:var(--bg-elev);">
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">#</div>
       <div class="modal-trade-cell" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Time</div>
@@ -3642,9 +3623,8 @@
       btn.classList.toggle('active', btn.dataset.result === t.result);
     });
     document.getElementById('edit-r').value = t.r != null ? t.r : '';
-    document.getElementById('edit-mfe').value = t.mfe != null ? t.mfe : '';
-    // MFE row is only relevant for wins (the "left on table" concept doesn't apply to BE/Lose).
-    document.getElementById('edit-mfe-row').style.display = (t.result === 'Win') ? '' : 'none';
+    document.getElementById('edit-potr').value = t.potentialR != null ? t.potentialR : '';
+    document.getElementById('edit-potr-row').style.display = (t.result === 'Win') ? '' : 'none';
     document.getElementById('edit-side').value = t.side || '';
     document.getElementById('edit-type').value = t.type || '';
     document.getElementById('edit-entry').value = t.entryTime || '';
@@ -3687,8 +3667,8 @@
     btn.addEventListener('click', () => {
       editingResult = btn.dataset.result;
       document.querySelectorAll('.edit-result-toggle button').forEach(b => b.classList.toggle('active', b === btn));
-      document.getElementById('edit-mfe-row').style.display = (editingResult === 'Win') ? '' : 'none';
-      if (editingResult !== 'Win') document.getElementById('edit-mfe').value = '';
+      document.getElementById('edit-potr-row').style.display = (editingResult === 'Win') ? '' : 'none';
+      if (editingResult !== 'Win') document.getElementById('edit-potr').value = '';
       updateEditNetPL();
     });
   });
@@ -3738,12 +3718,12 @@
     t.result = editingResult;
     const rVal = parseFloat(document.getElementById('edit-r').value);
     t.r = isNaN(rVal) ? 0 : rVal;
-    // MFE = R units the move extended beyond the user's exit. Only valid on Wins.
+    // Potential R = how far the move actually went. Only valid on Wins.
     if (t.result === 'Win') {
-      const mfeVal = parseFloat(document.getElementById('edit-mfe').value);
-      t.mfe = isNaN(mfeVal) ? null : mfeVal;
+      const potVal = parseFloat(document.getElementById('edit-potr').value);
+      t.potentialR = isNaN(potVal) ? null : potVal;
     } else {
-      t.mfe = null;
+      t.potentialR = null;
     }
     t.side = document.getElementById('edit-side').value || null;
     t.type = document.getElementById('edit-type').value || null;
@@ -3990,7 +3970,34 @@
     const gross = tradesInPeriod.reduce((s, t) => s + (typeof tradeGross === 'function' ? tradeGross(t) : 0), 0);
     const costs = tradesInPeriod.reduce((s, t) => s + (typeof tradeCosts === 'function' ? tradeCosts(t) : 0), 0);
     const net = gross - costs;
-    return { totalTrades: tradesInPeriod.length, wins: wins.length, losses: losses.length, bes: bes.length, wr, totalR, gross, net, costs };
+    const mfe = computeMfeStats(wins);
+    return { totalTrades: tradesInPeriod.length, wins: wins.length, losses: losses.length, bes: bes.length, wr, totalR, gross, net, costs, mfe };
+  }
+
+  // MFE stats from an array of Win trades. Returns { tracked, totalLeft, avgLeft } or null when no tracked wins.
+  function computeMfeStats(winsArr) {
+    const tracked = winsArr.filter(t => typeof t.potentialR === 'number' && !isNaN(t.potentialR));
+    if (tracked.length === 0) return { tracked: 0, totalWins: winsArr.length, totalLeft: 0, avgLeft: 0 };
+    const totalLeft = tracked.reduce((s, t) => s + ((t.potentialR || 0) - (parseFloat(t.r) || 0)), 0);
+    const avgLeft = totalLeft / tracked.length;
+    return { tracked: tracked.length, totalWins: winsArr.length, totalLeft, avgLeft };
+  }
+
+  // Render a compact "R left on table" block as HTML — used inside day/week/month modals.
+  // Returns empty string when there are no tracked wins.
+  function renderMfeBlock(mfe) {
+    if (!mfe || mfe.tracked === 0) return '';
+    const avgStr = (mfe.avgLeft >= 0 ? '+' : '') + mfe.avgLeft.toFixed(2) + 'R';
+    const totStr = (mfe.totalLeft >= 0 ? '+' : '') + mfe.totalLeft.toFixed(1) + 'R';
+    const cls = mfe.avgLeft > 0.05 ? 'bad' : '';
+    return `<div class="mfe-block">
+      <div class="mfe-title">R Left On Table</div>
+      <div class="mfe-row">
+        <div class="mfe-cell"><div class="mfe-label">Avg per win</div><div class="mfe-value ${cls}">${avgStr}</div></div>
+        <div class="mfe-cell"><div class="mfe-label">Total left</div><div class="mfe-value ${cls}">${totStr}</div></div>
+        <div class="mfe-cell"><div class="mfe-label">Tracked</div><div class="mfe-value">${mfe.tracked} / ${mfe.totalWins}</div></div>
+      </div>
+    </div>`;
   }
 
   function fillReviewModalBody(stats, titleText, greetingNoun) {
@@ -4015,6 +4022,7 @@
         <div class="wl-cell lose"><div class="big">${stats.losses}</div><div class="small">Losses</div></div>
         <div class="wl-cell be"><div class="big">${stats.bes}</div><div class="small">Break-even</div></div>
       </div>
+      ${renderMfeBlock(stats.mfe)}
     `;
   }
 
