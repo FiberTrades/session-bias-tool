@@ -322,6 +322,17 @@
   .month-insight-compare-vals .now { font-size: 16px; color: var(--text); }
   .month-insight-compare-vals .vs { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; }
   .month-insight-compare-vals .then { font-size: 13px; color: var(--text-dim); }
+  /* Patterns worth noting — rule-based actionable insights at the top of monthly review */
+  .patterns-block { background: var(--bg); border: 1px solid var(--border-2); position: relative; }
+  .patterns-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .pattern-item { display: flex; gap: 10px; align-items: flex-start; line-height: 1.5; font-family: 'Fraunces', serif; font-size: 14px; color: var(--text); }
+  .pattern-item .pattern-icon { font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.6; flex-shrink: 0; width: 14px; text-align: center; }
+  .pattern-item.pos .pattern-icon { color: var(--good); }
+  .pattern-item.neg .pattern-icon { color: var(--bad); }
+  .pattern-item strong { font-weight: normal; color: var(--text); background: var(--bg-elev); padding: 1px 6px; border: 1px solid var(--border-2); font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.02em; }
+  /* Trade of month — clickable cells that drill into the day's modal */
+  .trade-of-month-cell { cursor: pointer; padding: 12px; border: 1px solid var(--border-2); transition: border-color 150ms, background 150ms; }
+  .trade-of-month-cell:hover { border-color: var(--text-mid); background: var(--bg-elev); }
   /* Weekly Reflection structured form — separate question blocks for the weekend ritual */
   .reflect-block { margin-top: 28px; padding-top: 22px; border-top: 1px dashed var(--border-2); }
   .reflect-header { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-mid); margin-bottom: 6px; }
@@ -4397,10 +4408,176 @@
       </div>`;
     }
 
+    // === Best & worst trade of the month ===
+    // Highest R (positive only) and lowest R (negative only). Clickable: opens the trade's day modal.
+    let tradeOfMonthHtml = '';
+    const decisiveTrades = monthTrades.filter(t => t.result === 'Win' || t.result === 'Lose');
+    if (decisiveTrades.length >= 2) {
+      const sortedByR = decisiveTrades.slice().sort((a, b) => tradeR(b) - tradeR(a));
+      const best = sortedByR[0];
+      const worst = sortedByR[sortedByR.length - 1];
+      // Only show if best is a Win (positive R) and worst is a Lose; otherwise the framing is misleading
+      function fmtTradeCell(t, label, iconCls, icon) {
+        const r = tradeR(t);
+        const rStr = (r >= 0 ? '+' : '') + r.toFixed(2) + 'R';
+        const rCls = r > 0 ? 'good' : r < 0 ? 'bad' : '';
+        const dt = new Date(t.date);
+        const dateStr = dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+        const sideStr = t.side || '—';
+        const net = (typeof tradeNetPL === 'function') ? tradeNetPL(t) : 0;
+        const netStr = (net >= 0 ? '+£' : '-£') + Math.abs(net).toFixed(2);
+        const dateIso = dt.toISOString();
+        return `<div class="month-insight-cell trade-of-month-cell" data-trade-date="${dateIso}" title="Click to open this day's review">
+          <div class="month-insight-label"><span class="icon ${iconCls}">${icon}</span>${label}</div>
+          <div class="month-insight-value">${dateStr} · ${sideStr}</div>
+          <div class="month-insight-sub ${rCls}">${rStr} · ${netStr}</div>
+        </div>`;
+      }
+      tradeOfMonthHtml = `<div class="month-insight-block">
+        <div class="month-insight-title">Best & worst trade of the month</div>
+        <div class="month-insight-row">
+          ${fmtTradeCell(best, 'Best trade', 'good', '★')}
+          ${fmtTradeCell(worst, 'Worst trade', 'bad', '✕')}
+        </div>
+      </div>`;
+    }
+
+    // === Patterns worth noting ===
+    // A rule-based pass over tags, time slots, and weekdays to surface 1-4 actionable observations.
+    // Honesty thresholds matter: we'd rather show "no clear patterns yet" than fabricate insight from noise.
+    const PATTERN_LEAN_TRADES = 6,   PATTERN_LEAN_R = 5;     // tag with ≥6 trades AND ≥+5R → lean in
+    const PATTERN_AVOID_TRADES = 4,  PATTERN_AVOID_R = -2;   // tag with ≥4 trades AND ≤-2R → avoid
+    const PATTERN_SLOT_PAY_TRADES = 6,  PATTERN_SLOT_PAY_AVG = 0.5;  // bucket ≥6 trades AND ≥+0.5R avg
+    const PATTERN_SLOT_SKIP_TRADES = 4, PATTERN_SLOT_SKIP_AVG = -1;  // bucket ≥4 trades AND ≤-1R avg
+    const PATTERN_DAY_PAY_TRADES = 6,   PATTERN_DAY_PAY_AVG = 0.5;
+    const PATTERN_DAY_SKIP_TRADES = 4,  PATTERN_DAY_SKIP_AVG = -1;
+
+    const patterns = []; // { kind: 'lean'|'avoid'|'slot-pay'|'slot-skip'|'day-pay'|'day-skip', text, magnitude }
+
+    // Tag-based patterns (both concepts + mindset)
+    function scanTags(tagKey) {
+      const buckets = {};
+      monthTrades.forEach(t => {
+        const tags = (t.reviewSnap && Array.isArray(t.reviewSnap[tagKey])) ? t.reviewSnap[tagKey] : [];
+        const r = tradeR(t);
+        tags.forEach(tag => {
+          if (!buckets[tag]) buckets[tag] = { tag, totalR: 0, trades: 0 };
+          buckets[tag].totalR += r;
+          buckets[tag].trades++;
+        });
+      });
+      Object.values(buckets).forEach(b => {
+        if (b.trades >= PATTERN_LEAN_TRADES && b.totalR >= PATTERN_LEAN_R) {
+          patterns.push({
+            kind: 'lean',
+            magnitude: b.totalR,
+            text: `Your <strong>${b.tag}</strong> ${tagKey === 'mindset' ? 'mindset' : 'setups'} paid +${b.totalR.toFixed(1)}R across ${b.trades} trades. This is your edge — keep selecting for these.`
+          });
+        } else if (b.trades >= PATTERN_AVOID_TRADES && b.totalR <= PATTERN_AVOID_R) {
+          patterns.push({
+            kind: 'avoid',
+            magnitude: Math.abs(b.totalR),
+            text: `You're ${tagKey === 'mindset' ? 'trading <strong>' + b.tag + '</strong>' : 'taking <strong>' + b.tag + '</strong> setups'} at a ${b.totalR.toFixed(1)}R cost (${b.trades} trades). ${tagKey === 'mindset' ? 'Consider stepping aside on those days.' : 'Worth interrogating why these aren\'t working.'}`
+          });
+        }
+      });
+    }
+    scanTags('concepts');
+    scanTags('mindset');
+
+    // Time-slot patterns — reuse the window settings + adaptive bucket sizing logic from Time Analysis
+    const ws = parseHHMM(data.settings.windowStart || '08:00');
+    const we = parseHHMM(data.settings.windowEnd   || '10:00');
+    const tradesInWindow = monthTrades.filter(t => {
+      const min = (typeof tradeEntryMinutes === 'function') ? tradeEntryMinutes(t) : null;
+      return min != null && min >= ws && min < we;
+    });
+    const BUCKET_MIN = tradesInWindow.length < 30 ? 30 : tradesInWindow.length < 150 ? 15 : 5;
+    const slotBuckets = {};
+    tradesInWindow.forEach(t => {
+      const min = tradeEntryMinutes(t);
+      const slot = Math.floor((min - ws) / BUCKET_MIN) * BUCKET_MIN + ws;
+      const h1 = Math.floor(slot / 60), m1 = slot % 60;
+      const slotEnd = slot + BUCKET_MIN;
+      const h2 = Math.floor(slotEnd / 60), m2 = slotEnd % 60;
+      const key = `${String(h1).padStart(2,'0')}:${String(m1).padStart(2,'0')}–${String(h2).padStart(2,'0')}:${String(m2).padStart(2,'0')}`;
+      if (!slotBuckets[key]) slotBuckets[key] = { key, totalR: 0, trades: 0 };
+      slotBuckets[key].totalR += tradeR(t);
+      slotBuckets[key].trades++;
+    });
+    Object.values(slotBuckets).forEach(b => {
+      const avg = b.totalR / b.trades;
+      if (b.trades >= PATTERN_SLOT_PAY_TRADES && avg >= PATTERN_SLOT_PAY_AVG) {
+        patterns.push({
+          kind: 'slot-pay',
+          magnitude: avg * b.trades,
+          text: `The <strong>${b.key}</strong> slot is your money-maker (+${b.totalR.toFixed(1)}R across ${b.trades} trades, +${avg.toFixed(2)}R avg). Lean into this window.`
+        });
+      } else if (b.trades >= PATTERN_SLOT_SKIP_TRADES && avg <= PATTERN_SLOT_SKIP_AVG) {
+        patterns.push({
+          kind: 'slot-skip',
+          magnitude: Math.abs(avg * b.trades),
+          text: `The <strong>${b.key}</strong> slot cost ${b.totalR.toFixed(1)}R across ${b.trades} trades (${avg.toFixed(2)}R avg). Worth skipping that window.`
+        });
+      }
+    });
+
+    // Weekday patterns
+    const WEEKDAY_NAMES_PAT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayBuckets = {};
+    monthTrades.forEach(t => {
+      const dow = new Date(t.date).getDay();
+      if (dow === 0 || dow === 6) return;
+      const name = WEEKDAY_NAMES_PAT[dow];
+      if (!dayBuckets[name]) dayBuckets[name] = { name, totalR: 0, trades: 0 };
+      dayBuckets[name].totalR += tradeR(t);
+      dayBuckets[name].trades++;
+    });
+    Object.values(dayBuckets).forEach(b => {
+      const avg = b.totalR / b.trades;
+      if (b.trades >= PATTERN_DAY_PAY_TRADES && avg >= PATTERN_DAY_PAY_AVG) {
+        patterns.push({
+          kind: 'day-pay',
+          magnitude: avg * b.trades,
+          text: `<strong>${b.name}days</strong> are paying you (+${b.totalR.toFixed(1)}R across ${b.trades} trades). Trade these with conviction.`
+        });
+      } else if (b.trades >= PATTERN_DAY_SKIP_TRADES && avg <= PATTERN_DAY_SKIP_AVG) {
+        patterns.push({
+          kind: 'day-skip',
+          magnitude: Math.abs(avg * b.trades),
+          text: `<strong>${b.name}days</strong> cost you ${b.totalR.toFixed(1)}R across ${b.trades} trades. Consider sitting them out, or trading them smaller until the data shifts.`
+        });
+      }
+    });
+
+    // Sort by magnitude (biggest signals first), cap at 4
+    patterns.sort((a, b) => b.magnitude - a.magnitude);
+    const topPatterns = patterns.slice(0, 4);
+
+    let patternsHtml;
+    if (topPatterns.length === 0) {
+      patternsHtml = `<div class="month-insight-block patterns-block">
+        <div class="month-insight-title">Patterns worth noting</div>
+        <div class="month-insight-empty">No clear patterns yet this month — keep logging. Patterns surface when sample sizes pass the threshold.</div>
+      </div>`;
+    } else {
+      const items = topPatterns.map(p => {
+        const cls = (p.kind === 'lean' || p.kind === 'slot-pay' || p.kind === 'day-pay') ? 'pos' : 'neg';
+        const icon = cls === 'pos' ? '↑' : '↓';
+        return `<li class="pattern-item ${cls}"><span class="pattern-icon">${icon}</span><span class="pattern-text">${p.text}</span></li>`;
+      }).join('');
+      patternsHtml = `<div class="month-insight-block patterns-block">
+        <div class="month-insight-title">Patterns worth noting</div>
+        <ul class="patterns-list">${items}</ul>
+      </div>`;
+    }
+
     // Compose the whole block. If the month has zero trades, hide everything cleanly.
     if (monthTrades.length === 0) return '';
     return `<div class="month-insights">
       <div class="month-insights-header">Monthly Insights</div>
+      ${patternsHtml}
+      ${tradeOfMonthHtml}
       ${weekSectionHtml}
       ${consistencyHtml}
       ${conceptHtml}
@@ -4466,6 +4643,18 @@
     currentReview = { kind: 'monthly', start: periodStart, end: periodEnd, key: monthKey, titleText };
     const stats = computePeriodStats(periodStart, periodEnd);
     fillReviewModalBody(stats, titleText, 'month', { start: periodStart, end: periodEnd });
+    // Trade-of-month cells link to the day modal. Wire after the markup is in the DOM.
+    document.querySelectorAll('.trade-of-month-cell').forEach(el => {
+      el.addEventListener('click', () => {
+        const iso = el.dataset.tradeDate;
+        if (!iso) return;
+        const dateKey = new Date(iso).toDateString();
+        // Close the monthly modal first so the day modal isn't stacked on top awkwardly
+        document.getElementById('review-modal-bg').classList.remove('show');
+        currentReview = null;
+        if (typeof openDayModal === 'function') openDayModal(dateKey);
+      });
+    });
     const existing = (data.monthlyReviews || []).find(r => r.monthKey === monthKey) || {};
     renderMonthlyReflection(existing);
     document.getElementById('review-modal-bg').classList.add('show');
