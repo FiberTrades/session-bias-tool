@@ -85,6 +85,15 @@
   .section-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 22px; letter-spacing: -0.01em; }
   .section-hint { font-size: 11px; color: var(--text-dim); margin-bottom: 24px; margin-left: 60px; letter-spacing: 0.08em; text-transform: uppercase; }
   .potr-empty { color: var(--text-dim); font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; margin: 0 0 24px 60px; }
+  /* Info tip — small "?" icon with hover-revealed long text. Used to declutter
+     section hints throughout the app: collapse paragraphs of explainer text into
+     a tooltip behind a single discoverable icon. */
+  .info-tip { position: relative; display: inline-block; margin-left: 10px; vertical-align: middle; }
+  .info-tip-icon { display: inline-block; width: 14px; height: 14px; line-height: 13px; text-align: center; border: 1px solid var(--text-dim); border-radius: 50%; color: var(--text-dim); font-size: 9px; cursor: help; font-family: 'DM Mono', monospace; transition: color 150ms, border-color 150ms; }
+  .info-tip-icon:hover { color: var(--text); border-color: var(--text); }
+  .info-tip-content { display: none; position: absolute; top: 24px; left: -8px; background: var(--bg-elev); border: 1px solid var(--border-2); padding: 12px 14px; color: var(--text-mid); font-size: 11px; line-height: 1.6; width: 340px; z-index: 100; font-family: 'DM Mono', monospace; letter-spacing: 0.02em; text-transform: none; }
+  .info-tip:hover .info-tip-content { display: block; }
+  @media (max-width: 700px) { .info-tip-content { width: 260px; left: auto; right: -8px; } }
   /* Period filter row above the simulators — small inline control. */
   .potr-period-row { margin: 0 0 18px 60px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .potr-period-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); }
@@ -95,34 +104,44 @@
   .potr-period-sep { font-size: 10px; }
   .potr-period-count { font-size: 10px; color: var(--text-dim); font-style: italic; font-family: 'Fraunces', serif; margin-left: auto; }
   @media (max-width: 700px) { .potr-period-row { margin-left: 0; } }
-  /* Simulator: cards in a row showing what-if R totals at different "hold longer" buckets */
-  .potr-sim-title { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); margin: 0 0 4px 60px; }
-  /* Each simulator (R section + Pips section) gets vertical spacing. Second one gets a top divider. */
-  .potr-sim-section { margin-bottom: 28px; }
-  .potr-sim-section + .potr-sim-section { padding-top: 28px; border-top: 1px solid var(--border); }
-  .potr-sim-sub { font-size: 11px; color: var(--text-dim); margin: 0 0 14px 60px; letter-spacing: 0.04em; line-height: 1.5; }
-  .potr-sim-grid { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-left: 60px; }
-  .potr-sim-cell { background: var(--bg); padding: 16px 12px; text-align: center; }
-  .potr-sim-cell.actual { background: var(--bg-elev); }
-  /* Context cells (Actual avg, Potential R avg) — subtly tinted to separate them visually from
-     the scenario cells (+0.5R held, +1R held, etc.). They show per-win averages, not totals. */
-  .potr-sim-cell.context { background: var(--bg-elev); }
-  .potr-sim-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
-  /* Click-to-edit chip on each bucket's label. Underline hints at interactivity without shouting. */
-  .potr-bucket-edit { color: var(--text); cursor: pointer; border-bottom: 1px dashed var(--text-dim); padding: 0 2px; transition: color 150ms, border-color 150ms; }
-  .potr-bucket-edit:hover { color: var(--good); border-bottom-color: var(--good); }
-  .potr-bucket-input { width: 50px; padding: 1px 4px; background: var(--bg); color: var(--text); border: 1px solid var(--text-mid); font-family: 'DM Mono', monospace; font-size: 11px; text-align: center; outline: none; }
-  .potr-bucket-input::-webkit-inner-spin-button, .potr-bucket-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-  .potr-sim-value { font-family: 'Fraunces', serif; font-size: 22px; line-height: 1.1; }
-  .potr-sim-value.good { color: var(--good); }
-  .potr-sim-value.bad  { color: var(--bad); }
-  .potr-sim-delta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 6px; }
-  .potr-sim-delta.good { color: var(--good); }
-  .potr-sim-delta.bad  { color: var(--bad); }
+  /* "Held Longer" section: recommendation block + summary line + per-trade table. */
+  .potr-rec-block { margin: 0 0 18px 60px; padding: 16px 18px; background: var(--bg-elev); border: 1px solid var(--border-2); border-left: 3px solid var(--text-mid); }
+  .potr-rec-title { font-family: 'Fraunces', serif; font-size: 15px; color: var(--text); margin-bottom: 12px; }
+  .rec-row { display: flex; gap: 12px; align-items: baseline; margin-bottom: 10px; font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.55; }
+  .rec-row:last-child { margin-bottom: 0; }
+  .rec-tier { flex: 0 0 auto; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--border-2); white-space: nowrap; }
+  .rec-tier-low      { color: var(--text-dim); border-color: var(--border-2); }
+  .rec-tier-early    { color: var(--text-mid); border-color: var(--text-mid); }
+  .rec-tier-building { color: var(--text);     border-color: var(--text); }
+  .rec-tier-strong   { color: var(--good);     border-color: var(--good); }
+  .rec-tier-n { color: var(--text-dim); font-weight: normal; letter-spacing: 0.1em; }
+  .rec-text { color: var(--text-mid); }
+  .rec-text strong { color: var(--text); font-weight: normal; }
+  .rec-text strong.rec-suggest { color: var(--good); padding: 0 4px; background: rgba(0,0,0,0.15); }
+  /* Summary line above the per-trade table */
+  .potr-summary { margin: 0 0 14px 60px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-mid); line-height: 1.55; }
+  .potr-summary strong { color: var(--text); font-weight: normal; }
+  .potr-summary-left { color: var(--bad); }
+  /* Per-trade table */
+  .potr-trade-table { margin-left: 60px; }
+  .potr-trade-row { display: grid; grid-template-columns: 110px 70px minmax(120px, 1fr) minmax(120px, 1fr) minmax(130px, 1fr) 80px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 3px; cursor: pointer; transition: background 150ms; }
+  .potr-trade-row.headers { cursor: default; background: var(--bg-elev); }
+  .potr-trade-row.headers .potr-trade-cell { background: var(--bg-elev); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); padding: 9px 12px; }
+  .potr-trade-row:not(.headers):hover .potr-trade-cell { background: var(--bg-elev); }
+  .potr-trade-cell { background: var(--bg); padding: 11px 12px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); }
+  .potr-trade-cell.bad  { color: var(--bad); }
+  .potr-trade-cell.good { color: var(--good); }
+  .potr-trade-cell .potr-trade-sub { color: var(--text-dim); font-size: 10px; font-style: italic; }
+  /* Closing disclaimer */
   .potr-sim-note { font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; color: var(--text-dim); line-height: 1.5; margin: 14px 0 0 60px; max-width: 640px; }
   @media (max-width: 700px) {
-    .potr-empty, .potr-sim-title, .potr-sim-sub, .potr-sim-grid, .potr-sim-note { margin-left: 0; }
-    .potr-sim-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important; }
+    .potr-empty, .potr-rec-block, .potr-summary, .potr-trade-table, .potr-sim-note { margin-left: 0; }
+    .potr-rec-block { padding: 12px 14px; }
+    .rec-row { flex-direction: column; gap: 6px; }
+    .rec-tier { align-self: flex-start; }
+    .potr-trade-row { grid-template-columns: 90px 55px 1fr 1fr 1fr 60px; }
+    .potr-trade-cell { padding: 9px 8px; font-size: 11px; }
+    .potr-trade-row.headers .potr-trade-cell { padding: 7px 8px; }
   }
   .options { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-left: 60px; }
   .options.two-col   { grid-template-columns: 1fr 1fr; }
@@ -267,12 +286,21 @@
      Used wherever a KPI shows both R and pips equivalents — e.g. Total R · Pips, Potential R · Pips, Expectancy. */
   .stat-value.dual { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.1; }
   .stat-value.dual .dual-primary { font-size: inherit; }
-  .stat-value.dual .dual-secondary { font-size: 14px; color: var(--text-dim); font-style: italic; }
+  .stat-value.dual .dual-secondary { font-size: 14px; color: var(--text-dim); font-style: normal; }
   .stat-value.dual.medium .dual-secondary { font-size: 12px; }
   .stat-value.dual.good .dual-primary { color: var(--good); }
   .stat-value.dual.bad  .dual-primary { color: var(--bad); }
-  .stat-value.dual .dual-secondary.good { color: var(--good); opacity: 0.7; }
-  .stat-value.dual .dual-secondary.bad  { color: var(--bad);  opacity: 0.7; }
+  /* Pips secondary uses same colour as R primary (user request — full opacity, no italic). */
+  .stat-value.dual .dual-secondary.good { color: var(--good); opacity: 1; }
+  .stat-value.dual .dual-secondary.bad  { color: var(--bad);  opacity: 1; }
+  /* Modal stat cards: support same dual stacked layout used by .stat-value */
+  .modal-stat .v.dual { display: flex; flex-direction: column; align-items: center; line-height: 1.15; }
+  .modal-stat .v.dual .dual-primary { font-size: inherit; }
+  .modal-stat .v.dual .dual-secondary { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .modal-stat .v.dual.good .dual-primary { color: var(--good); }
+  .modal-stat .v.dual.bad  .dual-primary { color: var(--bad); }
+  .modal-stat .v.dual .dual-secondary.good { color: var(--good); }
+  .modal-stat .v.dual .dual-secondary.bad  { color: var(--bad); }
   .current-series { margin-top: 40px; padding: 22px 28px; border: 1px solid var(--border-2); background: var(--bg-elev); }
   .current-series-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
   .current-series-title { font-family: 'Fraunces', serif; font-size: 20px; }
@@ -286,14 +314,18 @@
   .series-dot.clickable:hover { opacity: 0.78; transform: scale(1.06); }
   .history-list { margin-top: 32px; }
   .history-row { display: grid; grid-template-columns: 60px repeat(4, 1fr) 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 6px; }
-  #type-breakdown .history-row, #side-breakdown .history-row, #dow-breakdown .history-row { grid-template-columns: 120px repeat(4, 1fr) 1fr; }
+  #type-breakdown .history-row, #side-breakdown .history-row, #dow-breakdown .history-row { grid-template-columns: 130px 1fr 90px 130px minmax(140px, 1.4fr); }
+  #type-breakdown .history-row.headers, #side-breakdown .history-row.headers, #dow-breakdown .history-row.headers { background: var(--bg-elev); }
+  #type-breakdown .history-row.headers .history-cell,
+  #side-breakdown .history-row.headers .history-cell,
+  #dow-breakdown  .history-row.headers .history-cell { padding: 9px 14px; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); }
   .history-cell { background: var(--bg); padding: 14px 14px; font-size: 12px; }
   .history-cell.label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; font-size: 10px; }
   .history-cell.center { text-align: center; }
   .history-cell.right  { text-align: right; }
-  .history-cell.pl-good { color: var(--good); font-weight: 500; }
-  .history-cell.pl-bad  { color: var(--bad); font-weight: 500; }
-  .history-cell.pl-be   { color: var(--text-mid); font-weight: 500; }
+  .history-cell.pl-good { color: var(--good); font-weight: 500; font-size: 14px; }
+  .history-cell.pl-bad  { color: var(--bad);  font-weight: 500; font-size: 14px; }
+  .history-cell.pl-be   { color: var(--text-mid); font-weight: 500; font-size: 14px; }
   /* Inline dim styling for the · separator and pips part in breakdown table cells */
   .history-cell .dim { color: var(--text-dim); }
   .wl-summary { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
@@ -545,7 +577,7 @@
   .modal-net.bad  { color: var(--bad); }
   .modal-close { background: transparent; border: 1px solid var(--border-2); color: var(--text-mid); cursor: pointer; padding: 6px 14px; font-family: 'DM Mono', monospace; font-size: 11px; }
   .modal-close:hover { color: var(--text); border-color: var(--text-mid); }
-  .modal-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 24px; }
+  .modal-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 24px; }
   .modal-stat { background: var(--bg-elev); padding: 14px; text-align: center; }
   .modal-stat .label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
   .modal-stat .v { font-family: 'Fraunces', serif; font-size: 17px; }
@@ -636,7 +668,7 @@
     .trade-row .trade-cell:nth-child(7), .trade-row .trade-cell:nth-child(8), .trade-row .trade-cell:nth-child(9), .trade-row .trade-cell:nth-child(10), .trade-row .trade-cell:nth-child(11), .trade-row-headers .trade-header-cell:nth-child(7), .trade-row-headers .trade-header-cell:nth-child(8), .trade-row-headers .trade-header-cell:nth-child(9), .trade-row-headers .trade-header-cell:nth-child(10), .trade-row-headers .trade-header-cell:nth-child(11) { display: none; }
     .saved-bias-grid { grid-template-columns: 1fr; }
     .history-row { grid-template-columns: 50px 1fr 1fr 1fr 1fr; }
-    #type-breakdown .history-row, #side-breakdown .history-row, #dow-breakdown .history-row { grid-template-columns: 100px 1fr 1fr 1fr 1fr; }
+    #type-breakdown .history-row, #side-breakdown .history-row, #dow-breakdown .history-row { grid-template-columns: 90px 1fr 60px 100px 1fr; }
     .wl-summary, .holdtime-grid { grid-template-columns: 1fr; }
     .time-hero-grid { grid-template-columns: 1fr 1fr; }
     .time-analysis-row { grid-template-columns: 80px 50px 70px 60px; gap: 8px; padding: 10px 12px; }
@@ -974,8 +1006,8 @@
         </div>
         <div class="stat-value" id="stat-pnl">£0</div>
       </div>
-      <div class="stat-cell"><div class="stat-tooltip" id="stat-total-tip">Net R across your current series of 10.</div><div class="stat-label" id="stat-total-label">Total R</div><div class="stat-value" id="stat-total">0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="stat-rleft-tip">R left on the table across wins in your current series. Potential minus actual captured. Only counts wins with potential R logged.</div><div class="stat-label" id="stat-rleft-label">Potential R</div><div class="stat-value" id="stat-rleft">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="stat-total-tip">Net R and Net Pips across your current series of 10.</div><div class="stat-label" id="stat-total-label">Total R · Pips</div><div class="stat-value dual" id="stat-total">0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="stat-rleft-tip">R and Pips left on the table across wins in your current series. Potential minus actual captured.</div><div class="stat-label" id="stat-rleft-label">Potential R · Pips</div><div class="stat-value dual" id="stat-rleft">—</div></div>
     </div>
 
     <div class="current-series">
@@ -1024,9 +1056,9 @@
       </div>
       <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label">Total Costs</div><div class="stat-value medium" id="kpi-costs">£0</div></div>
       <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) across every trade ever logged. BEs excluded.</div><div class="stat-label">Win Rate</div><div class="stat-value" id="kpi-winrate">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="kpi-totalr-tip">Net R across every trade ever logged.</div><div class="stat-label" id="kpi-totalr-label">Total R</div><div class="stat-value" id="kpi-totalr">0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="kpi-rleft-tip">R left on the table across all winning trades ever logged. Potential minus actual captured. Only counts wins with potential R logged.</div><div class="stat-label" id="kpi-rleft-label">Potential R</div><div class="stat-value" id="kpi-rleft">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="kpi-exp-tip">Average R per trade. Positive = profitable system.</div><div class="stat-label" id="kpi-exp-label">Expectancy</div><div class="stat-value" id="kpi-exp">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="kpi-totalr-tip">Net R and Net Pips across every trade ever logged.</div><div class="stat-label" id="kpi-totalr-label">Total R · Pips</div><div class="stat-value dual" id="kpi-totalr">0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="kpi-rleft-tip">R and Pips left on the table across all winning trades ever logged. Potential minus actual captured.</div><div class="stat-label" id="kpi-rleft-label">Potential R · Pips</div><div class="stat-value dual" id="kpi-rleft">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="kpi-exp-tip">Average R and average Pips per trade.</div><div class="stat-label" id="kpi-exp-label">Expectancy</div><div class="stat-value dual" id="kpi-exp">—</div></div>
       <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R across all trades. Above 1.5 = solid edge.</div><div class="stat-label">Profit Factor</div><div class="stat-value" id="kpi-pf">—</div></div>
     </div>
 
@@ -1076,20 +1108,17 @@
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">—</span><span class="section-title">Day of Week Breakdown</span></div>
-      <p class="section-hint">Performance by weekday — which days are your edge. WR = win rate · Avg R = average R per trade · W/L/BE = win/loss/break-even counts.</p>
+      <div class="section-header"><span class="section-num">—</span><span class="section-title">Day of Week Breakdown<span class="info-tip"><span class="info-tip-icon">?</span><span class="info-tip-content">Performance by weekday — which days are your edge. WR = win rate. W/L/BE = win/loss/break-even counts. Net R = sum of R across trades on that day.</span></span></span></div>
       <div id="dow-breakdown"></div>
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">—</span><span class="section-title">Long vs Short</span></div>
-      <p class="section-hint">Performance by direction — find out if one side of the market is your edge. Same column meanings as above.</p>
+      <div class="section-header"><span class="section-num">—</span><span class="section-title">Long vs Short<span class="info-tip"><span class="info-tip-icon">?</span><span class="info-tip-content">Performance by direction — find out if one side of the market is your edge. Same column meanings as above.</span></span></span></div>
       <div id="side-breakdown"></div>
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">—</span><span class="section-title">Reaction vs Continuation</span></div>
-      <p class="section-hint">Performance by trade type — tag trades in Review tab. Reaction = countertrend / mean-revert. Continuation = with-trend.</p>
+      <div class="section-header"><span class="section-num">—</span><span class="section-title">Reaction vs Continuation<span class="info-tip"><span class="info-tip-icon">?</span><span class="info-tip-content">Performance by trade type — tag trades in Review tab. Reaction = countertrend / mean-revert. Continuation = with-trend.</span></span></span></div>
       <div id="type-breakdown"></div>
     </section>
 
@@ -1119,16 +1148,11 @@
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">—</span><span class="section-title">What if I held winners longer?</span></div>
-      <p class="section-hint">Two simulators below — one for R, one for pips. Both show average captured vs. available across your tracked wins, plus a "hold longer" projection. Click any bucket value to change it.</p>
+      <div class="section-header"><span class="section-num">—</span><span class="section-title">What if I held winners longer?<span class="info-tip"><span class="info-tip-icon">?</span><span class="info-tip-content">A recommendation based on how much of the available move you're capturing on average, followed by a per-trade table sorted by R left on the table (worst exits first). Click any row to open that day's review. Conviction strength scales with the number of tracked wins — sub-10 wins is too few to act on, 50+ is a strong pattern.</span></span></span></div>
       <div class="potr-period-row">
         <span class="potr-period-label">Period</span>
         <select id="potr-period-select">
           <option value="all">All history</option>
-          <option value="this-year">This year</option>
-          <option value="last-year">Last year</option>
-          <option value="last-3-months">Last 3 months</option>
-          <option value="last-month">Last month</option>
           <option value="custom">Custom…</option>
         </select>
         <span class="potr-period-custom" id="potr-period-custom" style="display:none">
@@ -2935,10 +2959,19 @@
       }
       const elTotal = document.getElementById(`${prefix}-total`);
       if (elTotal) {
+        // R primary + pips secondary, both colour-matched (no dim styling — user requested).
+        const seriesAll = (data.currentSeries || []);
+        const totalPips = seriesAll.reduce((s, t) => s + tradePipsForMath(t), 0);
+        const tradesWithPips = seriesAll.filter(t => tradeHasTrackedPips(t));
         const rStr  = b.total > 0 ? (b.totalR >= 0 ? '+' : '') + b.totalR.toFixed(1) + 'R' : '0';
         const rCls  = b.totalR > 0 ? 'good' : b.totalR < 0 ? 'bad' : '';
-        elTotal.textContent = rStr;
-        elTotal.className = 'stat-value ' + rCls;
+        const pipsStr = tradesWithPips.length > 0
+          ? (totalPips >= 0 ? '+' : '') + totalPips.toFixed(0) + 'p'
+          : '— p';
+        const pipsCls = tradesWithPips.length === 0 ? ''
+                      : totalPips > 0 ? 'good' : totalPips < 0 ? 'bad' : '';
+        elTotal.innerHTML = `<span class="dual-primary">${rStr}</span><span class="dual-secondary ${pipsCls}">${pipsStr}</span>`;
+        elTotal.className = 'stat-value dual ' + rCls;
       }
       const elPf = document.getElementById(`${prefix}-pf`);
       if (elPf) {
@@ -2980,16 +3013,22 @@
     }
     renderSeriesPnlCell();
 
-    // Potential R Left (Series) — R only
+    // Potential R · Pips Left (Series) — both stacked, same colour
     const currentSeriesWins = (data.currentSeries || []).filter(t => t.result === 'Win');
     const rLeftEl = document.getElementById('stat-rleft');
     const seriesRLeftTracked = currentSeriesWins.filter(t => typeof t.potentialR === 'number' && !isNaN(t.potentialR));
     const seriesRLeft = seriesRLeftTracked.reduce((s, t) => s + ((t.potentialR || 0) - (parseFloat(t.r) || 0)), 0);
+    const seriesPipsTracked = currentSeriesWins.filter(t => typeof t.potentialPips === 'number' && !isNaN(t.potentialPips));
+    const seriesPipsLeft = seriesPipsTracked.reduce((s, t) => s + ((t.potentialPips || 0) - tradePipsForMath(t)), 0);
     const seriesRLeftStr = seriesRLeftTracked.length === 0 ? '—'
       : (seriesRLeft >= 0 ? '+' : '') + seriesRLeft.toFixed(2) + 'R';
     const seriesRLeftCls = seriesRLeft > 0.5 ? 'bad' : '';
-    rLeftEl.textContent = seriesRLeftStr;
-    rLeftEl.className = 'stat-value ' + seriesRLeftCls;
+    const seriesPipsLeftStr = seriesPipsTracked.length === 0 ? '— p'
+      : (seriesPipsLeft >= 0 ? '+' : '') + seriesPipsLeft.toFixed(0) + 'p';
+    const seriesPipsLeftCls = seriesPipsTracked.length === 0 ? ''
+      : seriesPipsLeft > 5 ? 'bad' : '';
+    rLeftEl.innerHTML = `<span class="dual-primary">${seriesRLeftStr}</span><span class="dual-secondary ${seriesPipsLeftCls}">${seriesPipsLeftStr}</span>`;
+    rLeftEl.className = 'stat-value dual ' + seriesRLeftCls;
 
     const cs = data.currentSeries;
     document.getElementById('current-progress').textContent = cs.length + ' / 10';
@@ -3161,24 +3200,39 @@
     const totalR = winRSum - lossRSum;
     const expVal = all.length > 0 ? totalR / all.length : null;
 
-    // Total R (lifetime)
+    // Sum pips across all trades — restored for dual KPI display.
+    const totalPips = all.reduce((s, t) => {
+      const p = parseFloat(t.pips);
+      return s + (!isNaN(p) ? p : 0);
+    }, 0);
+    const tradesWithPips = all.filter(t => tradeHasTrackedPips(t));
+    const expPipsVal = tradesWithPips.length > 0 ? totalPips / tradesWithPips.length : null;
+
+    // Total R · Pips (lifetime) — dual, same colour
     const totalREl = document.getElementById('kpi-totalr');
     const totalRStr  = (totalR >= 0 ? '+' : '') + totalR.toFixed(1) + 'R';
     const totalRCls  = totalR > 0 ? 'good' : totalR < 0 ? 'bad' : '';
+    const totalPipsStr = tradesWithPips.length > 0
+      ? (totalPips >= 0 ? '+' : '') + totalPips.toFixed(0) + 'p'
+      : '— p';
+    const totalPipsCls = tradesWithPips.length === 0 ? ''
+                       : totalPips > 0 ? 'good' : totalPips < 0 ? 'bad' : '';
     if (all.length === 0) {
-      totalREl.textContent = '0';
-      totalREl.className = 'stat-value';
+      totalREl.innerHTML = `<span class="dual-primary">0</span><span class="dual-secondary">0p</span>`;
+      totalREl.className = 'stat-value dual';
     } else {
-      totalREl.textContent = totalRStr;
-      totalREl.className = 'stat-value ' + totalRCls;
+      totalREl.innerHTML = `<span class="dual-primary">${totalRStr}</span><span class="dual-secondary ${totalPipsCls}">${totalPipsStr}</span>`;
+      totalREl.className = 'stat-value dual ' + totalRCls;
     }
 
-    // Expectancy R
+    // Expectancy R · Pips — dual, same colour
     const expEl = document.getElementById('kpi-exp');
     const expRStr  = expVal !== null ? (expVal >= 0 ? '+' : '') + expVal.toFixed(2) + 'R' : '—';
     const expRCls  = expVal === null ? '' : expVal > 0 ? 'good' : expVal < 0 ? 'bad' : '';
-    expEl.textContent = expRStr;
-    expEl.className = 'stat-value ' + expRCls;
+    const expPipsStr  = expPipsVal !== null ? (expPipsVal >= 0 ? '+' : '') + expPipsVal.toFixed(1) + 'p' : '— p';
+    const expPipsCls  = expPipsVal === null ? '' : expPipsVal > 0 ? 'good' : expPipsVal < 0 ? 'bad' : '';
+    expEl.innerHTML = `<span class="dual-primary">${expRStr}</span><span class="dual-secondary ${expPipsCls}">${expPipsStr}</span>`;
+    expEl.className = 'stat-value dual ' + expRCls;
 
     // Win Rate (lifetime, BEs excluded) — unit-independent
     const decisive = wins.length + losses.length;
@@ -3187,15 +3241,20 @@
     if (wrVal === null) { wrEl.textContent = '—'; wrEl.className = 'stat-value'; }
     else { wrEl.textContent = wrVal + '%'; wrEl.className = 'stat-value' + (wrVal >= 60 ? ' good' : wrVal >= 40 ? '' : ' bad'); }
 
-    // Potential R left on table (lifetime) — R only
+    // Potential R · Pips left on table (lifetime) — dual, same colour
     const rLeftEl = document.getElementById('kpi-rleft');
     const ltRLeftTracked = wins.filter(t => typeof t.potentialR === 'number' && !isNaN(t.potentialR));
     const ltRLeft = ltRLeftTracked.reduce((s, t) => s + ((t.potentialR || 0) - (parseFloat(t.r) || 0)), 0);
+    const trackedPipsWins = wins.filter(t => typeof t.potentialPips === 'number' && !isNaN(t.potentialPips));
+    const ltPipsLeft = trackedPipsWins.reduce((s, t) => s + ((t.potentialPips || 0) - tradePipsForMath(t)), 0);
     const rLeftStr  = ltRLeftTracked.length === 0 ? '—'
                     : (ltRLeft >= 0 ? '+' : '') + ltRLeft.toFixed(2) + 'R';
     const rLeftCls  = ltRLeft > 0.5 ? 'bad' : '';
-    rLeftEl.textContent = rLeftStr;
-    rLeftEl.className = 'stat-value ' + rLeftCls;
+    const pipsLeftStr = trackedPipsWins.length === 0 ? '— p'
+                      : (ltPipsLeft >= 0 ? '+' : '') + ltPipsLeft.toFixed(0) + 'p';
+    const pipsLeftCls = trackedPipsWins.length === 0 ? '' : ltPipsLeft > 5 ? 'bad' : '';
+    rLeftEl.innerHTML = `<span class="dual-primary">${rLeftStr}</span><span class="dual-secondary ${pipsLeftCls}">${pipsLeftStr}</span>`;
+    rLeftEl.className = 'stat-value dual ' + rLeftCls;
 
     const totalWinR = wins.reduce((s,t) => s + t.r, 0);
     const totalLossR = losses.length;
@@ -3240,21 +3299,28 @@
     function netUnitCls(s) {
       return s.netR > 0 ? 'pl-good' : s.netR < 0 ? 'pl-bad' : 'pl-be';
     }
-    const avgLabel = 'Avg R';
+    // Header row reused by all three breakdown tables. Drops the noisy inline labels in cells.
+    const breakdownHeader = `<div class="history-row headers">
+      <div class="history-cell label center">&nbsp;</div>
+      <div class="history-cell">Trades</div>
+      <div class="history-cell">WR</div>
+      <div class="history-cell">W / L / BE</div>
+      <div class="history-cell right">Net R</div>
+    </div>`;
+    const rowFor = (labelText, s) => `<div class="history-row">
+      <div class="history-cell label center">${labelText}</div>
+      <div class="history-cell">${s.count}</div>
+      <div class="history-cell">${s.wr !== null ? s.wr + '%' : '—'}</div>
+      <div class="history-cell">${s.w} / ${s.l} / ${s.be}</div>
+      <div class="history-cell right ${netUnitCls(s)}">${fmtNetUnit(s)}</div>
+    </div>`;
+
     if (!anyDow) dowWrap.innerHTML = '<div class="empty">Log a few trades to populate.</div>';
     else {
-      let html = '<div class="history-list" style="margin-top:0;">';
+      let html = '<div class="history-list" style="margin-top:0;">' + breakdownHeader;
       dows.forEach(d => {
         const dt = all.filter(t => t.dayOfWeek === d);
-        const s = sideStats(dt);
-        html += `<div class="history-row">
-          <div class="history-cell label center">${dowNames[d]}</div>
-          <div class="history-cell"><span class="label">Trades</span> ${s.count}</div>
-          <div class="history-cell"><span class="label">WR</span> ${s.wr !== null ? s.wr + '%' : '—'}</div>
-          <div class="history-cell"><span class="label">${avgLabel}</span> ${fmtAvgUnit(s)}</div>
-          <div class="history-cell"><span class="label">W/L/BE</span> ${s.w}/${s.l}/${s.be}</div>
-          <div class="history-cell right ${netUnitCls(s)}">${fmtNetUnit(s)}</div>
-        </div>`;
+        html += rowFor(dowNames[d], sideStats(dt));
       });
       html += '</div>';
       dowWrap.innerHTML = html;
@@ -3271,22 +3337,9 @@
       const sh = sideStats(shorts);
       sideWrap.innerHTML = `
         <div class="history-list" style="margin-top:0;">
-          <div class="history-row">
-            <div class="history-cell label center">Long</div>
-            <div class="history-cell"><span class="label">Trades</span> ${lo.count}</div>
-            <div class="history-cell"><span class="label">WR</span> ${lo.wr !== null ? lo.wr + '%' : '—'}</div>
-            <div class="history-cell"><span class="label">${avgLabel}</span> ${fmtAvgUnit(lo)}</div>
-            <div class="history-cell"><span class="label">W/L/BE</span> ${lo.w}/${lo.l}/${lo.be}</div>
-            <div class="history-cell right ${netUnitCls(lo)}">${fmtNetUnit(lo)}</div>
-          </div>
-          <div class="history-row">
-            <div class="history-cell label center">Short</div>
-            <div class="history-cell"><span class="label">Trades</span> ${sh.count}</div>
-            <div class="history-cell"><span class="label">WR</span> ${sh.wr !== null ? sh.wr + '%' : '—'}</div>
-            <div class="history-cell"><span class="label">${avgLabel}</span> ${fmtAvgUnit(sh)}</div>
-            <div class="history-cell"><span class="label">W/L/BE</span> ${sh.w}/${sh.l}/${sh.be}</div>
-            <div class="history-cell right ${netUnitCls(sh)}">${fmtNetUnit(sh)}</div>
-          </div>
+          ${breakdownHeader}
+          ${rowFor('Long', lo)}
+          ${rowFor('Short', sh)}
           ${untaggedSide > 0 ? `<div style="font-size:10px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:12px;text-align:center;">${untaggedSide} trade${untaggedSide === 1 ? '' : 's'} untagged</div>` : ''}
         </div>`;
     }
@@ -3302,22 +3355,9 @@
       const c = sideStats(continuation);
       typeWrap.innerHTML = `
         <div class="history-list" style="margin-top:0;">
-          <div class="history-row">
-            <div class="history-cell label center">Reaction</div>
-            <div class="history-cell"><span class="label">Trades</span> ${r.count}</div>
-            <div class="history-cell"><span class="label">WR</span> ${r.wr !== null ? r.wr + '%' : '—'}</div>
-            <div class="history-cell"><span class="label">${avgLabel}</span> ${fmtAvgUnit(r)}</div>
-            <div class="history-cell"><span class="label">W/L/BE</span> ${r.w}/${r.l}/${r.be}</div>
-            <div class="history-cell right ${netUnitCls(r)}">${fmtNetUnit(r)}</div>
-          </div>
-          <div class="history-row">
-            <div class="history-cell label center">Continuation</div>
-            <div class="history-cell"><span class="label">Trades</span> ${c.count}</div>
-            <div class="history-cell"><span class="label">WR</span> ${c.wr !== null ? c.wr + '%' : '—'}</div>
-            <div class="history-cell"><span class="label">${avgLabel}</span> ${fmtAvgUnit(c)}</div>
-            <div class="history-cell"><span class="label">W/L/BE</span> ${c.w}/${c.l}/${c.be}</div>
-            <div class="history-cell right ${netUnitCls(c)}">${fmtNetUnit(c)}</div>
-          </div>
+          ${breakdownHeader}
+          ${rowFor('Reaction', r)}
+          ${rowFor('Continuation', c)}
           ${untaggedType > 0 ? `<div style="font-size:10px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:12px;text-align:center;">${untaggedType} trade${untaggedType === 1 ? '' : 's'} untagged</div>` : ''}
         </div>`;
     }
@@ -3587,167 +3627,188 @@
     const countEl = document.getElementById('potr-period-count');
     if (countEl) countEl.textContent = `${allTrades.length} trade${allTrades.length === 1 ? '' : 's'} in scope`;
 
-    // Build the HTML + post-render wiring for ONE simulator mode.
-    // Returns { html, wireUp(rootEl) } so the caller can append HTML then attach handlers afterwards.
-    function buildSimulator(isPips) {
-      const actualField    = isPips ? 'pips'           : 'r';
-      const potentialField = isPips ? 'potentialPips'  : 'potentialR';
-      const bucketsKey     = isPips ? 'potPipsBuckets' : 'potRBuckets';
-      const unitWord       = isPips ? 'Pips' : 'R';
-      const unit           = isPips ? 'p' : 'R';
-      const title          = isPips ? 'Pips' : 'R';
+    // ------------------------------------------------------------------
+    // Tracked wins for R and Pips — independent sets (a trade may have R
+    // but not pips tracked, or vice versa). Each metric is computed on its
+    // own tracked set.
+    // ------------------------------------------------------------------
+    const wins = allTrades.filter(t => t.result === 'Win');
+    const tracked = wins.filter(t =>
+      (typeof t.potentialR === 'number' && !isNaN(t.potentialR)) ||
+      (typeof t.potentialPips === 'number' && !isNaN(t.potentialPips))
+    );
 
-      // Wins with the relevant Potential field logged. These are the only trades the simulator can use.
-      const trackedWins = allTrades.filter(t =>
-        t.result === 'Win' &&
-        typeof t[potentialField] === 'number' &&
-        !isNaN(t[potentialField])
-      );
-
-      // Empty state for this mode — but the OTHER mode might have data, so don't bail the whole section.
-      if (trackedWins.length === 0) {
-        return {
-          html: `<div class="potr-sim-section" data-mode="${isPips ? 'pips' : 'r'}">
-            <div class="potr-sim-title">${title}</div>
-            <p class="potr-empty" style="margin-left:0;">No winning trades with Potential ${unitWord} logged yet. Log when you mark a win and patterns appear here.</p>
-          </div>`,
-          wireUp: () => {}
-        };
-      }
-
-      // Configurable bucket array — different defaults for R vs pips, both stored in settings.
-      const BUCKETS = data.settings[bucketsKey].slice();
-
-      // Two contextual averages — both computed over the tracked-Potential winning set.
-      const capturedSum  = trackedWins.reduce((s, t) => s + (parseFloat(t[actualField]) || 0), 0);
-      const potentialSum = trackedWins.reduce((s, t) => s + (t[potentialField] || 0), 0);
-      const actualAvg    = capturedSum / trackedWins.length;
-      const potentialAvg = potentialSum / trackedWins.length;
-
-      function tradeUnitForSim(t) {
-        if (t.result === 'Win') return parseFloat(t[actualField]) || 0;
-        if (t.result === 'Lose') {
-          // R mode: each loss = -1R. Pips mode: use logged pips (negative). Fallback to 0 if missing.
-          if (isPips) {
-            const v = parseFloat(t.pips);
-            return !isNaN(v) ? v : 0;
-          }
-          return -1;
-        }
-        return 0;
-      }
-      const actualTotal = allTrades.reduce((s, t) => s + tradeUnitForSim(t), 0);
-
-      function simulate(holdMore) {
-        return allTrades.reduce((sum, t) => {
-          if (t.result === 'Win' && typeof t[potentialField] === 'number' && !isNaN(t[potentialField])) {
-            const actual = parseFloat(t[actualField]) || 0;
-            return sum + Math.min(actual + holdMore, t[potentialField]);
-          }
-          return sum + tradeUnitForSim(t);
-        }, 0);
-      }
-
-      const fmtV     = v => (v >= 0 ? '+' : '') + v.toFixed(isPips ? 0 : 2) + unit;
-      const fmtDelta = d => (d > 0 ? '+' : d < 0 ? '−' : '') + Math.abs(d).toFixed(isPips ? 0 : 2) + unit;
-
-      // Two context cards: avg captured vs avg potential. Both are positive (wins only set).
-      const avgLabel = isPips ? 'Potential Pips avg' : 'Potential R avg';
-      const cells = [
-        `<div class="potr-sim-cell context">
-          <div class="potr-sim-label">Actual avg</div>
-          <div class="potr-sim-value good">${fmtV(actualAvg)}</div>
-          <div class="potr-sim-delta">Per tracked win</div>
-        </div>`,
-        `<div class="potr-sim-cell context">
-          <div class="potr-sim-label">${avgLabel}</div>
-          <div class="potr-sim-value">${fmtV(potentialAvg)}</div>
-          <div class="potr-sim-delta">${trackedWins.length} win${trackedWins.length === 1 ? '' : 's'} tracked</div>
-        </div>`
-      ];
-
-      BUCKETS.forEach((holdMore, idx) => {
-        const simV  = simulate(holdMore);
-        const delta = simV - actualTotal;
-        const cls   = simV > 0 ? 'good' : simV < 0 ? 'bad' : '';
-        const dcls  = delta > 0.01 ? 'good' : delta < -0.01 ? 'bad' : '';
-        // data-mode attribute on the chip lets the click handler know which bucket array to mutate.
-        const label = `+<span class="potr-bucket-edit" data-bucket-idx="${idx}" data-mode="${isPips ? 'pips' : 'r'}" title="Click to change">${holdMore}</span>${unit} held`;
-        cells.push(`<div class="potr-sim-cell">
-          <div class="potr-sim-label">${label}</div>
-          <div class="potr-sim-value ${cls}">${fmtV(simV)}</div>
-          <div class="potr-sim-delta ${dcls}">${fmtDelta(delta)}</div>
-        </div>`);
-      });
-
-      const colCount = BUCKETS.length + 2;
-      const subText = isPips
-        ? 'First two cards: average pips captured vs. average pips available across your tracked wins. Remaining cards: simulated total pips if every win held up to X more pips (capped at each trade\'s actual ceiling). Click any bucket value to change it.'
-        : 'First two cards: average R captured vs. average R available across your tracked wins. Remaining cards: simulated total R if every win held up to X more R (capped at each trade\'s actual ceiling). Click any bucket value to change it.';
-
-      const html = `<div class="potr-sim-section" data-mode="${isPips ? 'pips' : 'r'}">
-        <div class="potr-sim-title">${title}</div>
-        <div class="potr-sim-sub">${subText}</div>
-        <div class="potr-sim-grid" style="grid-template-columns: repeat(${colCount}, 1fr);">${cells.join('')}</div>
-      </div>`;
-      return { html, isPips };
-    }
-
-    // Build both simulators
-    const rSim    = buildSimulator(false);
-    const pipsSim = buildSimulator(true);
-
-    // If BOTH have no data, show a single empty state instead of two stacked ones.
-    const rHasData    = !rSim.html.includes('potr-empty');
-    const pipsHasData = !pipsSim.html.includes('potr-empty');
-    if (!rHasData && !pipsHasData) {
+    if (tracked.length === 0) {
       simWrap.innerHTML = `<p class="potr-empty">No winning trades with Potential R or Potential Pips logged yet. Log when you mark a win and patterns appear here.</p>`;
       return;
     }
 
-    // Render both. The shared "honesty note" at the bottom — one copy, not two.
+    // ------------------------------------------------------------------
+    // Build a recommendation for ONE metric (R or Pips). Returns null if
+    // that metric has no tracked wins in the filtered scope.
+    // ------------------------------------------------------------------
+    function buildRecommendation(isPips) {
+      const actualField    = isPips ? 'pips'           : 'r';
+      const potentialField = isPips ? 'potentialPips'  : 'potentialR';
+      const unit           = isPips ? 'p' : 'R';
+      const unitName       = isPips ? 'Pips' : 'R';
+      const decimals       = isPips ? 0 : 1;
+
+      const trackedM = wins.filter(t =>
+        typeof t[potentialField] === 'number' && !isNaN(t[potentialField])
+      );
+      if (trackedM.length === 0) return null;
+
+      const capturedSum  = trackedM.reduce((s, t) => s + (parseFloat(t[actualField]) || 0), 0);
+      const potentialSum = trackedM.reduce((s, t) => s + t[potentialField], 0);
+      const captureRate  = potentialSum === 0 ? 0 : (capturedSum / potentialSum) * 100;
+      const avgCaptured  = capturedSum / trackedM.length;
+      const avgPotential = potentialSum / trackedM.length;
+      const avgGap       = avgPotential - avgCaptured;
+      // Conservative suggestion — half the avg gap. Theoretical ceiling isn't realistic;
+      // half the gap is a realistic stretch goal that respects slippage/hesitation.
+      const suggested    = Math.max(0, avgGap / 2);
+
+      // Conviction tier by sample size
+      let tier;
+      if      (trackedM.length < 10) tier = 'too-few';
+      else if (trackedM.length < 25) tier = 'early';
+      else if (trackedM.length < 50) tier = 'building';
+      else                            tier = 'strong';
+
+      return {
+        n: trackedM.length, captureRate, avgCaptured, avgPotential, avgGap, suggested,
+        tier, unit, unitName, decimals, capturedSum, potentialSum
+      };
+    }
+
+    const recR    = buildRecommendation(false);
+    const recPips = buildRecommendation(true);
+
+    // ------------------------------------------------------------------
+    // Render recommendation row. Tier label + verdict text. If capture
+    // rate is already high (≥80%), congratulate rather than push to hold.
+    // ------------------------------------------------------------------
+    const tierMeta = {
+      'too-few':  { label: 'Not enough yet',         cls: 'rec-tier-low'      },
+      'early':    { label: 'Early signal',           cls: 'rec-tier-early'    },
+      'building': { label: 'Building conviction',    cls: 'rec-tier-building' },
+      'strong':   { label: 'Strong pattern',         cls: 'rec-tier-strong'   }
+    };
+
+    function renderRec(rec) {
+      if (!rec) return '';
+      const t = tierMeta[rec.tier];
+      const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(rec.decimals) + rec.unit;
+
+      let body;
+      if (rec.tier === 'too-few') {
+        const need = 10 - rec.n;
+        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> only ${rec.n} tracked win${rec.n === 1 ? '' : 's'} so far — log ${need} more to start getting a real signal.</span>`;
+      } else if (rec.captureRate >= 80) {
+        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> capturing <strong>${rec.captureRate.toFixed(0)}%</strong> of available — you're already taking most of the move. No urgent change needed.</span>`;
+      } else if (rec.suggested < (rec.decimals === 0 ? 1 : 0.2)) {
+        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> avg captured ${fmt(rec.avgCaptured)} vs ${fmt(rec.avgPotential)} potential. Gap too small to meaningfully suggest holding longer.</span>`;
+      } else {
+        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> capturing <strong>${rec.captureRate.toFixed(0)}%</strong> of available (avg ${fmt(rec.avgCaptured)} vs ${fmt(rec.avgPotential)} potential per win). Try holding <strong class="rec-suggest">${fmt(rec.suggested)}</strong> longer per win.</span>`;
+      }
+      return `<div class="rec-row">
+        <span class="rec-tier ${t.cls}">${t.label} <span class="rec-tier-n">· ${rec.n} ${rec.unitName.toLowerCase()} win${rec.n === 1 ? '' : 's'}</span></span>
+        ${body}
+      </div>`;
+    }
+
+    // ------------------------------------------------------------------
+    // Summary line — overall capture rate + left on table.
+    // ------------------------------------------------------------------
+    const sumCapR    = recR    ? recR.capturedSum    : 0;
+    const sumPotR    = recR    ? recR.potentialSum   : 0;
+    const sumLeftR   = sumPotR - sumCapR;
+    const sumCapP    = recPips ? recPips.capturedSum : 0;
+    const sumPotP    = recPips ? recPips.potentialSum : 0;
+    const sumLeftP   = sumPotP - sumCapP;
+    const rateRStr   = recR    ? `${(recR.captureRate).toFixed(0)}% of R` : '';
+    const ratePStr   = recPips ? `${(recPips.captureRate).toFixed(0)}% of pips` : '';
+    const rateJoined = [rateRStr, ratePStr].filter(Boolean).join(' · ');
+    const leftRStr   = recR    ? `+${sumLeftR.toFixed(2)}R` : '';
+    const leftPStr   = recPips ? `+${sumLeftP.toFixed(0)}p` : '';
+    const leftJoined = [leftRStr, leftPStr].filter(Boolean).join(' · ');
+    const summaryLine = `<div class="potr-summary">You captured <strong>${rateJoined}</strong> across ${tracked.length} tracked win${tracked.length === 1 ? '' : 's'}. <span class="potr-summary-left">${leftJoined} left on the table.</span></div>`;
+
+    // ------------------------------------------------------------------
+    // Per-trade table — sorted by R left on table descending, so worst
+    // exits sit at the top. Each row clicks into that day's modal.
+    // ------------------------------------------------------------------
+    const rows = tracked.map(t => {
+      const capR = parseFloat(t.r) || 0;
+      const potR = (typeof t.potentialR === 'number' && !isNaN(t.potentialR)) ? t.potentialR : null;
+      const capP = tradePipsForMath(t);
+      const potP = (typeof t.potentialPips === 'number' && !isNaN(t.potentialPips)) ? t.potentialPips : null;
+      const leftR = potR !== null ? potR - capR : null;
+      const leftP = potP !== null ? potP - capP : null;
+      const captureR = (potR !== null && potR !== 0) ? (capR / potR) * 100 : null;
+      const captureP = (potP !== null && potP !== 0) ? (capP / potP) * 100 : null;
+      // Sort score: prioritize biggest R left on table; fall back to pips left / 5 if no R.
+      const sortScore = (leftR !== null ? leftR : (leftP !== null ? leftP / 5 : 0));
+      return { trade: t, capR, potR, capP, potP, leftR, leftP, captureR, captureP, sortScore };
+    }).sort((a, b) => b.sortScore - a.sortScore);
+
+    const tableRowsHtml = rows.map(r => {
+      const t = r.trade;
+      const d = new Date(t.date);
+      const dateStr = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+      const dateKey = d.toDateString();
+      const side = t.side || '—';
+      const capRStr = (r.capR >= 0 ? '+' : '') + r.capR.toFixed(2) + 'R';
+      const capPStr = r.potP !== null || r.capP !== 0 ? (r.capP >= 0 ? '+' : '') + r.capP.toFixed(0) + 'p' : '— p';
+      const potRStr = r.potR !== null ? '+' + r.potR.toFixed(2) + 'R' : '—';
+      const potPStr = r.potP !== null ? '+' + r.potP.toFixed(0) + 'p' : '— p';
+      const leftRStr = r.leftR !== null ? '+' + r.leftR.toFixed(2) + 'R' : '—';
+      const leftPStr = r.leftP !== null ? '+' + r.leftP.toFixed(0) + 'p' : '— p';
+      const leftCls = (r.leftR != null && r.leftR > 0.5) ? 'bad' : '';
+      // Capture % — average of R and pips capture if both present, otherwise whichever exists.
+      const pctVals = [r.captureR, r.captureP].filter(v => v !== null);
+      const avgPct = pctVals.length > 0 ? pctVals.reduce((s, v) => s + v, 0) / pctVals.length : null;
+      const pctStr = avgPct !== null ? avgPct.toFixed(0) + '%' : '—';
+      const pctCls = avgPct === null ? '' : avgPct >= 80 ? 'good' : avgPct < 50 ? 'bad' : '';
+      return `<div class="potr-trade-row" data-date-key="${dateKey}" title="Click to open this day's review">
+        <div class="potr-trade-cell">${dateStr}</div>
+        <div class="potr-trade-cell">${side}</div>
+        <div class="potr-trade-cell">${capRStr} <span class="potr-trade-sub">· ${capPStr}</span></div>
+        <div class="potr-trade-cell">${potRStr} <span class="potr-trade-sub">· ${potPStr}</span></div>
+        <div class="potr-trade-cell ${leftCls}">${leftRStr} <span class="potr-trade-sub">· ${leftPStr}</span></div>
+        <div class="potr-trade-cell ${pctCls}">${pctStr}</div>
+      </div>`;
+    }).join('');
+
+    const tableHtml = `
+      <div class="potr-trade-table">
+        <div class="potr-trade-row headers">
+          <div class="potr-trade-cell">Date</div>
+          <div class="potr-trade-cell">Side</div>
+          <div class="potr-trade-cell">Captured</div>
+          <div class="potr-trade-cell">Potential</div>
+          <div class="potr-trade-cell">Left on table</div>
+          <div class="potr-trade-cell">Capture</div>
+        </div>
+        ${tableRowsHtml}
+      </div>`;
+
     simWrap.innerHTML = `
-      ${rSim.html}
-      ${pipsSim.html}
-      <div class="potr-sim-note">These numbers show the theoretical ceiling — what was technically available if you'd timed exits perfectly. They don't account for the slippage, hesitation, and missed reversals that come with holding for longer. Treat as an upper bound, not a goal.</div>
+      <div class="potr-rec-block">
+        <div class="potr-rec-title">Should I hold winners longer?</div>
+        ${renderRec(recR)}
+        ${renderRec(recPips)}
+      </div>
+      ${summaryLine}
+      ${tableHtml}
+      <div class="potr-sim-note">These numbers show the theoretical ceiling — what was technically available if you'd timed exits perfectly. They don't account for slippage, hesitation, and missed reversals when holding for longer. Treat as an upper bound, not a goal.</div>
     `;
 
-    // Wire up click-to-edit on each bucket chip. The data-mode attribute on the chip tells us
-    // whether to edit potRBuckets or potPipsBuckets.
-    simWrap.querySelectorAll('.potr-bucket-edit').forEach(chip => {
-      chip.addEventListener('click', e => {
-        e.stopPropagation();
-        if (chip.dataset.editing === '1') return;
-        chip.dataset.editing = '1';
-        const idx        = parseInt(chip.dataset.bucketIdx, 10);
-        const mode       = chip.dataset.mode;       // 'r' | 'pips'
-        const isPipsChip = mode === 'pips';
-        const bucketsKey = isPipsChip ? 'potPipsBuckets' : 'potRBuckets';
-        const currentVal = data.settings[bucketsKey][idx];
-        const maxV       = isPipsChip ? 200 : 20;
-        const stepV      = isPipsChip ? 1 : 0.1;
-        chip.innerHTML = `<input type="number" class="potr-bucket-input" min="0.1" max="${maxV}" step="${stepV}" value="${currentVal}" />`;
-        const input = chip.querySelector('input');
-        input.focus();
-        input.select();
-        function commit() {
-          const v = parseFloat(input.value);
-          if (!isNaN(v) && v > 0 && v <= maxV) {
-            const rounded = isPipsChip ? Math.round(v) : Math.round(v * 10) / 10;
-            data.settings[bucketsKey][idx] = rounded;
-            data.settings[bucketsKey].sort((a, b) => a - b);
-            saveData();
-          }
-          renderPotentialRAnalysis(allTrades);
-        }
-        input.addEventListener('blur', commit);
-        input.addEventListener('keydown', evt => {
-          if (evt.key === 'Enter') { evt.preventDefault(); input.blur(); }
-          else if (evt.key === 'Escape') {
-            chip.dataset.editing = '';
-            chip.textContent = currentVal;
-          }
-        });
+    // Wire up: clicking any per-trade row opens that day's modal.
+    simWrap.querySelectorAll('.potr-trade-row[data-date-key]').forEach(row => {
+      row.addEventListener('click', () => {
+        if (typeof openDayModal === 'function') openDayModal(row.dataset.dateKey);
       });
     });
   }
@@ -4169,8 +4230,6 @@
     const wins = dayTrades.filter(t => t.result === 'Win').length;
     const losses = dayTrades.filter(t => t.result === 'Lose').length;
     const bes = dayTrades.filter(t => t.result === 'BE').length;
-    const dec = wins + losses;
-    const wr = dec > 0 ? Math.round(wins/dec * 100) : null;
     const gross = dayTrades.reduce((s,t) => s + tradeGross(t), 0);
     const costs = dayTrades.reduce((s,t) => s + tradeCosts(t), 0);
     const net = gross - costs;
@@ -4179,17 +4238,40 @@
     netEl.textContent = fmtMoney(net);
     netEl.className = 'modal-net ' + (net > 0 ? 'good' : net < 0 ? 'bad' : '');
 
+    // Day-level R + pips totals (across all trades on this day, win/lose/be combined the usual way).
+    const dayTotalR = dayTrades.reduce((s, t) => {
+      if (t.result === 'Win') return s + (parseFloat(t.r) || 0);
+      if (t.result === 'Lose') return s - 1;
+      return s;
+    }, 0);
+    const dayTotalPips = dayTrades.reduce((s, t) => s + tradePipsForMath(t), 0);
+    const dayPipsTracked = dayTrades.filter(t => tradeHasTrackedPips(t)).length;
+    const dayTotalRStr = (dayTotalR >= 0 ? '+' : '') + dayTotalR.toFixed(2) + 'R';
+    const dayTotalRCls = dayTotalR > 0 ? 'good' : dayTotalR < 0 ? 'bad' : '';
+    const dayTotalPipsStr = dayPipsTracked > 0 ? (dayTotalPips >= 0 ? '+' : '') + dayTotalPips.toFixed(0) + 'p' : '— p';
+    const dayTotalPipsCls = dayPipsTracked === 0 ? '' : dayTotalPips > 0 ? 'good' : dayTotalPips < 0 ? 'bad' : '';
+
+    // Day-level Potential R + Pips left on table (across this day's wins only)
+    const dayWins = dayTrades.filter(t => t.result === 'Win');
+    const dayPotRTracked = dayWins.filter(t => typeof t.potentialR === 'number' && !isNaN(t.potentialR));
+    const dayPotR = dayPotRTracked.reduce((s, t) => s + ((t.potentialR || 0) - (parseFloat(t.r) || 0)), 0);
+    const dayPotPipsTracked = dayWins.filter(t => typeof t.potentialPips === 'number' && !isNaN(t.potentialPips));
+    const dayPotPips = dayPotPipsTracked.reduce((s, t) => s + ((t.potentialPips || 0) - tradePipsForMath(t)), 0);
+    const dayPotRStr = dayPotRTracked.length === 0 ? '—' : (dayPotR >= 0 ? '+' : '') + dayPotR.toFixed(2) + 'R';
+    const dayPotRCls = dayPotR > 0.5 ? 'bad' : '';
+    const dayPotPipsStr = dayPotPipsTracked.length === 0 ? '— p' : (dayPotPips >= 0 ? '+' : '') + dayPotPips.toFixed(0) + 'p';
+    const dayPotPipsCls = dayPotPipsTracked.length === 0 ? '' : dayPotPips > 5 ? 'bad' : '';
+
     document.getElementById('modal-stats').innerHTML = `
-      <div class="modal-stat"><div class="label">Win Rate</div><div class="v">${wr !== null ? wr + '%' : '—'}</div></div>
       <div class="modal-stat"><div class="label">W / L / BE</div><div class="v">${wins} / ${losses} / ${bes}</div></div>
       <div class="modal-stat"><div class="label">Gross P&L</div><div class="v ${gross > 0 ? 'good' : gross < 0 ? 'bad' : ''}">${fmtMoney(gross)}</div></div>
-      <div class="modal-stat"><div class="label">Costs</div><div class="v">${fmtMoney(costs, { noSign: true })}</div></div>`;
+      <div class="modal-stat"><div class="label">Costs</div><div class="v">${fmtMoney(costs, { noSign: true })}</div></div>
+      <div class="modal-stat"><div class="label">Total R · Pips</div><div class="v dual ${dayTotalRCls}"><span class="dual-primary">${dayTotalRStr}</span><span class="dual-secondary ${dayTotalPipsCls}">${dayTotalPipsStr}</span></div></div>
+      <div class="modal-stat"><div class="label">Potential R · Pips</div><div class="v dual ${dayPotRCls}"><span class="dual-primary">${dayPotRStr}</span><span class="dual-secondary ${dayPotPipsCls}">${dayPotPipsStr}</span></div></div>`;
 
-    // R Left On Table block for this day's wins
-    const dayMfeWins = dayTrades.filter(t => t.result === 'Win');
-    const dayMfe = computeMfeStats(dayMfeWins);
+    // Removed: the separate Potential R block below (now folded into the stat row above).
     const mfeContainer = document.getElementById('modal-mfe');
-    if (mfeContainer) mfeContainer.innerHTML = renderMfeBlock(dayMfe);
+    if (mfeContainer) mfeContainer.innerHTML = '';
 
     let tHtml = `<div class="modal-trade-row headers" style="background:var(--bg-elev);">
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">#</div>
@@ -5327,33 +5409,42 @@
     document.getElementById('review-modal-title').textContent = titleText;
     const n = getName();
     const greeting = n ? `Here's how your ${greetingNoun} went, ${n}.` : `Here's how your ${greetingNoun} went.`;
+
+    // P&L breakdown — match daily modal exactly: Gross + Costs as separate cards.
+    const grossStr = (stats.gross >= 0 ? '+' : '-') + '£' + Math.abs(stats.gross || 0).toFixed(2);
+    const grossCls = (stats.gross || 0) > 0 ? 'good' : (stats.gross || 0) < 0 ? 'bad' : '';
+    const costsStr = '£' + Math.abs(stats.costs || 0).toFixed(2);
     const netStr = (stats.net >= 0 ? '+' : '-') + '£' + Math.abs(stats.net).toFixed(2);
     const netCls = stats.net > 0 ? 'good' : stats.net < 0 ? 'bad' : '';
-    // Total R
+
+    // Total R · Pips
     const totalRStr = (stats.totalR >= 0 ? '+' : '') + stats.totalR.toFixed(2) + 'R';
     const totalRCls = stats.totalR > 0 ? 'good' : stats.totalR < 0 ? 'bad' : '';
-    // Potential R — total left on table
-    const potLeftR = (stats.mfe && stats.mfe.trackedR > 0) ? stats.mfe.totalLeftR : null;
+    const hasPips = stats.totalPips !== 0 || (stats.mfe && stats.mfe.trackedPips > 0);
+    const totalPipsStr = hasPips ? (stats.totalPips >= 0 ? '+' : '') + stats.totalPips.toFixed(0) + 'p' : '— p';
+    const totalPipsCls = !hasPips ? '' : stats.totalPips > 0 ? 'good' : stats.totalPips < 0 ? 'bad' : '';
+
+    // Potential R · Pips — totals left on table
+    const potLeftR    = (stats.mfe && stats.mfe.trackedR    > 0) ? stats.mfe.totalLeftR    : null;
+    const potLeftPips = (stats.mfe && stats.mfe.trackedPips > 0) ? stats.mfe.totalLeftPips : null;
     const potRStr  = potLeftR == null ? '—' : (potLeftR >= 0 ? '+' : '') + potLeftR.toFixed(2) + 'R';
     const potRCls  = potLeftR == null ? '' : potLeftR > 0.5 ? 'bad' : '';
+    const potPStr  = potLeftPips == null ? '— p' : (potLeftPips >= 0 ? '+' : '') + potLeftPips.toFixed(0) + 'p';
+    const potPCls  = potLeftPips == null ? '' : potLeftPips > 5 ? 'bad' : '';
+
     const monthlyExtra = (greetingNoun === 'month' && monthRange) ? renderMonthlyInsights(monthRange.start, monthRange.end) : '';
     document.getElementById('review-modal-body').innerHTML = `
       <p style="color:var(--text-mid);font-size:13px;margin-bottom:20px;">${greeting}</p>
-      <div class="stats-summary" style="margin-top:0;">
-        <div class="stat-cell"><div class="stat-label">Trades</div><div class="stat-value medium">${stats.totalTrades}</div></div>
-        <div class="stat-cell"><div class="stat-label">Net P&L</div><div class="stat-value medium ${netCls}">${netStr}</div></div>
-        <div class="stat-cell"><div class="stat-label">Total R</div>
-          <div class="stat-value medium ${totalRCls}">${totalRStr}</div>
-        </div>
-        <div class="stat-cell"><div class="stat-tooltip">R left on the table across this period's winning trades. Only counts wins with potential R logged.</div>
-          <div class="stat-label">Potential R</div>
-          <div class="stat-value medium ${potRCls}">${potRStr}</div>
-        </div>
+      <div class="modal-stats" style="margin-top:0;margin-bottom:20px;">
+        <div class="modal-stat"><div class="label">W / L / BE</div><div class="v">${stats.wins} / ${stats.losses} / ${stats.bes}</div></div>
+        <div class="modal-stat"><div class="label">Gross P&L</div><div class="v ${grossCls}">${grossStr}</div></div>
+        <div class="modal-stat"><div class="label">Costs</div><div class="v">${costsStr}</div></div>
+        <div class="modal-stat"><div class="label">Total R · Pips</div><div class="v dual ${totalRCls}"><span class="dual-primary">${totalRStr}</span><span class="dual-secondary ${totalPipsCls}">${totalPipsStr}</span></div></div>
+        <div class="modal-stat"><div class="label">Potential R · Pips</div><div class="v dual ${potRCls}"><span class="dual-primary">${potRStr}</span><span class="dual-secondary ${potPCls}">${potPStr}</span></div></div>
       </div>
-      <div class="wl-summary" style="margin-top:16px;">
-        <div class="wl-cell win"><div class="big">${stats.wins}</div><div class="small">Wins</div></div>
-        <div class="wl-cell lose"><div class="big">${stats.losses}</div><div class="small">Losses</div></div>
-        <div class="wl-cell be"><div class="big">${stats.bes}</div><div class="small">Break-even</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px;">
+        <div class="modal-stat" style="border:1px solid var(--border-2);"><div class="label">Trades</div><div class="v">${stats.totalTrades}</div></div>
+        <div class="modal-stat" style="border:1px solid var(--border-2);"><div class="label">Net P&L</div><div class="v ${netCls}">${netStr}</div></div>
       </div>
       ${monthlyExtra}
     `;
