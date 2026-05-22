@@ -342,31 +342,31 @@
   /* Trade of month — clickable cells that drill into the day's modal */
   .trade-of-month-cell { cursor: pointer; padding: 12px; border: 1px solid var(--border-2); transition: border-color 150ms, background 150ms; }
   .trade-of-month-cell:hover { border-color: var(--text-mid); background: var(--bg-elev); }
-  /* Small auto-pulled chart thumbnail inside trade-of-month + weekly best/worst cards */
-  .trade-thumb { margin: 6px 0 8px; border: 1px solid var(--border-2); background: var(--bg-elev); overflow: hidden; }
+  /* Inline thumbnail used in trade-of-month + weekly best/worst cards.
+     Sized as a small visual identifier (~60×40, natural 16:9). Sits left of the trade meta text. */
+  .trade-thumb { border: 1px solid var(--border-2); background: var(--bg-elev); overflow: hidden; flex-shrink: 0; width: 80px; }
   .trade-thumb a { display: block; transition: opacity 150ms; }
   .trade-thumb a:hover { opacity: 0.85; }
-  .trade-thumb img { display: block; width: 100%; height: 110px; object-fit: cover; }
-  /* Auto-trade card inside the weekly Best/Worst reflection questions */
-  .auto-trade-card { padding: 12px; border: 1px solid var(--border-2); background: var(--bg-elev); margin-bottom: 8px; }
+  .trade-thumb img { display: block; width: 100%; height: 50px; object-fit: cover; }
+  /* Auto-trade card: compact horizontal layout. Label above, thumb+meta side by side below. */
+  .auto-trade-card { padding: 10px 12px; border: 1px solid var(--border-2); background: var(--bg-elev); margin-bottom: 8px; }
   .auto-trade-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
   .auto-trade-label .icon { font-family: 'DM Mono', monospace; font-size: 10px; }
   .auto-trade-label .icon.good { color: var(--good); }
   .auto-trade-label .icon.bad  { color: var(--bad); }
-  .auto-trade-meta { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-mid); letter-spacing: 0.02em; }
+  .auto-trade-body { display: flex; gap: 10px; align-items: center; }
+  .auto-trade-body .trade-thumb { margin: 0; }
+  .auto-trade-meta { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-mid); letter-spacing: 0.02em; line-height: 1.5; min-width: 0; flex: 1; }
   .auto-trade-meta .good { color: var(--good); }
   .auto-trade-meta .bad  { color: var(--bad); }
-  .auto-trade-meta .auto-trade-date { color: var(--text); font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; }
+  .auto-trade-meta .auto-trade-date { color: var(--text); font-family: 'Fraunces', serif; font-style: italic; font-size: 13px; }
   /* Side-by-side Best & Worst columns inside the weekly reflection.
-     Each column holds an auto-trade card on top + its notes textarea below.
-     Collapses to single column on narrow screens so cards don't get crushed. */
+     Each column holds a compact auto-trade card + its notes textarea below.
+     Collapses to single column on narrow screens. */
   .reflect-bw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .reflect-bw-grid > :only-child { grid-column: 1 / -1; }
   .reflect-bw-col { display: flex; flex-direction: column; gap: 8px; }
   .reflect-bw-col .auto-trade-card { margin-bottom: 0; }
-  /* Smaller, less aggressively cropped chart thumb inside this context — cards are half-width, so the
-     natural 16:9 of TradingView snapshots reads well at ~75px height without object-fit cropping much. */
-  .reflect-bw-col .trade-thumb img { height: 75px; }
   @media (max-width: 640px) {
     .reflect-bw-grid { grid-template-columns: 1fr; }
   }
@@ -4500,11 +4500,16 @@
       // Pull a thumbnail from the trade's logged charts. Prefer post-session review chart
       // (more likely to show entry/exit), fall back to bias chart, otherwise none.
       const thumbHtml = pickTradeChartThumb(t);
+      // Compact horizontal layout: small thumb on the left, date/side/R/£ stacked on the right.
       return `<div class="month-insight-cell trade-of-month-cell" data-trade-date="${dateIso}" title="Click to open this day's review">
         <div class="month-insight-label"><span class="icon ${iconCls}">${icon}</span>${label}</div>
-        ${thumbHtml}
-        <div class="month-insight-value">${dateStr} · ${sideStr}</div>
-        <div class="month-insight-sub ${rCls}">${rStr} · ${netStr}</div>
+        <div class="auto-trade-body">
+          ${thumbHtml}
+          <div class="auto-trade-meta">
+            <div><span class="auto-trade-date">${dateStr}</span> · ${sideStr}</div>
+            <div><span class="${rCls}">${rStr}</span> · <span class="${rCls}">${netStr}</span></div>
+          </div>
+        </div>
       </div>`;
     }
     if (winsThisMonth.length > 0 || lossesThisMonth.length > 0) {
@@ -4801,10 +4806,16 @@
       const net = (typeof tradeNetPL === 'function') ? tradeNetPL(t) : 0;
       const netStr = (net >= 0 ? '+£' : '-£') + Math.abs(net).toFixed(2);
       const thumbHtml = (typeof pickTradeChartThumb === 'function') ? pickTradeChartThumb(t) : '';
+      // Two-line meta: date+side on top, R+£ underneath. Reads cleanly even in narrow half-width columns.
       return `<div class="auto-trade-card">
         <div class="auto-trade-label"><span class="icon ${iconCls}">${icon}</span>${label}</div>
-        ${thumbHtml}
-        <div class="auto-trade-meta"><span class="auto-trade-date">${dateStr}</span> · <span>${sideStr}</span> · <span class="${rCls}">${rStr}</span> · <span class="${rCls}">${netStr}</span></div>
+        <div class="auto-trade-body">
+          ${thumbHtml}
+          <div class="auto-trade-meta">
+            <div><span class="auto-trade-date">${dateStr}</span> · ${sideStr}</div>
+            <div><span class="${rCls}">${rStr}</span> · <span class="${rCls}">${netStr}</span></div>
+          </div>
+        </div>
       </div>`;
     }
 
