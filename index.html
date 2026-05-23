@@ -479,8 +479,9 @@
   .holdtime-cell .value.be   { color: var(--info); }
   .holdtime-cell .sub { margin-top: 6px; font-size: 10px; color: var(--text-dim); }
   /* Trade Time / Duration analysis */
-  .time-hero-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #383838; border: 1px solid #383838; }
-  .time-hero-cell { background: var(--bg); padding: 22px 18px; }
+  .time-hero-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid #383838; }
+  .time-hero-cell { background: var(--bg); padding: 22px 18px; border-right: 1px solid #383838; }
+  .time-hero-cell:last-child { border-right: none; }
   .time-hero-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
   .time-hero-icon { font-size: 14px; }
   .time-hero-icon.good { color: var(--good); }
@@ -894,8 +895,8 @@
 <div class="container">
 
   <header class="header">
-    <div class="brand">Session Tool</div>
-    <h1><span id="header-mode">Session Bias</span></h1>
+    <div class="brand" data-i18n="brand.label">Session Tool</div>
+    <h1><span id="header-mode" data-i18n="tab.bias">Session Bias</span></h1>
 
     <div class="tabs">
       <button class="tab active" data-page="bias"><span class="num">01</span><span data-i18n="tab.bias">Session Bias</span></button>
@@ -989,7 +990,7 @@
       <p class="session-live-body" data-i18n-html="banner.body_html">Stay on this tab — your <strong>morning bias sits above</strong>, keeping you anchored. And when you take a trade, <strong>log it the moment you take it</strong> — while the chart's still in front of you. Fresh observation beats yesterday's reconstruction, every time.</p>
     </div>
     <div class="saved-bias hidden" id="saved-bias-card">
-      <div class="saved-bias-label">This morning's bias</div>
+      <div class="saved-bias-label" data-i18n="review.this_morning_bias">This morning's bias</div>
       <div class="saved-bias-grid" id="saved-bias-grid"></div>
       <div class="saved-bias-link hidden" id="saved-bias-link"></div>
       <div class="saved-bias-notes hidden" id="saved-bias-notes"></div>
@@ -1132,7 +1133,7 @@
 
     <section>
       <div class="section-header"><span class="section-num">09</span><span class="section-title" data-i18n="review.s9.title">Mindset</span></div>
-      <p class="section-hint">Mental state — be honest, this is how you grow.</p>
+      <p class="section-hint" data-i18n="hint.mental_state">Mental state — be honest, this is how you grow.</p>
       <div class="tags" id="mindset-tags">
         <button class="tag" data-value="Flawless Execution" data-i18n="tag.flawless_execution">Flawless Execution</button>
         <button class="tag" data-value="Perfect Patience" data-i18n="tag.perfect_patience">Perfect Patience</button>
@@ -1192,25 +1193,25 @@
         <div class="stat-tooltip">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap. Shared with the Statistics tab.</div>
         <div class="stat-label">
           <span class="pnl-toggle">
-            <span class="pnl-toggle-opt" data-mode="net">Net P&L</span>
+            <span class="pnl-toggle-opt" data-mode="net" data-i18n="kpi.net_pnl">Net P&L</span>
             <span class="pnl-toggle-sep">·</span>
-            <span class="pnl-toggle-opt" data-mode="gross">Gross P&L</span>
+            <span class="pnl-toggle-opt" data-mode="gross" data-i18n="kpi.gross_pnl">Gross P&L</span>
           </span>
         </div>
         <div class="stat-value" id="stat-pnl" data-currency-symbol="{C}0">£0</div>
       </div>
-      <div class="stat-cell"><div class="stat-tooltip" id="stat-total-tip">Net R and Net Pips across your current series of 10.</div><div class="stat-label" id="stat-total-label">Total R · Pips</div><div class="stat-value dual" id="stat-total">0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="stat-rleft-tip">R and Pips left on the table across wins in your current series. Potential minus actual captured.</div><div class="stat-label" id="stat-rleft-label">Potential R · Pips</div><div class="stat-value dual" id="stat-rleft">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="stat-total-tip">Net R and Net Pips across your current series of 10.</div><div class="stat-label" id="stat-total-label" data-i18n="kpi.total_rp">Total R · Pips</div><div class="stat-value dual" id="stat-total">0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="stat-rleft-tip">R and Pips left on the table across wins in your current series. Potential minus actual captured.</div><div class="stat-label" id="stat-rleft-label" data-i18n="kpi.potential_rp">Potential R · Pips</div><div class="stat-value dual" id="stat-rleft">—</div></div>
     </div>
 
     <div class="current-series">
       <div class="current-series-header">
-        <div class="current-series-title">Current Series</div>
+        <div class="current-series-title" data-i18n="stats.current_series">Current Series</div>
         <div class="current-series-progress" id="current-progress">0 / 10</div>
       </div>
       <div class="series-dots" id="current-dots"></div>
       <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-top:8px;" id="current-tally">No trades logged yet</div>
-      <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;font-style:italic;">Click any trade dot to edit or delete</div>
+      <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;font-style:italic;">${t('modal.click_dot_edit')}</div>
     </div>
 
     <section>
@@ -1229,36 +1230,36 @@
 
     <div class="settings-panel">
       <span class="label" data-i18n="settings.account">Account Settings</span>
-      <div class="settings-field"><span class="k">Starting Balance £</span><input id="setting-balance" type="number" step="any" placeholder="10000" /></div>
-      <span class="defaults-label" style="font-size:8px;margin-left:auto;">Risk &amp; Costs defaults are set in Review tab</span>
+      <div class="settings-field"><span class="k" data-currency-symbol="Starting Balance {C}">Starting Balance £</span><input id="setting-balance" type="number" step="any" placeholder="10000" /></div>
+      <span class="defaults-label" style="font-size:8px;margin-left:auto;"><span data-i18n="settings.defaults_hint_inline">Risk &amp; Costs defaults are set in Review tab</span></span>
     </div>
 
     <div class="stats-summary stats-summary-4col" style="margin-top:24px;">
-      <div class="stat-cell"><div class="stat-tooltip">Your current account balance: Starting Balance (set above) plus Net P&L.</div><div class="stat-label">Account Balance</div><div class="stat-value medium" id="kpi-balance" data-currency-symbol="{C}0">£0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Your current account balance: Starting Balance (set above) plus Net P&L.</div><div class="stat-label" data-i18n="kpi.account_balance">Account Balance</div><div class="stat-value medium" id="kpi-balance" data-currency-symbol="{C}0">£0</div></div>
       <div class="stat-cell" id="kpi-pnl-cell">
         <div class="stat-tooltip">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap.</div>
         <div class="stat-label">
           <span class="pnl-toggle">
-            <span class="pnl-toggle-opt" data-mode="net">Net P&L</span>
+            <span class="pnl-toggle-opt" data-mode="net" data-i18n="kpi.net_pnl">Net P&L</span>
             <span class="pnl-toggle-sep">·</span>
-            <span class="pnl-toggle-opt" data-mode="gross">Gross P&L</span>
+            <span class="pnl-toggle-opt" data-mode="gross" data-i18n="kpi.gross_pnl">Gross P&L</span>
           </span>
         </div>
         <div class="stat-value" id="kpi-pnl" data-currency-symbol="{C}0">£0</div>
       </div>
-      <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label">Total Costs</div><div class="stat-value medium" id="kpi-costs" data-currency-symbol="{C}0">£0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) across every trade ever logged. BEs excluded.</div><div class="stat-label">Win Rate</div><div class="stat-value" id="kpi-winrate">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label" data-i18n="kpi.total_costs">Total Costs</div><div class="stat-value medium" id="kpi-costs" data-currency-symbol="{C}0">£0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) across every trade ever logged. BEs excluded.</div><div class="stat-label" data-i18n="kpi.win_rate">Win Rate</div><div class="stat-value" id="kpi-winrate">—</div></div>
       <div class="stat-cell"><div class="stat-tooltip" id="kpi-totalr-tip">Net R and Net Pips across every trade ever logged.</div><div class="stat-label" id="kpi-totalr-label">Total R · Pips</div><div class="stat-value dual" id="kpi-totalr">0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="kpi-rleft-tip">R and Pips left on the table across all winning trades ever logged. Potential minus actual captured.</div><div class="stat-label" id="kpi-rleft-label">Potential R · Pips</div><div class="stat-value dual" id="kpi-rleft">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="kpi-exp-tip">Average R and average Pips per trade.</div><div class="stat-label" id="kpi-exp-label">Expectancy</div><div class="stat-value dual" id="kpi-exp">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R across all trades. Above 1.5 = solid edge.</div><div class="stat-label">Profit Factor</div><div class="stat-value" id="kpi-pf">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="kpi-rleft-tip">R and Pips left on the table across all winning trades ever logged. Potential minus actual captured.</div><div class="stat-label" id="kpi-rleft-label" data-i18n="kpi.potential_rp">Potential R · Pips</div><div class="stat-value dual" id="kpi-rleft">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="kpi-exp-tip">Average R and average Pips per trade.</div><div class="stat-label" id="kpi-exp-label" data-i18n="kpi.expectancy">Expectancy</div><div class="stat-value dual" id="kpi-exp">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R across all trades. Above 1.5 = solid edge.</div><div class="stat-label" data-i18n="kpi.profit_factor">Profit Factor</div><div class="stat-value" id="kpi-pf">—</div></div>
     </div>
 
     <div class="chart-card">
       <div class="chart-card-row">
         <div>
-          <div class="chart-card-title">Equity Curve</div>
-          <div class="chart-card-subtitle" id="equity-chart-subtitle">Account balance over time</div>
+          <div class="chart-card-title" data-i18n="eq.eyebrow">Equity Curve</div>
+          <div class="chart-card-subtitle" id="equity-chart-subtitle" data-i18n="eq.title">Account balance over time</div>
         </div>
       </div>
       <div id="equity-chart-wrap"><svg id="equity-chart"></svg></div>
@@ -1266,23 +1267,23 @@
 
     <section style="margin-top:40px;">
       <div class="section-header"><span class="section-num">—</span><span class="section-title" data-i18n="stats.s2.title">Wins vs Losses</span></div>
-      <p class="section-hint">Side-by-side comparison of your winning and losing trades.</p>
+      <p class="section-hint" data-i18n="hint.wins_vs_losses">Side-by-side comparison of your winning and losing trades.</p>
       <div class="wl-summary">
         <div class="wl-cell win">
           <div class="stat-tooltip">Total number of winning trades, total R captured, and average R per win. Higher avg R = bigger winners on average.</div>
-          <div class="label">Wins</div>
+          <div class="label" data-i18n="kpi.wins">Wins</div>
           <div class="big" id="wl-win-count">0</div>
           <div class="detail" id="wl-win-detail">—</div>
         </div>
         <div class="wl-cell loss">
           <div class="stat-tooltip">Total number of losing trades. Each loss counts as -1R by default. If your imported actual losses were bigger than 1R (slippage), they show as higher R in the average.</div>
-          <div class="label">Losses</div>
+          <div class="label" data-i18n="kpi.losses">Losses</div>
           <div class="big" id="wl-loss-count">0</div>
           <div class="detail" id="wl-loss-detail">—</div>
         </div>
         <div class="wl-cell be">
           <div class="stat-tooltip">Trades that closed at or near entry, often with SL moved to BE. They contribute 0R to stats but may carry small £ costs (commission + spread).</div>
-          <div class="label">Break-evens</div>
+          <div class="label" data-i18n="kpi.bes">Break-evens</div>
           <div class="big" id="wl-be-count">0</div>
           <div class="detail" id="wl-be-detail">—</div>
         </div>
@@ -1291,11 +1292,11 @@
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title" data-i18n="stats.s3.title">Max Consecutive Streaks</span></div>
-      <p class="section-hint">Longest runs across all history. Critical for position sizing.</p>
+      <p class="section-hint" data-i18n="hint.max_streaks">Longest runs across all history. Critical for position sizing.</p>
       <div class="stats-summary" style="margin-top:0;grid-template-columns:repeat(3, 1fr);">
-        <div class="stat-cell"><div class="stat-tooltip">Longest unbroken run of winning trades. Critical for confidence — and for understanding what you can ride.</div><div class="stat-label">Max Win Streak</div><div class="stat-value good" id="stat-max-wins">0</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Longest unbroken run of losses. The worst stretch you've survived. Position-size for at least this many in a row.</div><div class="stat-label">Max Loss Streak</div><div class="stat-value bad" id="stat-max-losses">0</div></div>
-        <div class="stat-cell"><div class="stat-tooltip">Longest run of break-even trades in a row. High values can mean you're consistently moving to BE too early.</div><div class="stat-label">Max BE Streak</div><div class="stat-value be" id="stat-max-bes">0</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Longest unbroken run of winning trades. Critical for confidence — and for understanding what you can ride.</div><div class="stat-label" data-i18n="kpi.max_win_streak">Max Win Streak</div><div class="stat-value good" id="stat-max-wins">0</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Longest unbroken run of losses. The worst stretch you've survived. Position-size for at least this many in a row.</div><div class="stat-label" data-i18n="kpi.max_loss_streak">Max Loss Streak</div><div class="stat-value bad" id="stat-max-losses">0</div></div>
+        <div class="stat-cell"><div class="stat-tooltip">Longest run of break-even trades in a row. High values can mean you're consistently moving to BE too early.</div><div class="stat-label" data-i18n="kpi.max_be_streak">Max BE Streak</div><div class="stat-value be" id="stat-max-bes">0</div></div>
       </div>
     </section>
 
@@ -1320,15 +1321,15 @@
       <div class="holdtime-grid">
         <div class="holdtime-cell">
           <div class="stat-tooltip">Average time you held winning trades. Short avg = you take quick wins. Long avg = you let winners run.</div>
-          <div class="label">Avg Win</div><div class="value good" id="ht-win">—</div><div class="sub" id="ht-win-count">No data</div>
+          <div class="label" data-i18n="tta.avg_win">Avg Win</div><div class="value good" id="ht-win">—</div><div class="sub" id="ht-win-count">No data</div>
         </div>
         <div class="holdtime-cell">
           <div class="stat-tooltip">Average time you held losing trades. Short avg = you cut losses fast. Long avg = you may be hoping/holding too long.</div>
-          <div class="label">Avg Loss</div><div class="value bad" id="ht-loss">—</div><div class="sub" id="ht-loss-count">No data</div>
+          <div class="label" data-i18n="tta.avg_loss">Avg Loss</div><div class="value bad" id="ht-loss">—</div><div class="sub" id="ht-loss-count">No data</div>
         </div>
         <div class="holdtime-cell">
           <div class="stat-tooltip">Average time in break-even trades. Useful for spotting whether you're rushing or sitting too long before SL gets hit.</div>
-          <div class="label">Avg BE</div><div class="value be" id="ht-be">—</div><div class="sub" id="ht-be-count">No data</div>
+          <div class="label" data-i18n="tta.avg_be">Avg BE</div><div class="value be" id="ht-be">—</div><div class="sub" id="ht-be-count">No data</div>
         </div>
       </div>
     </section>
@@ -1359,19 +1360,19 @@
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title" data-i18n="trades.s7.title">Tags Analysis</span></div>
-      <p class="section-hint">Your 10 most-used concept and mindset tags across all trades.</p>
+      <p class="section-hint" data-i18n="hint.tags_analysis">Your 10 most-used concept and mindset tags across all trades.</p>
 
       <div class="pattern-row">
         <div class="pattern-block">
-          <div class="pattern-block-title">Top 10 Concepts</div>
+          <div class="pattern-block-title" data-i18n="tags.top_concepts">Top 10 Concepts</div>
           <div id="top-concepts-table" class="tag-leaderboard"></div>
-          <button type="button" id="expand-concepts" class="tag-leaderboard-expand" data-target="top-concepts-table" data-kind="concepts">+ Show all</button>
+          <button type="button" id="expand-concepts" class="tag-leaderboard-expand" data-target="top-concepts-table" data-kind="concepts" data-i18n="tags.show_all_initial">+ Show all</button>
         </div>
 
         <div class="pattern-block">
-          <div class="pattern-block-title">Top 10 Mindset States</div>
+          <div class="pattern-block-title" data-i18n="tags.top_mindset">Top 10 Mindset States</div>
           <div id="top-mindset-table" class="tag-leaderboard"></div>
-          <button type="button" id="expand-mindset" class="tag-leaderboard-expand" data-target="top-mindset-table" data-kind="mindset">+ Show all</button>
+          <button type="button" id="expand-mindset" class="tag-leaderboard-expand" data-target="top-mindset-table" data-kind="mindset" data-i18n="tags.show_all_initial">+ Show all</button>
         </div>
       </div>
     </section>
@@ -1435,7 +1436,7 @@
     </div>
     <div class="modal-stats" id="modal-stats"></div>
     <div id="modal-mfe"></div>
-    <div class="modal-section-title">Trades <span style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;font-family:'DM Mono',monospace;font-style:normal;font-weight:300;margin-left:12px;">— click any row to edit or delete</span></div>
+    <div class="modal-section-title"><span data-i18n="modal.trades_header">Trades</span> <span style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;font-family:'DM Mono',monospace;font-style:normal;font-weight:300;margin-left:12px;">— <span data-i18n="modal.click_row_edit_lower">click any row to edit or delete</span></span></div>
     <div class="modal-trades" id="modal-trades"></div>
     <div id="modal-bias-section"></div>
   </div>
@@ -1482,15 +1483,15 @@
       <div class="label" data-i18n="edit.lbl.side">Side</div>
       <div class="field"><select id="edit-side">
         <option value="">—</option>
-        <option value="Long">Long</option>
-        <option value="Short">Short</option>
+        <option value="Long" data-i18n="side.long">Long</option>
+        <option value="Short" data-i18n="side.short">Short</option>
       </select></div>
 
       <div class="label" data-i18n="edit.lbl.type">Type</div>
       <div class="field"><select id="edit-type">
         <option value="">—</option>
-        <option value="Reaction">Reaction</option>
-        <option value="Continuation">Continuation</option>
+        <option value="Reaction" data-i18n="type.reaction">Reaction</option>
+        <option value="Continuation" data-i18n="type.continuation">Continuation</option>
       </select></div>
 
       <div class="label" data-i18n="edit.lbl.entry_time">Entry Time</div>
@@ -1820,6 +1821,201 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'word.win': 'win',
+      'word.wins': 'wins',
+      'pot.tier_too_few': 'Not enough yet',
+      'pot.tier_early': 'Early signal',
+      'pot.tier_building': 'Building conviction',
+      'pot.tier_strong': 'Strong pattern',
+      'pot.body_too_few_one': 'only {N} tracked win so far — log {M} more to start getting a real signal.',
+      'pot.body_too_few': 'only {N} tracked wins so far — log {M} more to start getting a real signal.',
+      'pot.body_already_capturing': 'capturing <strong>{PCT}%</strong> of available — you\'re already taking most of the move. No urgent change needed.',
+      'pot.body_gap_small': 'avg captured {CAP} vs {POT} potential. Gap too small to meaningfully suggest holding longer.',
+      'pot.body_recommend': 'capturing <strong>{PCT}%</strong> of available (avg {CAP} vs {POT} potential per win). Holding {SUGG} longer per win would have added {TOTAL} across your {N} win{S}.',
+      'pot.summary_line': 'You captured {PCT} of the move across {N} tracked win{S}. {LEFT}',
+      'pot.left_on_table': 'left on the table.',
+      'pot.newer': '‹ Newer',
+      'pot.older': 'Older ›',
+      'pot.of': 'of',
+      'pot.hide_trades': 'Hide trades',
+      'pot.show_trades_n': 'Show {N} trade{S}',
+      'wvl.each_minus_one_r': 'Each: -1R',
+      'brk.untagged_one': 'trade untagged',
+      'brk.untagged_many': 'trades untagged',
+      'tta.from_one_trade': 'from 1 trade',
+      'tta.from_n_trades': 'from {N} trades',
+      'tta.need_more_other_slot': 'Need {N} more trade{S} in another slot',
+      'cal.dow.sun': 'Sun',
+      'cal.dow.mon': 'Mon',
+      'cal.dow.tue': 'Tue',
+      'cal.dow.wed': 'Wed',
+      'cal.dow.thu': 'Thu',
+      'cal.dow.fri': 'Fri',
+      'cal.dow.sat': 'Sat',
+      'cal.week_short': 'Week',
+      'cal.week_short_n': 'Week {N}',
+      'cal.mon.jan': 'Jan',
+      'cal.mon.feb': 'Feb',
+      'cal.mon.mar': 'Mar',
+      'cal.mon.apr': 'Apr',
+      'cal.mon.may': 'May',
+      'cal.mon.jun': 'Jun',
+      'cal.mon.jul': 'Jul',
+      'cal.mon.aug': 'Aug',
+      'cal.mon.sep': 'Sep',
+      'cal.mon.oct': 'Oct',
+      'cal.mon.nov': 'Nov',
+      'cal.mon.dec': 'Dec',
+      'cal.no_trades_month': 'No trades this month',
+      'tags.show_top10': '− Show top 10',
+      'tags.show_all_initial': '+ Show all',
+      'modal.best_trade_title': 'Best trade',
+      'modal.worst_trade_title': 'Worst trade',
+      'modal.missed_wins_label': 'Winning trades I didn\'t take?',
+      'modal.tv_urls': 'Paste TradingView snapshot URLs — one per line.',
+      'modal.tv_urls_missed': 'Paste TradingView snapshot URLs — one per line. One chart per missed setup.',
+      'modal.missed_wins_placeholder': 'Setups you saw but skipped. What stopped you — fear, distraction, missed entry, wrong filter?',
+      'modal.focus_next_label': 'What can I focus on next week to make my performance even better?',
+      'modal.focus_next_placeholder': 'One concrete thing.',
+      'modal.learned_label': 'What did I learn about myself or the markets this week?',
+      'modal.learned_placeholder': 'Something you didn\'t know on Monday. Process wins, executions, patience moments all count.',
+      'btn.copy_to_discord': 'Copy to Discord',
+      'modal.best_week': 'Best week',
+      'modal.worst_week': 'Worst week',
+      'modal.consistency_of': 'of {N} trading days',
+      'modal.across_one_trade': 'across 1 trade',
+      'modal.across_n_trades': 'across {N} trades',
+      'modal.best_worst_trade_month': 'Best & worst trade of the month',
+      'modal.toughest_trade_month': 'Toughest trade of the month',
+      'modal.only_ranked_tag': 'Only ranked tag',
+      'modal.best_short': 'Best',
+      'settings.starting_balance_lbl': 'Starting Balance {C}',
+      'modal.click_row_edit_lower': 'click any row to edit or delete',
+      'brand.label': 'Session Tool',
+      'kpi.net_pnl': 'Net P&L',
+      'kpi.gross_pnl': 'Gross P&L',
+      'kpi.total_rp': 'Total R · Pips',
+      'kpi.potential_rp': 'Potential R · Pips',
+      'kpi.account_balance': 'Account Balance',
+      'kpi.total_costs': 'Total Costs',
+      'kpi.win_rate': 'Win Rate',
+      'kpi.expectancy': 'Expectancy',
+      'kpi.profit_factor': 'Profit Factor',
+      'eq.eyebrow': 'Equity Curve',
+      'eq.title': 'Account balance over time',
+      'hint.wins_vs_losses': 'Side-by-side comparison of your winning and losing trades.',
+      'hint.max_streaks': 'Longest runs across all history. Critical for position sizing.',
+      'hint.tags_analysis': 'Your 10 most-used concept and mindset tags across all trades.',
+      'hint.mental_state': 'Mental state — be honest, this is how you grow.',
+      'cal.monthly_summary': 'Monthly Summary',
+      'stats.current_series': 'Current Series',
+      'review.this_morning_bias': 'This Morning\'s Bias',
+      'settings.defaults_hint_inline': 'Risk & Costs defaults are set in Review tab',
+      'kpi.wins': 'Wins',
+      'kpi.losses': 'Losses',
+      'kpi.bes': 'Break-Evens',
+      'kpi.max_win_streak': 'Max Win Streak',
+      'kpi.max_loss_streak': 'Max Loss Streak',
+      'kpi.max_be_streak': 'Max BE Streak',
+      'tta.avg_win': 'Avg Win',
+      'tta.avg_loss': 'Avg Loss',
+      'tta.avg_be': 'Avg BE',
+      'tta.best_slot': 'Best slot',
+      'tta.worst_slot': 'Worst slot',
+      'tta.most_active_slot': 'Most active slot',
+      'tta.best_win_rate': 'Best win rate',
+      'tta.best_duration': 'Best duration',
+      'tta.worst_duration': 'Worst duration',
+      'tta.most_active_duration': 'Most active duration',
+      'tta.from_trades': 'from {N} trade{S}',
+      'tta.need_more': 'Need {N} more trade{S} to know',
+      'tta.need_more_decided': 'Need {N} more decided trade{S} in one slot',
+      'tta.log_times': 'Log entry/exit times',
+      'tta.consistent_label': 'Even',
+      'tta.consistent_best': 'Performance is consistent across slots',
+      'tta.consistent_worst': 'No slot is meaningfully worse than others',
+      'brk.col.trades': 'Trades',
+      'brk.col.wr': 'WR',
+      'brk.col.wlbe': 'W / L / BE',
+      'brk.col.netr': 'Net R',
+      'side.long': 'Long',
+      'side.short': 'Short',
+      'type.reaction': 'Reaction',
+      'type.continuation': 'Continuation',
+      'dow.monday': 'Monday',
+      'dow.tuesday': 'Tuesday',
+      'dow.wednesday': 'Wednesday',
+      'dow.thursday': 'Thursday',
+      'dow.friday': 'Friday',
+      'dow.saturday': 'Saturday',
+      'dow.sunday': 'Sunday',
+      'wvl.total': 'Total:',
+      'wvl.avg_per_win': 'Avg: {R} per win',
+      'wvl.avg_per_loss': 'Avg: {R} per loss',
+      'wvl.no_wins': t('wvl.no_wins'),
+      'wvl.no_losses': t('wvl.no_losses'),
+      'wvl.no_bes': t('wvl.no_bes'),
+      'wvl.zerorcontrib': '0R contribution',
+      'wvl.costs_lbl': 'Costs:',
+      'pot.title': 'Should I hold winners longer?',
+      'pot.not_enough_yet': 'NOT ENOUGH YET',
+      'pot.r_win': '{N} R WIN',
+      'pot.r_wins': '{N} R WINS',
+      'pot.pips_win': '{N} PIPS WIN',
+      'pot.pips_wins': '{N} PIPS WINS',
+      'pot.r_label': 'R:',
+      'pot.pips_label': 'Pips:',
+      'pot.log_more': 'only {N} tracked win so far — log {M} more to start getting a real signal.',
+      'pot.captured_line': 'You captured {PCT}% of the move across {N} tracked win. {R}R · {P}p left on the table.',
+      'pot.captured_line_plural': 'You captured {PCT}% of the move across {N} tracked wins. {R}R · {P}p left on the table.',
+      'pot.hide_trades': 'HIDE TRADES',
+      'pot.show_trades': 'SHOW TRADES',
+      'pot.col_date': 'DATE',
+      'pot.col_side': 'SIDE',
+      'pot.col_captured': 'CAPTURED',
+      'pot.col_potential': 'POTENTIAL',
+      'pot.col_left': 'LEFT ON TABLE',
+      'pot.col_capture': 'CAPTURE',
+      'pot.disclaimer': "These numbers show the theoretical ceiling — what was technically available if you'd timed exits perfectly. They don't account for slippage, hesitation, and missed reversals when holding for longer. Treat as an upper bound, not a goal.",
+      'pot.trades_in_scope': '{N} trades in scope',
+      'period.label': 'Period',
+      'period.custom': 'Custom…',
+      'tags.top_concepts': 'Top 10 Concepts',
+      'tags.top_mindset': 'Top 10 Mindset States',
+      'tags.col_tag': 'TAG',
+      'tags.col_used': 'USED',
+      'tags.show_all': '+ SHOW ALL ({N})',
+      'cal.month_total': 'Month Total',
+      'cal.best_worst': 'Best/Worst',
+      'cal.trades': 'Trades',
+      'cal.wr': 'WR',
+      'cal.week_n': 'WEEK {N}',
+      'cal.trade_count_singular': '1 trade',
+      'cal.trade_count_plural': '{N} trades',
+      'modal.trades_header': 'Trades',
+      'modal.click_row_edit': 'CLICK ANY ROW TO EDIT OR DELETE',
+      'modal.click_dot_edit': 'CLICK ANY TRADE DOT TO EDIT OR DELETE',
+      'modal.bias_review': 'Bias & Review',
+      'modal.reflection_label': 'Reflection:',
+      'modal.close_btn': 'Close',
+      'modal.done_btn': 'Done',
+      'modal.weekend_reflection': 'Weekend Reflection',
+      'modal.weekend_sit_with': 'Sit down with this on Saturday or Sunday. The questions are the work — your future self reads these.',
+      'modal.picture_week': 'Picture of the week\'s opportunities',
+      'modal.best_worst_trade': 'My best & worst trade of the week',
+      'modal.best_trade': 'BEST TRADE',
+      'modal.worst_trade': 'WORST TRADE',
+      'modal.why_best': 'Why was it your best? Read, execution, patience, conviction…',
+      'modal.why_worst': 'Why was it your worst? What\'s the lesson?',
+      'modal.monthly_insights': 'Monthly Insights',
+      'modal.patterns_noting': 'Patterns worth noting',
+      'modal.no_patterns': 'No clear patterns yet this month — keep logging. Patterns surface when sample sizes pass the threshold.',
+      'modal.trade_of_month': 'Trade of the month',
+      'modal.best_worst_week': 'Best & Worst Week',
+      'modal.only_one_week': 'Only one week of trades this month — no comparison available.',
+      'modal.consistency': 'Consistency',
+      'modal.consistency_days': '{N} of {T} trading days',
+      'discord.empty_review': 'Fill in the form to preview your Discord post.',
       'edit.lbl.entry_time': 'Entry Time',
       'edit.lbl.exit_time': 'Exit Time',
       'edit.lbl.risk_sl_short': 'Risk {C} & SL',
@@ -1886,7 +2082,7 @@
       'opt.bullish': 'Bullish',
       'opt.bearish': 'Bearish',
       'opt.yes': 'Yes',
-      'opt.no_observed_only': 'No — Observed Only',
+      'opt.no': 'No — Observed Only',
       'opt.flawless': 'Flawless',
       'opt.needs_work': 'Needs Work',
       'opt.low': 'Low',
@@ -2121,6 +2317,201 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'word.win': 'ganadora',
+      'word.wins': 'ganadoras',
+      'pot.tier_too_few': 'Aún insuficiente',
+      'pot.tier_early': 'Señal temprana',
+      'pot.tier_building': 'Construyendo convicción',
+      'pot.tier_strong': 'Patrón fuerte',
+      'pot.body_too_few_one': 'solo {N} ganadora rastreada hasta ahora — registra {M} más para empezar a tener una señal real.',
+      'pot.body_too_few': 'solo {N} ganadoras rastreadas hasta ahora — registra {M} más para empezar a tener una señal real.',
+      'pot.body_already_capturing': 'capturando <strong>{PCT}%</strong> de lo disponible — ya estás tomando la mayor parte del movimiento. No urge cambiar.',
+      'pot.body_gap_small': 'media capturada {CAP} vs {POT} potencial. La diferencia es demasiado pequeña para sugerir aguantar más.',
+      'pot.body_recommend': 'capturando <strong>{PCT}%</strong> de lo disponible (media {CAP} vs {POT} potencial por ganadora). Aguantar {SUGG} más por ganadora habría sumado {TOTAL} en tus {N} ganadora{S}.',
+      'pot.summary_line': 'Capturaste {PCT} del movimiento en {N} ganadora{S} rastreada{S}. {LEFT}',
+      'pot.left_on_table': 'dejados sobre la mesa.',
+      'pot.newer': '‹ Más recientes',
+      'pot.older': 'Más antiguas ›',
+      'pot.of': 'de',
+      'pot.hide_trades': 'Ocultar operaciones',
+      'pot.show_trades_n': 'Mostrar {N} operación{S}',
+      'wvl.each_minus_one_r': 'Cada una: -1R',
+      'brk.untagged_one': 'operación sin etiquetar',
+      'brk.untagged_many': 'operaciones sin etiquetar',
+      'tta.from_one_trade': 'de 1 operación',
+      'tta.from_n_trades': 'de {N} operaciones',
+      'tta.need_more_other_slot': 'Faltan {N} operación{S} más en otra franja',
+      'cal.dow.sun': 'Dom',
+      'cal.dow.mon': 'Lun',
+      'cal.dow.tue': 'Mar',
+      'cal.dow.wed': 'Mié',
+      'cal.dow.thu': 'Jue',
+      'cal.dow.fri': 'Vie',
+      'cal.dow.sat': 'Sáb',
+      'cal.week_short': 'Sem',
+      'cal.week_short_n': 'Sem {N}',
+      'cal.mon.jan': 'Ene',
+      'cal.mon.feb': 'Feb',
+      'cal.mon.mar': 'Mar',
+      'cal.mon.apr': 'Abr',
+      'cal.mon.may': 'May',
+      'cal.mon.jun': 'Jun',
+      'cal.mon.jul': 'Jul',
+      'cal.mon.aug': 'Ago',
+      'cal.mon.sep': 'Sep',
+      'cal.mon.oct': 'Oct',
+      'cal.mon.nov': 'Nov',
+      'cal.mon.dec': 'Dic',
+      'cal.no_trades_month': 'Sin operaciones este mes',
+      'tags.show_top10': '− Mostrar las 10 principales',
+      'tags.show_all_initial': '+ Mostrar todas',
+      'modal.best_trade_title': 'Mejor operación',
+      'modal.worst_trade_title': 'Peor operación',
+      'modal.missed_wins_label': '¿Operaciones ganadoras que no tomé?',
+      'modal.tv_urls': 'Pega URLs de capturas de TradingView — una por línea.',
+      'modal.tv_urls_missed': 'Pega URLs de capturas de TradingView — una por línea. Una por setup perdido.',
+      'modal.missed_wins_placeholder': 'Setups que viste pero te saltaste. ¿Qué te frenó — miedo, distracción, entrada perdida, filtro equivocado?',
+      'modal.focus_next_label': '¿En qué puedo concentrarme la próxima semana para mejorar el rendimiento?',
+      'modal.focus_next_placeholder': 'Una cosa concreta.',
+      'modal.learned_label': '¿Qué aprendí de mí o del mercado esta semana?',
+      'modal.learned_placeholder': 'Algo que no sabías el lunes. Procesos, ejecuciones, momentos de paciencia — todo cuenta.',
+      'btn.copy_to_discord': 'Copiar a Discord',
+      'modal.best_week': 'Mejor semana',
+      'modal.worst_week': 'Peor semana',
+      'modal.consistency_of': 'de {N} días operables',
+      'modal.across_one_trade': 'en 1 operación',
+      'modal.across_n_trades': 'en {N} operaciones',
+      'modal.best_worst_trade_month': 'Mejor y peor operación del mes',
+      'modal.toughest_trade_month': 'Operación más dura del mes',
+      'modal.only_ranked_tag': 'Única etiqueta clasificada',
+      'modal.best_short': 'Mejor',
+      'settings.starting_balance_lbl': 'Balance Inicial {C}',
+      'modal.click_row_edit_lower': 'pulsa cualquier fila para editar o eliminar',
+      'brand.label': 'Herramienta de Sesión',
+      'kpi.net_pnl': 'P&G Neto',
+      'kpi.gross_pnl': 'P&G Bruto',
+      'kpi.total_rp': 'R · Pips Total',
+      'kpi.potential_rp': 'R · Pips Potencial',
+      'kpi.account_balance': 'Balance de Cuenta',
+      'kpi.total_costs': 'Costes Totales',
+      'kpi.win_rate': 'Ratio de Acierto',
+      'kpi.expectancy': 'Expectativa',
+      'kpi.profit_factor': 'Factor de Beneficio',
+      'eq.eyebrow': 'Curva de Capital',
+      'eq.title': 'Balance de cuenta a lo largo del tiempo',
+      'hint.wins_vs_losses': 'Comparación en paralelo de tus operaciones ganadoras y perdedoras.',
+      'hint.max_streaks': 'Rachas más largas en todo el historial. Crítico para el tamaño de la posición.',
+      'hint.tags_analysis': 'Tus 10 etiquetas de concepto y mentalidad más usadas en todas las operaciones.',
+      'hint.mental_state': 'Estado mental — sé honesto, así es como se crece.',
+      'cal.monthly_summary': 'Resumen Mensual',
+      'stats.current_series': 'Serie Actual',
+      'review.this_morning_bias': 'El Sesgo de Esta Mañana',
+      'settings.defaults_hint_inline': 'Riesgo y Costes por defecto se configuran en Revisión',
+      'kpi.wins': 'Ganadoras',
+      'kpi.losses': 'Pérdidas',
+      'kpi.bes': 'Break-Evens',
+      'kpi.max_win_streak': 'Racha Máx Ganadora',
+      'kpi.max_loss_streak': 'Racha Máx Perdedora',
+      'kpi.max_be_streak': 'Racha Máx BE',
+      'tta.avg_win': 'Media Ganadora',
+      'tta.avg_loss': 'Media Perdedora',
+      'tta.avg_be': 'Media BE',
+      'tta.best_slot': 'Mejor franja',
+      'tta.worst_slot': 'Peor franja',
+      'tta.most_active_slot': 'Franja más activa',
+      'tta.best_win_rate': 'Mejor ratio de acierto',
+      'tta.best_duration': 'Mejor duración',
+      'tta.worst_duration': 'Peor duración',
+      'tta.most_active_duration': 'Duración más activa',
+      'tta.from_trades': 'de {N} operación{S}',
+      'tta.need_more': 'Faltan {N} operación{S} más para saberlo',
+      'tta.need_more_decided': 'Faltan {N} operación{S} decidida{S} más en una franja',
+      'tta.log_times': 'Registra horas de entrada/salida',
+      'tta.consistent_label': 'Equilibrado',
+      'tta.consistent_best': 'El rendimiento es consistente en todas las franjas',
+      'tta.consistent_worst': 'Ninguna franja es significativamente peor',
+      'brk.col.trades': 'Operaciones',
+      'brk.col.wr': 'WR',
+      'brk.col.wlbe': 'G / P / BE',
+      'brk.col.netr': 'R Neto',
+      'side.long': 'Largo',
+      'side.short': 'Corto',
+      'type.reaction': 'Reacción',
+      'type.continuation': 'Continuación',
+      'dow.monday': 'Lunes',
+      'dow.tuesday': 'Martes',
+      'dow.wednesday': 'Miércoles',
+      'dow.thursday': 'Jueves',
+      'dow.friday': 'Viernes',
+      'dow.saturday': 'Sábado',
+      'dow.sunday': 'Domingo',
+      'wvl.total': 'Total:',
+      'wvl.avg_per_win': 'Media: {R} por ganadora',
+      'wvl.avg_per_loss': 'Media: {R} por pérdida',
+      'wvl.no_wins': 'Aún sin ganadoras',
+      'wvl.no_losses': 'Aún sin pérdidas',
+      'wvl.no_bes': 'Aún sin operaciones BE',
+      'wvl.zerorcontrib': 'Contribución 0R',
+      'wvl.costs_lbl': 'Costes:',
+      'pot.title': '¿Debería aguantar más las ganadoras?',
+      'pot.not_enough_yet': 'AÚN INSUFICIENTE',
+      'pot.r_win': '{N} R GANADORA',
+      'pot.r_wins': '{N} R GANADORAS',
+      'pot.pips_win': '{N} PIPS GANADORA',
+      'pot.pips_wins': '{N} PIPS GANADORAS',
+      'pot.r_label': 'R:',
+      'pot.pips_label': 'Pips:',
+      'pot.log_more': 'solo {N} ganadora rastreada hasta ahora — registra {M} más para empezar a tener una señal real.',
+      'pot.captured_line': 'Capturaste {PCT}% del movimiento en {N} ganadora rastreada. {R}R · {P}p dejados sobre la mesa.',
+      'pot.captured_line_plural': 'Capturaste {PCT}% del movimiento en {N} ganadoras rastreadas. {R}R · {P}p dejados sobre la mesa.',
+      'pot.hide_trades': 'OCULTAR OPERACIONES',
+      'pot.show_trades': 'MOSTRAR OPERACIONES',
+      'pot.col_date': 'FECHA',
+      'pot.col_side': 'DIRECCIÓN',
+      'pot.col_captured': 'CAPTURADO',
+      'pot.col_potential': 'POTENCIAL',
+      'pot.col_left': 'EN LA MESA',
+      'pot.col_capture': 'CAPTURA',
+      'pot.disclaimer': 'Estos números muestran el techo teórico — lo que técnicamente había si hubieras cronometrado las salidas a la perfección. No tienen en cuenta deslizamiento, dudas y reversiones perdidas al aguantar más tiempo. Trátalo como cota superior, no como objetivo.',
+      'pot.trades_in_scope': '{N} operaciones en alcance',
+      'period.label': 'Periodo',
+      'period.custom': 'Personalizado…',
+      'tags.top_concepts': '10 Principales Conceptos',
+      'tags.top_mindset': '10 Principales Estados Mentales',
+      'tags.col_tag': 'ETIQUETA',
+      'tags.col_used': 'USADAS',
+      'tags.show_all': '+ MOSTRAR TODAS ({N})',
+      'cal.month_total': 'Total del Mes',
+      'cal.best_worst': 'Mejor/Peor',
+      'cal.trades': 'Operaciones',
+      'cal.wr': 'WR',
+      'cal.week_n': 'SEMANA {N}',
+      'cal.trade_count_singular': '1 operación',
+      'cal.trade_count_plural': '{N} operaciones',
+      'modal.trades_header': 'Operaciones',
+      'modal.click_row_edit': 'PULSA CUALQUIER FILA PARA EDITAR O ELIMINAR',
+      'modal.click_dot_edit': 'PULSA CUALQUIER PUNTO PARA EDITAR O ELIMINAR',
+      'modal.bias_review': 'Sesgo y Revisión',
+      'modal.reflection_label': 'Reflexión:',
+      'modal.close_btn': 'Cerrar',
+      'modal.done_btn': 'Hecho',
+      'modal.weekend_reflection': 'Reflexión de Fin de Semana',
+      'modal.weekend_sit_with': 'Siéntate con esto el sábado o el domingo. Las preguntas son el trabajo — tu yo futuro las leerá.',
+      'modal.picture_week': 'Imagen de las oportunidades de la semana',
+      'modal.best_worst_trade': 'Mi mejor y peor operación de la semana',
+      'modal.best_trade': 'MEJOR OPERACIÓN',
+      'modal.worst_trade': 'PEOR OPERACIÓN',
+      'modal.why_best': '¿Por qué fue la mejor? Lectura, ejecución, paciencia, convicción…',
+      'modal.why_worst': '¿Por qué fue la peor? ¿Cuál es la lección?',
+      'modal.monthly_insights': 'Análisis del Mes',
+      'modal.patterns_noting': 'Patrones a destacar',
+      'modal.no_patterns': 'Aún no hay patrones claros este mes — sigue registrando. Los patrones surgen cuando la muestra supera el umbral.',
+      'modal.trade_of_month': 'Operación del mes',
+      'modal.best_worst_week': 'Mejor y Peor Semana',
+      'modal.only_one_week': 'Solo una semana de operaciones este mes — no hay comparación disponible.',
+      'modal.consistency': 'Constancia',
+      'modal.consistency_days': '{N} de {T} días operados',
+      'discord.empty_review': 'Rellena el formulario para previsualizar tu mensaje de Discord.',
       'edit.lbl.entry_time': 'Hora Entrada',
       'edit.lbl.exit_time': 'Hora Salida',
       'edit.lbl.risk_sl_short': 'Riesgo {C} y SL',
@@ -2187,7 +2578,7 @@
       'opt.bullish': 'Alcista',
       'opt.bearish': 'Bajista',
       'opt.yes': 'Sí',
-      'opt.no_observed_only': 'No — Solo Observada',
+      'opt.no': 'No — Sólo Observada',
       'opt.flawless': 'Impecable',
       'opt.needs_work': 'A Mejorar',
       'opt.low': 'Bajo',
@@ -2303,6 +2694,8 @@
 
   // Locale code for date/number formatting
   // Translate a result value (Win/Lose/BE) — used everywhere result text is shown.
+  // Translate 'win' / 'wins' for pluralization in performance text.
+  function tWin(n) { return t(n === 1 || n === 'win' ? 'word.win' : 'word.wins'); }
   function tResult(r) {
     if (r === 'Win')  return t('res.win');
     if (r === 'Lose') return t('res.lose');
@@ -3121,8 +3514,8 @@
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('page-' + target).classList.add('active');
-      const modeMap = { bias: 'Session Bias', review: 'Session Review', stats: 'Series of 10', trades: 'Statistics', tradeview: 'Trades Calendar' };
-      document.getElementById('header-mode').textContent = modeMap[target] || 'Bias';
+      const modeMap = { bias: t('tab.bias'), review: t('tab.review'), stats: t('tab.stats'), trades: t('tab.trades'), tradeview: t('tab.tradeview') };
+      document.getElementById('header-mode').textContent = modeMap[target] || t('tab.bias');
       // Rotate page caption with British-voice line for the new page.
       refreshPageCaption(target);
       if (target === 'review') renderSavedBias();
@@ -3166,7 +3559,7 @@
           <button type="button" class="tv-link-remove" title="Remove link">×</button>
         </div>
         <div class="tv-link-preview-wrap"></div>
-        <textarea class="tv-link-notes" placeholder="${t('ph.chart_notes')}" rows="2"></textarea>
+        <textarea class="tv-link-notes" data-i18n-placeholder="ph.chart_notes" placeholder="${t('ph.chart_notes')}" rows="2"></textarea>
       `;
       const urlInput   = card.querySelector('.tv-link-url');
       const notesInput = card.querySelector('.tv-link-notes');
@@ -3441,7 +3834,7 @@
       row.innerHTML = `
         <div class="trade-cell trade-num">${idx + 1}</div>
         <div class="trade-cell"><select class="trade-select result-select">
-          <option value="">—</option><option value="Win">Win</option><option value="Lose">Lose</option><option value="BE">BE</option>
+          <option value="">—</option><option value="Win">${t('res.win')}</option><option value="Lose">${t('res.lose')}</option><option value="BE">${t('res.be')}</option>
         </select></div>
         <div class="trade-cell trade-cell-dual">
           <input class="trade-input trade-input-tiny r-input" type="text" inputmode="decimal" placeholder="R" title="R-multiple captured" />
@@ -3454,10 +3847,10 @@
           <input class="trade-input trade-input-tiny potpips-input" type="text" inputmode="decimal" placeholder="P" title="Potential pips — how far the move went" />
         </div>
         <div class="trade-cell"><select class="trade-select type-select">
-          <option value="">—</option><option value="Reaction">Reaction</option><option value="Continuation">Continuation</option>
+          <option value="">—</option><option value="Reaction">${t('type.reaction')}</option><option value="Continuation">${t('type.continuation')}</option>
         </select></div>
         <div class="trade-cell"><select class="trade-select side-select">
-          <option value="">—</option><option value="Long">Long</option><option value="Short">Short</option>
+          <option value="">—</option><option value="Long">${t('side.long')}</option><option value="Short">${t('side.short')}</option>
         </select></div>
         <div class="trade-cell"><input class="trade-input entry-input" type="time" /></div>
         <div class="trade-cell"><input class="trade-input exit-input" type="time" /></div>
@@ -3702,7 +4095,7 @@
           <button type="button" class="tv-link-remove" title="Remove link">×</button>
         </div>
         <div class="tv-link-preview-wrap"></div>
-        <textarea class="tv-link-notes" placeholder="${t('ph.chart_notes')}" rows="2"></textarea>
+        <textarea class="tv-link-notes" data-i18n-placeholder="ph.chart_notes" placeholder="${t('ph.chart_notes')}" rows="2"></textarea>
       `;
       const urlInput   = card.querySelector('.tv-link-url');
       const notesInput = card.querySelector('.tv-link-notes');
@@ -4344,15 +4737,15 @@
     document.getElementById('wl-loss-count').textContent = losses.length;
     document.getElementById('wl-be-count').textContent = bes.length;
     document.getElementById('wl-win-detail').innerHTML = wins.length > 0
-      ? `Total: +${totalWinR.toFixed(2)}R<br>Avg: +${(totalWinR/wins.length).toFixed(2)}R per win`
-      : 'No wins yet';
+      ? `${t('wvl.total')} +${totalWinR.toFixed(2)}R<br>${t('wvl.avg_per_win').replace('{R}', '+'+(totalWinR/wins.length).toFixed(2)+'R')}`
+      : t('wvl.no_wins');
     document.getElementById('wl-loss-detail').innerHTML = losses.length > 0
-      ? `Total: -${totalLossR.toFixed(2)}R<br>Each: -1R`
-      : 'No losses yet';
+      ? `${t('wvl.total')} -${totalLossR.toFixed(2)}R<br>${t('wvl.each_minus_one_r')}`
+      : t('wvl.no_losses');
     const beCosts = bes.reduce((s,t) => s + (parseFloat(t.costs) || 0), 0);
     document.getElementById('wl-be-detail').innerHTML = bes.length > 0
-      ? `0R contribution<br>Costs: -${curSym()}${beCosts.toFixed(2)}`
-      : 'No BE trades yet';
+      ? `${t('wvl.zerorcontrib')}<br>${t('wvl.costs_lbl')} -${curSym()}${beCosts.toFixed(2)}`
+      : t('wvl.no_bes');
 
     let mw=0, ml=0, mb=0, cw=0, cl=0, cb=0;
     all.forEach(t => {
@@ -4384,10 +4777,10 @@
     // Header row reused by all three breakdown tables.
     const breakdownHeader = `<div class="history-row headers">
       <div class="history-cell label">&nbsp;</div>
-      <div class="history-cell">Trades</div>
-      <div class="history-cell">WR</div>
-      <div class="history-cell">W / L / BE</div>
-      <div class="history-cell right">Net R</div>
+      <div class="history-cell">${t('brk.col.trades')}</div>
+      <div class="history-cell">${t('brk.col.wr')}</div>
+      <div class="history-cell">${t('brk.col.wlbe')}</div>
+      <div class="history-cell right">${t('brk.col.netr')}</div>
     </div>`;
     // Render one breakdown row. No empty/filled split — the "0" / "—" placeholders tell the story.
     // (Previously used an `empty` class which collided with the global .empty empty-state card style.)
@@ -4403,7 +4796,7 @@
       </div>`;
     };
 
-    if (!anyDow) dowWrap.innerHTML = '<div class="empty">Log a few trades to populate.</div>';
+    if (!anyDow) dowWrap.innerHTML = `<div class="empty">${t('empty.log_trades_dow')}</div>`;
     else {
       let html = '<div class="history-list" style="margin-top:0;">' + breakdownHeader;
       dows.forEach(d => {
@@ -4419,17 +4812,17 @@
     const shorts = all.filter(t => t.side === 'Short');
     const untaggedSide = all.filter(t => !t.side).length;
     if (longs.length === 0 && shorts.length === 0) {
-      sideWrap.innerHTML = '<div class="empty">Tag your trades as Long or Short in the Review tab to populate.</div>';
+      sideWrap.innerHTML = `<div class="empty">${t('empty.tag_side')}</div>`;
     } else {
       const lo = sideStats(longs);
       const sh = sideStats(shorts);
       sideWrap.innerHTML = `
         <div class="history-list" style="margin-top:0;">
           ${breakdownHeader}
-          ${rowFor('Long', lo)}
-          ${rowFor('Short', sh)}
+          ${rowFor(t('side.long'), lo)}
+          ${rowFor(t('side.short'), sh)}
         </div>
-        ${untaggedSide > 0 ? `<div style="font-size:10px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:12px;">${untaggedSide} trade${untaggedSide === 1 ? '' : 's'} untagged</div>` : ''}`;
+        ${untaggedSide > 0 ? `<div style="font-size:10px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:12px;">${untaggedSide} ${untaggedSide === 1 ? t('brk.untagged_one') : t('brk.untagged_many')}</div>` : ''}`;
     }
 
     const typeWrap = document.getElementById('type-breakdown');
@@ -4437,17 +4830,17 @@
     const continuation = all.filter(t => t.type === 'Continuation');
     const untaggedType = all.filter(t => !t.type).length;
     if (reaction.length === 0 && continuation.length === 0) {
-      typeWrap.innerHTML = '<div class="empty">Tag trades as Reaction or Continuation in the Review tab to populate.</div>';
+      typeWrap.innerHTML = `<div class="empty">${t('empty.tag_type')}</div>`;
     } else {
       const r = sideStats(reaction);
       const c = sideStats(continuation);
       typeWrap.innerHTML = `
         <div class="history-list" style="margin-top:0;">
           ${breakdownHeader}
-          ${rowFor('Reaction', r)}
-          ${rowFor('Continuation', c)}
+          ${rowFor(t('type.reaction'), r)}
+          ${rowFor(t('type.continuation'), c)}
         </div>
-        ${untaggedType > 0 ? `<div style="font-size:10px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:12px;">${untaggedType} trade${untaggedType === 1 ? '' : 's'} untagged</div>` : ''}`;
+        ${untaggedType > 0 ? `<div style="font-size:10px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:12px;">${untaggedType} ${untaggedType === 1 ? t('brk.untagged_one') : t('brk.untagged_many')}</div>` : ''}`;
     }
 
     const winsHt = wins.map(holdMinutes).filter(m => m !== null);
@@ -4457,9 +4850,9 @@
     document.getElementById('ht-win').textContent = winsHt.length > 0 ? formatMinutes(avg(winsHt)) : '—';
     document.getElementById('ht-loss').textContent = lossesHt.length > 0 ? formatMinutes(avg(lossesHt)) : '—';
     document.getElementById('ht-be').textContent = besHt.length > 0 ? formatMinutes(avg(besHt)) : '—';
-    document.getElementById('ht-win-count').textContent = winsHt.length > 0 ? `from ${winsHt.length} trade${winsHt.length === 1 ? '' : 's'}` : 'Log entry+exit times';
-    document.getElementById('ht-loss-count').textContent = lossesHt.length > 0 ? `from ${lossesHt.length} trade${lossesHt.length === 1 ? '' : 's'}` : 'Log entry+exit times';
-    document.getElementById('ht-be-count').textContent = besHt.length > 0 ? `from ${besHt.length} trade${besHt.length === 1 ? '' : 's'}` : 'Log entry+exit times';
+    document.getElementById('ht-win-count').textContent = winsHt.length > 0 ? `${winsHt.length === 1 ? t('tta.from_one_trade') : t('tta.from_n_trades').replace('{N}', winsHt.length)}` : t('tta.log_times');
+    document.getElementById('ht-loss-count').textContent = lossesHt.length > 0 ? `${lossesHt.length === 1 ? t('tta.from_one_trade') : t('tta.from_n_trades').replace('{N}', lossesHt.length)}` : t('tta.log_times');
+    document.getElementById('ht-be-count').textContent = besHt.length > 0 ? `${besHt.length === 1 ? t('tta.from_one_trade') : t('tta.from_n_trades').replace('{N}', besHt.length)}` : t('tta.log_times');
 
     // Top tags: simple count-only tables for concepts and mindset
     const conceptRows = buildTagCounts(all, 'concepts');
@@ -4489,7 +4882,7 @@
       return;
     }
     btn.classList.remove('hidden');
-    btn.textContent = expanded ? `− Show top 10` : `+ Show all (${totalTags})`;
+    btn.textContent = expanded ? t('tags.show_top10') : t('tags.show_all').replace('{N}', totalTags);
   }
 
   // Wire expand-button click handlers once at init.
@@ -4537,8 +4930,8 @@
 
     let html = `<div class="tag-leaderboard-row header" style="grid-row:1;grid-column:1;${HDR_SZ}">
       <div></div>
-      <div>Tag</div>
-      <div class="col-count" style="text-align:right;">Used</div>
+      <div>${t('tags.col_tag')}</div>
+      <div class="col-count" style="text-align:right;">${t('tags.col_used')}</div>
     </div>`;
     for (let i = 0; i < SLOTS; i++) {
       const r = dataRows[i];
@@ -4732,7 +5125,7 @@
     );
 
     if (tracked.length === 0) {
-      simWrap.innerHTML = `<p class="potr-empty">No winning trades with Potential R or Potential Pips logged yet. Log when you mark a win and patterns appear here.</p>`;
+      simWrap.innerHTML = `<p class="potr-empty">${t('empty.no_potential_wins')}</p>`;
       return;
     }
 
@@ -4783,10 +5176,10 @@
     // rate is already high (≥80%), congratulate rather than push to hold.
     // ------------------------------------------------------------------
     const tierMeta = {
-      'too-few':  { label: 'Not enough yet',         cls: 'rec-tier-low'      },
-      'early':    { label: 'Early signal',           cls: 'rec-tier-early'    },
-      'building': { label: 'Building conviction',    cls: 'rec-tier-building' },
-      'strong':   { label: 'Strong pattern',         cls: 'rec-tier-strong'   }
+      'too-few':  { label: t('pot.tier_too_few'),     cls: 'rec-tier-low'      },
+      'early':    { label: t('pot.tier_early'),       cls: 'rec-tier-early'    },
+      'building': { label: t('pot.tier_building'),    cls: 'rec-tier-building' },
+      'strong':   { label: t('pot.tier_strong'),      cls: 'rec-tier-strong'   }
     };
 
     function renderRec(rec) {
@@ -4797,19 +5190,19 @@
       let body;
       if (rec.tier === 'too-few') {
         const need = 10 - rec.n;
-        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> only ${rec.n} tracked win${rec.n === 1 ? '' : 's'} so far — log ${need} more to start getting a real signal.</span>`;
+        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> ${rec.n === 1 ? t('pot.body_too_few_one').replace('{N}', rec.n).replace('{M}', need) : t('pot.body_too_few').replace('{N}', rec.n).replace('{M}', need)}</span>`;
       } else if (rec.captureRate >= 80) {
-        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> capturing <strong>${rec.captureRate.toFixed(0)}%</strong> of available — you're already taking most of the move. No urgent change needed.</span>`;
+        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> ${t('pot.body_already_capturing').replace('{PCT}', rec.captureRate.toFixed(0))}</span>`;
       } else if (rec.suggested < (rec.decimals === 0 ? 1 : 0.2)) {
-        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> avg captured ${fmt(rec.avgCaptured)} vs ${fmt(rec.avgPotential)} potential. Gap too small to meaningfully suggest holding longer.</span>`;
+        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> ${t('pot.body_gap_small').replace('{CAP}', fmt(rec.avgCaptured)).replace('{POT}', fmt(rec.avgPotential))}</span>`;
       } else {
         // Concrete impact: if you'd held `suggested` more per win across all n wins
         const totalExtra = rec.suggested * rec.n;
         const totalExtraStr = fmt(totalExtra);
-        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> capturing <strong>${rec.captureRate.toFixed(0)}%</strong> of available (avg ${fmt(rec.avgCaptured)} vs ${fmt(rec.avgPotential)} potential per win). Holding <strong class="rec-suggest">${fmt(rec.suggested)}</strong> longer per win would have added <strong class="rec-suggest">${totalExtraStr}</strong> across your ${rec.n} win${rec.n === 1 ? '' : 's'}.</span>`;
+        body = `<span class="rec-text"><strong>${rec.unitName}:</strong> ${t('pot.body_recommend').replace('{PCT}', rec.captureRate.toFixed(0)).replace('{CAP}', fmt(rec.avgCaptured)).replace('{POT}', fmt(rec.avgPotential)).replace('{SUGG}', `<strong class="rec-suggest">${fmt(rec.suggested)}</strong>`).replace('{TOTAL}', `<strong class="rec-suggest">${totalExtraStr}</strong>`).replace('{N}', rec.n).replace('{S}', rec.n === 1 ? '' : 's')}</span>`;
       }
       return `<div class="rec-row">
-        <span class="rec-tier ${t.cls}">${t.label} <span class="rec-tier-n">· ${rec.n} ${rec.unitName.toLowerCase()} win${rec.n === 1 ? '' : 's'}</span></span>
+        <span class="rec-tier ${t.cls}">${t.label} <span class="rec-tier-n">· ${rec.n} ${rec.unitName.toLowerCase()} ${rec.n === 1 ? tWin(1) : tWin(2)}</span></span>
         ${body}
       </div>`;
     }
@@ -4830,7 +5223,7 @@
     const leftRStr   = recR    ? `+${sumLeftR.toFixed(2)}R` : '';
     const leftPStr   = recPips ? `+${sumLeftP.toFixed(0)}p` : '';
     const leftJoined = [leftRStr, leftPStr].filter(Boolean).join(' · ');
-    const summaryLine = `<div class="potr-summary">You captured <strong>${captureStr}</strong> of the move across ${tracked.length} tracked win${tracked.length === 1 ? '' : 's'}. <span class="potr-summary-left">${leftJoined} left on the table.</span></div>`;
+    const summaryLine = `<div class="potr-summary">${t('pot.summary_line').replace('{PCT}', `<strong>${captureStr}</strong>`).replace('{N}', tracked.length).replace('{S}', tracked.length === 1 ? '' : 's').replace('{LEFT}', `<span class="potr-summary-left">${leftJoined} ${t('pot.left_on_table')}</span>`)}</div>`;
 
     // ------------------------------------------------------------------
     // Per-trade table — sorted by R left on table descending, so worst
@@ -4853,7 +5246,7 @@
     const tableRowsHtml = rows.map(r => {
       const t = r.trade;
       const d = new Date(t.date);
-      const dateStr = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+      const dateStr = d.toLocaleDateString(tLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
       const dateKey = d.toDateString();
       const side = t.side || '—';
       const capRStr = (r.capR >= 0 ? '+' : '') + r.capR.toFixed(2) + 'R';
@@ -4891,27 +5284,27 @@
     const showNav = totalRows > POTR_TABLE_PAGE_SIZE;
     const navHtml = showNav ? `
       <div class="potr-table-nav">
-        <button type="button" class="potr-page-btn" id="potr-page-prev" ${potrTablePage === 0 ? 'disabled' : ''}>‹ Newer</button>
-        <span class="potr-page-info">${pageStart + 1}–${pageEnd} of ${totalRows}</span>
-        <button type="button" class="potr-page-btn" id="potr-page-next" ${potrTablePage >= totalPages - 1 ? 'disabled' : ''}>Older ›</button>
+        <button type="button" class="potr-page-btn" id="potr-page-prev" ${potrTablePage === 0 ? 'disabled' : ''}>${t('pot.newer')}</button>
+        <span class="potr-page-info">${pageStart + 1}–${pageEnd} ${t('pot.of')} ${totalRows}</span>
+        <button type="button" class="potr-page-btn" id="potr-page-next" ${potrTablePage >= totalPages - 1 ? 'disabled' : ''}>${t('pot.older')}</button>
       </div>` : '';
 
     const tableHtml = `
       <div class="potr-trade-table">
         <div class="potr-trade-row headers">
-          <div class="potr-trade-cell">Date</div>
-          <div class="potr-trade-cell">Side</div>
-          <div class="potr-trade-cell">Captured</div>
-          <div class="potr-trade-cell">Potential</div>
-          <div class="potr-trade-cell">Left on table</div>
-          <div class="potr-trade-cell">Capture</div>
+          <div class="potr-trade-cell">${t('pot.col_date')}</div>
+          <div class="potr-trade-cell">${t('pot.col_side')}</div>
+          <div class="potr-trade-cell">${t('pot.col_captured')}</div>
+          <div class="potr-trade-cell">${t('pot.col_potential')}</div>
+          <div class="potr-trade-cell">${t('pot.col_left')}</div>
+          <div class="potr-trade-cell">${t('pot.col_capture')}</div>
         </div>
         ${visibleRows}
       </div>
       ${navHtml}`;
 
     const showTable = data.settings.potrShowTable !== false;
-    const toggleLabel = showTable ? 'Hide trades' : `Show ${totalRows} trade${totalRows === 1 ? '' : 's'}`;
+    const toggleLabel = showTable ? t('pot.hide_trades') : t('pot.show_trades_n').replace('{N}', totalRows).replace('{S}', totalRows === 1 ? '' : 's');
     const summaryRowHtml = `
       <div class="potr-summary-row">
         ${summaryLine}
@@ -4920,13 +5313,13 @@
 
     simWrap.innerHTML = `
       <div class="potr-rec-block">
-        <div class="potr-rec-title">Should I hold winners longer?</div>
+        <div class="potr-rec-title">${t('pot.title')}</div>
         ${renderRec(recR)}
         ${renderRec(recPips)}
       </div>
       ${summaryRowHtml}
       ${showTable ? tableHtml : ''}
-      ${showTable ? '<div class="potr-sim-note">These numbers show the theoretical ceiling — what was technically available if you\'d timed exits perfectly. They don\'t account for slippage, hesitation, and missed reversals when holding for longer. Treat as an upper bound, not a goal.</div>' : ''}
+      ${showTable ? `<div class="potr-sim-note">${t('pot.disclaimer')}</div>` : ''}
     `;
 
     // Toggle button — flip the setting and re-render.
@@ -5064,14 +5457,14 @@
       return Math.max(1, MIN_TRADES_PER_BUCKET - (closest.wins + closest.losses));
     }
 
-    const labelBest = kind === 'time' ? 'Best slot'  : 'Best duration';
-    const labelWorst = kind === 'time' ? 'Worst slot' : 'Worst duration';
-    const labelMost = kind === 'time' ? 'Most active slot' : 'Most active duration';
+    const labelBest = kind === 'time' ? t('tta.best_slot')  : t('tta.best_duration');
+    const labelWorst = kind === 'time' ? t('tta.worst_slot') : t('tta.worst_duration');
+    const labelMost = kind === 'time' ? t('tta.most_active_slot') : t('tta.most_active_duration');
 
     function netHtml(b) {
       const netStr = (b.net >= 0 ? '+' : '-') + curSym() + Math.abs(b.net).toFixed(2);
       const cls = b.net > 0 ? 'good' : b.net < 0 ? 'bad' : '';
-      return `${b.trades.length} trade${b.trades.length === 1 ? '' : 's'} <span class="pl ${cls}">${netStr}</span>`;
+      return `${b.trades.length === 1 ? t('cal.trade_count_singular') : t('cal.trade_count_plural').replace('{N}', b.trades.length)} <span class="pl ${cls}">${netStr}</span>`;
     }
     function emptyCell(label, icon, iconCls, hint) {
       return `<div class="time-hero-cell">
@@ -5092,8 +5485,8 @@
     let bestCell, worstCell;
     if (consistent) {
       // Performance is flat — be honest about it instead of fabricating a winner
-      bestCell = valueCell(labelBest, '↑', 'good', 'Even', 'Performance is consistent across slots');
-      worstCell = valueCell(labelWorst, '↓', 'bad', 'Even', 'No slot is meaningfully worse than others');
+      bestCell = valueCell(labelBest, '↑', 'good', t('tta.consistent_label'), t('tta.consistent_best'));
+      worstCell = valueCell(labelWorst, '↓', 'bad', t('tta.consistent_label'), t('tta.consistent_worst'));
     } else if (best && worst) {
       bestCell = valueCell(labelBest, '↑', 'good', best.key, netHtml(best));
       worstCell = valueCell(labelWorst, '↓', 'bad', worst.key, netHtml(worst));
@@ -5101,12 +5494,12 @@
       // Only one eligible bucket — show it but explain there's no comparison yet
       bestCell = valueCell(labelBest, '↑', 'good', best.key, netHtml(best));
       const need = tradesNeededForBestWorst();
-      worstCell = emptyCell(labelWorst, '↓', 'bad', `Need ${need} more trade${need === 1 ? '' : 's'} in another slot`);
+      worstCell = emptyCell(labelWorst, '↓', 'bad', t('tta.need_more_other_slot').replace('{N}', need).replace('{S}', need === 1 ? '' : 's'));
     } else {
       // No eligible buckets yet
       const need = tradesNeededForBestWorst();
-      bestCell = emptyCell(labelBest, '↑', 'good', `Need ${need} more trade${need === 1 ? '' : 's'} to know`);
-      worstCell = emptyCell(labelWorst, '↓', 'bad', `Need ${need} more trade${need === 1 ? '' : 's'} to know`);
+      bestCell = emptyCell(labelBest, '↑', 'good', t('tta.need_more').replace('{N}', need).replace('{S}', need === 1 ? '' : 's'));
+      worstCell = emptyCell(labelWorst, '↓', 'bad', t('tta.need_more').replace('{N}', need).replace('{S}', need === 1 ? '' : 's'));
     }
 
     // Most active — always shown if any trades exist
@@ -5116,10 +5509,10 @@
     let wrCell;
     if (topWR) {
       const wr = Math.round(topWR.wins / (topWR.wins + topWR.losses) * 100);
-      wrCell = valueCell('Best win rate', '★', 'good', topWR.key, `${wr}% across ${topWR.wins + topWR.losses} decided`);
+      wrCell = valueCell(t('tta.best_win_rate'), '★', 'good', topWR.key, `${wr}% across ${topWR.wins + topWR.losses} decided`);
     } else {
       const need = tradesNeededForWR();
-      wrCell = emptyCell('Best win rate', '★', 'good', `Need ${need} more decided trade${need === 1 ? '' : 's'} in one slot`);
+      wrCell = emptyCell(t('tta.best_win_rate'), '★', 'good', `Need ${need} more decided trade${need === 1 ? '' : 's'} in one slot`);
     }
 
     summaryEl.innerHTML = `<div class="time-hero-grid">${bestCell}${worstCell}${mostCell}${wrCell}</div>`;
@@ -5144,13 +5537,13 @@
   function renderYearGlance() {
     const wrap = document.getElementById('year-glance');
     const all = getAllLifetimeTrades();
-    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const monthNames = [t('cal.mon.jan'), t('cal.mon.feb'), t('cal.mon.mar'), t('cal.mon.apr'), t('cal.mon.may'), t('cal.mon.jun'), t('cal.mon.jul'), t('cal.mon.aug'), t('cal.mon.sep'), t('cal.mon.oct'), t('cal.mon.nov'), t('cal.mon.dec')];
     let html = `<div class="year-nav">
         <button class="cal-nav-btn" id="year-prev">‹</button>
         <div class="year-label">${yearGlanceYear}</div>
         <button class="cal-nav-btn" id="year-next">›</button>
       </div>
-      <div class="title">Monthly Summary</div>
+      <div class="title" data-i18n="cal.monthly_summary">Monthly Summary</div>
       <div class="year-months">`;
     for (let m = 0; m < 12; m++) {
       const monthTrades = all.filter(t => {
@@ -5186,9 +5579,9 @@
   }
 
   function renderCalendar() {
-    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const calTitleDate = new Date(calendarYear, calendarMonth, 1);
     const titleEl = document.getElementById('cal-month-title');
-    titleEl.textContent = `${monthNames[calendarMonth]} ${calendarYear}`;
+    titleEl.textContent = calTitleDate.toLocaleDateString(tLocale(), { month: 'long', year: 'numeric' }).replace(/^./, c => c.toUpperCase());
     const grouped = tradesGroupedByDate();
     const firstDay = new Date(calendarYear, calendarMonth, 1);
     const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
@@ -5206,10 +5599,10 @@
     grid.style.maxHeight = `${28 + weeks * 65 + weeks * 4 + 4}px`;
 
     const SZ = 'height:65px !important;min-height:65px;max-height:65px;';
-    const headers = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const headers = [t('cal.dow.sun'), t('cal.dow.mon'), t('cal.dow.tue'), t('cal.dow.wed'), t('cal.dow.thu'), t('cal.dow.fri'), t('cal.dow.sat')];
     let html = '';
     headers.forEach((h, i) => html += `<div class="cal-day-header" style="grid-row:1;grid-column:${i+1};">${h}</div>`);
-    html += `<div class="cal-day-header week-col" style="grid-row:1;grid-column:8;">Week</div>`;
+    html += `<div class="cal-day-header week-col" style="grid-row:1;grid-column:8;">${t('cal.week_short')}</div>`;
 
     let weekIdx = 0;
     let currentRow = 2; // CSS Grid rows are 1-indexed; row 1 is headers, week rows start at 2
@@ -5241,7 +5634,7 @@
       const plLabel = dayTrades.length > 0 ? fmtMoneyShort(net) : '';
       // P&L label colour mirrors the day classification so BE days show neutral/blue label, not red
       const plCls = cls === 'win' ? 'good' : cls === 'loss' ? 'bad' : 'be';
-      const tradeCount = dayTrades.length > 0 ? `${dayTrades.length} trade${dayTrades.length === 1 ? '' : 's'}` : '';
+      const tradeCount = dayTrades.length > 0 ? (dayTrades.length === 1 ? t('cal.trade_count_singular') : t('cal.trade_count_plural').replace('{N}', dayTrades.length)) : '';
       const weekday = dateObj.getDay();
       const colNum = weekday + 1; // explicit column placement
       html += `<div class="cal-day ${cls} ${hasTrade} ${todayCls}" data-date="${key}" style="grid-row:${currentRow};grid-column:${colNum};${SZ}">
@@ -5280,7 +5673,7 @@
         }
         const wCls = weekNet > 0 ? 'good' : weekNet < 0 ? 'bad' : '';
         const wLabel = weekCount > 0 ? fmtMoneyShort(weekNet) : curSym() + '0';
-        const wSub = weekCount > 0 ? `${weekCount} trade${weekCount === 1 ? '' : 's'}` : '';
+        const wSub = weekCount > 0 ? (weekCount === 1 ? t('cal.trade_count_singular') : t('cal.trade_count_plural').replace('{N}', weekCount)) : '';
         // Determine weekKey for dedup-matching against saved reviews
         const yearStart = new Date(fridayDate.getFullYear(), 0, 1);
         const dayOfYear = Math.floor((fridayDate - yearStart) / (1000*60*60*24));
@@ -5289,7 +5682,7 @@
         const hasReview = (data.weeklyReviews || []).some(r => r.weekKey === weekKey);
         html += `<div class="cal-week-summary clickable" data-monday="${mondayDate.toISOString()}" data-friday="${fridayDate.toISOString()}" data-week-key="${weekKey}" title="Click to ${hasReview ? 'view' : 'add'} weekly review" style="grid-row:${currentRow};grid-column:8;${SZ}">
           <div class="pl ${wCls}">${wLabel}</div>
-          <div class="label">Week ${weekIdx}</div>
+          <div class="label">${t('cal.week_short_n').replace('{N}', weekIdx)}</div>
           ${wSub ? `<div class="sub">${wSub}</div>` : ''}
         </div>`;
         currentWeek = { trades: [], net: 0, anchorDate: null };
@@ -5340,11 +5733,11 @@
                        (monthWins === 0 && monthLosses === 0) ? 'be' :
                        monthNet > 0 ? 'good' : monthNet < 0 ? 'bad' : 'be';
       summary.innerHTML = `
-        <div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">Month Total</span><br><span class="total ${monthCls}">${fmtMoney(monthNet)}</span></div>
-        <div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">Trades</span><br><span style="font-family:'Fraunces',serif;font-size:14px;">${monthTrades.length}</span></div>
-        ${monthWR !== null ? `<div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">WR</span><br><span style="font-family:'Fraunces',serif;font-size:14px;">${monthWR}%</span></div>` : ''}
-        ${bestDay !== null ? `<div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">Best/Worst</span><br><span style="font-family:'Fraunces',serif;font-size:13px;color:var(--good);">${fmtMoneyShort(bestDay)}</span> / <span style="font-family:'Fraunces',serif;font-size:13px;color:var(--bad);">${fmtMoneyShort(worstDay)}</span></div>` : ''}`;
-    } else summary.innerHTML = '<div style="color:var(--text-dim);font-size:11px;">No trades this month</div>';
+        <div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">${t('cal.month_total')}</span><br><span class="total ${monthCls}">${fmtMoney(monthNet)}</span></div>
+        <div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">${t('cal.trades')}</span><br><span style="font-family:'Fraunces',serif;font-size:14px;">${monthTrades.length}</span></div>
+        ${monthWR !== null ? `<div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">${t('cal.wr')}</span><br><span style="font-family:'Fraunces',serif;font-size:14px;">${monthWR}%</span></div>` : ''}
+        ${bestDay !== null ? `<div><span style="color:var(--text-dim);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;">${t('cal.best_worst')}</span><br><span style="font-family:'Fraunces',serif;font-size:13px;color:var(--good);">${fmtMoneyShort(bestDay)}</span> / <span style="font-family:'Fraunces',serif;font-size:13px;color:var(--bad);">${fmtMoneyShort(worstDay)}</span></div>` : ''}`;
+    } else summary.innerHTML = `<div style="color:var(--text-dim);font-size:11px;">${t('cal.no_trades_month')}</div>`;
   }
 
   document.getElementById('cal-prev').addEventListener('click', () => {
@@ -5467,7 +5860,7 @@
       const b = firstWithBias.biasSnap;
       const r = firstWithBias.reviewSnap || {};
       const dir = b.direction === 'Bullish' ? '↑' : b.direction === 'Bearish' ? '↓' : '';
-      let html = '<div class="modal-section-title">Bias & Review</div><div class="modal-bias-text">';
+      let html = `<div class="modal-section-title">${t('modal.bias_review')}</div><div class="modal-bias-text">`;
       if (b.direction) html += `<strong style="color:var(--text);">${dir} ${b.direction}</strong>`;
       if (b.structure) html += ` &middot; ${b.structure}`;
       if (b.location)  html += ` &middot; ${b.location}`;
@@ -5481,7 +5874,7 @@
         else html += `<br><a href="${link}" target="_blank" rel="noopener" style="color:var(--text-mid);word-break:break-all;">${link}</a>${noteEl}`;
       });
       if (b.notes) html += `<br><em style="color:var(--text-dim);">"${b.notes}"</em>`;
-      if (r.reflection) html += `<br><br><strong style="color:var(--text);">Reflection:</strong><br>${r.reflection}`;
+      if (r.reflection) html += `<br><br><strong style="color:var(--text);">${t('modal.reflection_label')}</strong><br>${r.reflection}`;
       const biasUrls = biasLinks.map(l => l.url);
       const reviewLinksSnap = (r.tvLinks || []).filter(l => l && l.url && !biasUrls.includes(l.url));
       if (reviewLinksSnap.length > 0) {
@@ -6133,24 +6526,24 @@
       const cls = v => v > 0 ? 'good' : v < 0 ? 'bad' : '';
       weekSectionHtml = `
         <div class="month-insight-block">
-          <div class="month-insight-title">Best & worst week</div>
+          <div class="month-insight-title">${t('modal.best_worst_week')}</div>
           <div class="month-insight-row">
             <div class="month-insight-cell">
-              <div class="month-insight-label"><span class="icon good">↑</span>Best week</div>
+              <div class="month-insight-label"><span class="icon good">↑</span>${t('modal.best_week')}</div>
               <div class="month-insight-value">${fmtWeek(best.key)}</div>
-              <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} across ${best.trades} trade${best.trades === 1 ? '' : 's'}</div>
+              <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} ${best.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', best.trades)}</div>
             </div>
             <div class="month-insight-cell">
-              <div class="month-insight-label"><span class="icon bad">↓</span>Worst week</div>
+              <div class="month-insight-label"><span class="icon bad">↓</span>${t('modal.worst_week')}</div>
               <div class="month-insight-value">${fmtWeek(worst.key)}</div>
-              <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} across ${worst.trades} trade${worst.trades === 1 ? '' : 's'}</div>
+              <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} ${worst.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', worst.trades)}</div>
             </div>
           </div>
         </div>`;
     } else if (weeks.length === 1) {
       weekSectionHtml = `<div class="month-insight-block">
-        <div class="month-insight-title">Best & worst week</div>
-        <div class="month-insight-empty">Only one week of trades this month — no comparison available.</div>
+        <div class="month-insight-title">${t('modal.best_worst_week')}</div>
+        <div class="month-insight-empty">${t('modal.only_one_week')}</div>
       </div>`;
     }
 
@@ -6173,10 +6566,10 @@
     const consistency = weekdaysInMonth > 0 ? Math.round(tradedDays / weekdaysInMonth * 100) : 0;
     const consistencyHtml = `
       <div class="month-insight-block">
-        <div class="month-insight-title">Consistency</div>
+        <div class="month-insight-title">${t('modal.consistency')}</div>
         <div class="month-insight-flat">
           <span class="month-insight-big">${tradedDays}</span>
-          <span class="month-insight-of">of ${weekdaysInMonth} trading days</span>
+          <span class="month-insight-of">${t('modal.consistency_of').replace('{N}', weekdaysInMonth)}</span>
           <span class="month-insight-pct">${consistency}%</span>
         </div>
       </div>`;
@@ -6212,9 +6605,9 @@
           <div class="month-insight-title">${title}</div>
           <div class="month-insight-row">
             <div class="month-insight-cell">
-              <div class="month-insight-label"><span class="icon info">◆</span>Only ranked tag</div>
+              <div class="month-insight-label"><span class="icon info">◆</span>${t('modal.only_ranked_tag')}</div>
               <div class="month-insight-value">${best.tag}</div>
-              <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} across ${best.trades} trade${best.trades === 1 ? '' : 's'}</div>
+              <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} ${best.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', best.trades)}</div>
             </div>
           </div>
         </div>`;
@@ -6223,14 +6616,14 @@
         <div class="month-insight-title">${title}</div>
         <div class="month-insight-row">
           <div class="month-insight-cell">
-            <div class="month-insight-label"><span class="icon good">↑</span>Best</div>
+            <div class="month-insight-label"><span class="icon good">↑</span>${t('modal.best_short')}</div>
             <div class="month-insight-value">${best.tag}</div>
-            <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} across ${best.trades} trade${best.trades === 1 ? '' : 's'}</div>
+            <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} ${best.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', best.trades)}</div>
           </div>
           <div class="month-insight-cell">
             <div class="month-insight-label"><span class="icon bad">↓</span>Worst</div>
             <div class="month-insight-value">${worst.tag}</div>
-            <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} across ${worst.trades} trade${worst.trades === 1 ? '' : 's'}</div>
+            <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} ${worst.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', worst.trades)}</div>
           </div>
         </div>
       </div>`;
@@ -6262,12 +6655,12 @@
           <div class="month-insight-cell">
             <div class="month-insight-label"><span class="icon good">↑</span>Best day</div>
             <div class="month-insight-value">${best.name}</div>
-            <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} across ${best.trades} trade${best.trades === 1 ? '' : 's'}</div>
+            <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} ${best.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', best.trades)}</div>
           </div>
           <div class="month-insight-cell">
             <div class="month-insight-label"><span class="icon bad">↓</span>Worst day</div>
             <div class="month-insight-value">${worst.name}</div>
-            <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} across ${worst.trades} trade${worst.trades === 1 ? '' : 's'}</div>
+            <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} ${worst.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', worst.trades)}</div>
           </div>
         </div>
       </div>`;
@@ -6385,9 +6778,9 @@
         const worst = lossesThisMonth.slice().sort((a, b) => tradeR(a) - tradeR(b))[0];
         cells.push(fmtTradeCell(worst, 'Worst trade', 'bad', '✕'));
       }
-      if (cells.length === 2) title = 'Best & worst trade of the month';
+      if (cells.length === 2) title = t('modal.best_worst_trade_month');
       else if (winsThisMonth.length > 0) title = 'Trade of the month';
-      else title = 'Toughest trade of the month';
+      else title = t('modal.toughest_trade_month');
       tradeOfMonthHtml = `<div class="month-insight-block">
         <div class="month-insight-title">${title}</div>
         <div class="month-insight-row">
@@ -6526,7 +6919,7 @@
     let patternsHtml;
     if (topPatterns.length === 0) {
       patternsHtml = `<div class="month-insight-block patterns-block">
-        <div class="month-insight-title">Patterns worth noting</div>
+        <div class="month-insight-title">${t('modal.patterns_noting')}</div>
         <div class="month-insight-empty">No clear patterns yet this month — keep logging. Patterns surface when sample sizes pass the threshold.</div>
       </div>`;
     } else {
@@ -6536,7 +6929,7 @@
         return `<li class="pattern-item ${cls}"><span class="pattern-icon">${icon}</span><span class="pattern-text">${p.text}</span></li>`;
       }).join('');
       patternsHtml = `<div class="month-insight-block patterns-block">
-        <div class="month-insight-title">Patterns worth noting</div>
+        <div class="month-insight-title">${t('modal.patterns_noting')}</div>
         <ul class="patterns-list">${items}</ul>
       </div>`;
     }
@@ -6544,7 +6937,7 @@
     // Compose the whole block. If the month has zero trades, hide everything cleanly.
     if (monthTrades.length === 0) return '';
     return `<div class="month-insights">
-      <div class="month-insights-header">Monthly Insights</div>
+      <div class="month-insights-header">${t('modal.monthly_insights')}</div>
       ${patternsHtml}
       ${tradeOfMonthHtml}
       ${weekSectionHtml}
@@ -6840,48 +7233,48 @@
 
     document.getElementById('review-modal-reflection').innerHTML = `
       <div class="reflect-block">
-        <div class="reflect-header">Weekend Reflection</div>
-        <div class="reflect-subhead">Sit down with this on Saturday or Sunday. The questions are the work — your future self reads these.</div>
+        <div class="reflect-header">${t('modal.weekend_reflection')}</div>
+        <div class="reflect-subhead">${t('modal.weekend_sit_with')}</div>
 
         <div class="reflect-question">
-          <div class="reflect-q-label">Picture of the week's opportunities</div>
-          <textarea id="rfx-week-chart-url" class="reflect-q-urls" rows="2" placeholder="Paste TradingView snapshot URLs — one per line.">${esc(weekChartUrl)}</textarea>
+          <div class="reflect-q-label">${t('modal.picture_week')}</div>
+          <textarea id="rfx-week-chart-url" class="reflect-q-urls" rows="2" placeholder="${t('modal.tv_urls')}">${esc(weekChartUrl)}</textarea>
           <div id="rfx-week-chart-preview" class="reflect-q-preview">${tvPreviewMultiHtml(weekChartUrl)}</div>
         </div>
 
         ${(bestWinTrade || worstLoseTrade) ? `<div class="reflect-question">
-          <div class="reflect-q-label">My best & worst trade of the week</div>
+          <div class="reflect-q-label">${t('modal.best_worst_trade')}</div>
           <div class="reflect-bw-grid">
             ${bestWinTrade ? `<div class="reflect-bw-col">
-              ${autoTradeCard(bestWinTrade, 'Best trade', 'good', '★')}
-              <textarea id="rfx-best-trade-notes" class="reflect-q-textarea" placeholder="Why was it your best? Read, execution, patience, conviction…">${esc(bestTradeNotes)}</textarea>
+              ${autoTradeCard(bestWinTrade, t('modal.best_trade_title'), 'good', '★')}
+              <textarea id="rfx-best-trade-notes" class="reflect-q-textarea" placeholder="${t('modal.why_best')}">${esc(bestTradeNotes)}</textarea>
             </div>` : ''}
             ${worstLoseTrade ? `<div class="reflect-bw-col">
-              ${autoTradeCard(worstLoseTrade, 'Worst trade', 'bad', '✕')}
-              <textarea id="rfx-worst-trade-notes" class="reflect-q-textarea" placeholder="Where did this go wrong? Read, entry, sizing, exit, emotional state…">${esc(worstTradeNotes)}</textarea>
+              ${autoTradeCard(worstLoseTrade, t('modal.worst_trade_title'), 'bad', '✕')}
+              <textarea id="rfx-worst-trade-notes" class="reflect-q-textarea" placeholder="${t('modal.why_worst')}">${esc(worstTradeNotes)}</textarea>
             </div>` : ''}
           </div>
         </div>` : ''}
 
         <div class="reflect-question">
-          <div class="reflect-q-label">Winning trades I didn't take?</div>
-          <textarea id="rfx-missed-url" class="reflect-q-urls" rows="2" placeholder="Paste TradingView snapshot URLs — one per line. One chart per missed setup.">${esc(missedUrl)}</textarea>
+          <div class="reflect-q-label">${t('modal.missed_wins_label')}</div>
+          <textarea id="rfx-missed-url" class="reflect-q-urls" rows="2" placeholder="${t('modal.tv_urls_missed')}">${esc(missedUrl)}</textarea>
           <div id="rfx-missed-preview" class="reflect-q-preview">${tvPreviewMultiHtml(missedUrl)}</div>
-          <textarea id="rfx-missed-wins" class="reflect-q-textarea" placeholder="Setups you saw but skipped. What stopped you — fear, distraction, missed entry, wrong filter?">${esc(missedWins)}</textarea>
+          <textarea id="rfx-missed-wins" class="reflect-q-textarea" placeholder="${t('modal.missed_wins_placeholder')}">${esc(missedWins)}</textarea>
         </div>
 
         <div class="reflect-question">
-          <div class="reflect-q-label">What can I focus on next week to make my performance even better?</div>
-          <textarea id="rfx-focus-next" class="reflect-q-textarea" placeholder="One concrete thing.">${esc(focusNext)}</textarea>
+          <div class="reflect-q-label">${t('modal.focus_next_label')}</div>
+          <textarea id="rfx-focus-next" class="reflect-q-textarea" placeholder="${t('modal.focus_next_placeholder')}">${esc(focusNext)}</textarea>
         </div>
 
         <div class="reflect-question">
-          <div class="reflect-q-label">What did I learn about myself or the markets this week?</div>
-          <textarea id="rfx-learned" class="reflect-q-textarea" placeholder="Something you didn't know on Monday. Process wins, executions, patience moments all count.">${esc(learned)}</textarea>
+          <div class="reflect-q-label">${t('modal.learned_label')}</div>
+          <textarea id="rfx-learned" class="reflect-q-textarea" placeholder="${t('modal.learned_placeholder')}">${esc(learned)}</textarea>
         </div>
 
         <div style="display:flex;justify-content:flex-end;margin-top:18px;">
-          <button type="button" id="rfx-discord-copy" style="background:transparent;color:var(--text);border:1px solid var(--text-mid);padding:8px 18px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;">Copy to Discord</button>
+          <button type="button" id="rfx-discord-copy" style="background:transparent;color:var(--text);border:1px solid var(--text-mid);padding:8px 18px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;" data-i18n="btn.copy_to_discord">Copy to Discord</button>
         </div>
       </div>
     `;
