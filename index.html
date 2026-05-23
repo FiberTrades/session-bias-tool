@@ -164,7 +164,7 @@
     .potr-trade-cell { padding: 9px 8px; font-size: 11px; }
     .potr-trade-row.headers .potr-trade-cell { padding: 7px 8px; }
   }
-  .options { display: grid; gap: 1px; background: var(--border-2); border: 1px solid var(--border-2); margin-left: 60px; }
+  .options { display: grid; gap: 1px; background: #383838; border: 1px solid #383838; margin-left: 60px; }
   .options.two-col   { grid-template-columns: 1fr 1fr; }
   .options.three-col { grid-template-columns: repeat(3, 1fr); }
   .options.four-col  { grid-template-columns: repeat(4, 1fr); }
@@ -470,7 +470,7 @@
   .holdtime-cell .value.be   { color: var(--info); }
   .holdtime-cell .sub { margin-top: 6px; font-size: 10px; color: var(--text-dim); }
   /* Trade Time / Duration analysis */
-  .time-hero-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border-2); border: 1px solid var(--border-2); }
+  .time-hero-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #383838; border: 1px solid #383838; }
   .time-hero-cell { background: var(--bg); padding: 22px 18px; }
   .time-hero-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
   .time-hero-icon { font-size: 14px; }
@@ -804,10 +804,13 @@
   .footer .data-actions a { color: var(--text-dim); cursor: pointer; text-decoration: none; transition: color 200ms; }
   .footer .data-actions a:hover { color: var(--text); }
   /* Language toggle — flag icons next to footer actions */
-  .lang-toggle { display: inline-flex; gap: 8px; align-items: center; }
-  .lang-flag { cursor: pointer; font-size: 16px; line-height: 1; opacity: 0.4; transition: opacity 200ms, transform 200ms; user-select: none; }
+  .lang-toggle { display: inline-flex; gap: 8px; align-items: center; vertical-align: middle; line-height: 1; }
+  .lang-flag { cursor: pointer; font-size: 14px; line-height: 1; opacity: 0.4; transition: opacity 200ms, transform 200ms; user-select: none; display: inline-block; }
   .lang-flag:hover { opacity: 0.85; transform: scale(1.1); }
   .lang-flag.active { opacity: 1; }
+  /* Currency selector — matches link styling */
+  .currency-select { background: transparent; border: 1px solid var(--border-2); color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; padding: 3px 6px; cursor: pointer; vertical-align: middle; outline: none; transition: all 200ms; }
+  .currency-select:hover { color: var(--text); border-color: var(--text-mid); }
   .empty { padding: 56px 28px; text-align: center; border: 1px dashed var(--border-2); color: var(--text-dim); font-family: 'Fraunces', serif; font-style: italic; font-size: 16px; }
   .edit-trade-form { display: grid; grid-template-columns: 130px 1fr; gap: 14px 18px; align-items: center; margin-bottom: 16px; }
   .edit-trade-form .label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
@@ -899,50 +902,50 @@
     <div id="bias-greeting" class="bias-greeting"></div>
     <section>
       <div class="section-header"><span class="section-num">01</span><span class="section-title" data-i18n="bias.s1.title">Trading Mode</span></div>
-      <p class="section-hint">Observation or execution this session.</p>
+      <p class="section-hint" data-i18n="hint.observation_or_execution_this_session">Observation or execution this session.</p>
       <div class="options two-col" data-bias="mode">
-        <button class="option" data-value="Observation">Observation</button>
-        <button class="option" data-value="Execution">Execution</button>
+        <button class="option" data-value="Observation" data-i18n="opt.observation">Observation</button>
+        <button class="option" data-value="Execution" data-i18n="opt.execution">Execution</button>
       </div>
     </section>
     <section>
       <div class="section-header"><span class="section-num">02</span><span class="section-title" data-i18n="bias.s2.title">Market Structure</span></div>
-      <p class="section-hint">Dominant structure across higher timeframes.</p>
+      <p class="section-hint" data-i18n="hint.dominant_structure_across_higher_timeframes">Dominant structure across higher timeframes.</p>
       <div class="options three-col" data-bias="structure">
-        <button class="option" data-value="Initiating">Initiating</button>
-        <button class="option" data-value="Trending">Trending</button>
-        <button class="option" data-value="Ranging">Ranging</button>
+        <button class="option" data-value="Initiating" data-i18n="opt.initiating">Initiating</button>
+        <button class="option" data-value="Trending" data-i18n="opt.trending">Trending</button>
+        <button class="option" data-value="Ranging" data-i18n="opt.ranging">Ranging</button>
       </div>
     </section>
     <section>
       <div class="section-header"><span class="section-num">03</span><span class="section-title" data-i18n="bias.s3.title">Price Location</span></div>
-      <p class="section-hint">Position relative to key levels.</p>
+      <p class="section-hint" data-i18n="hint.position_relative_to_key_levels">Position relative to key levels.</p>
       <div class="options six-col" data-bias="location">
-        <button class="option" data-value="Premium Edge">Premium Edge</button>
-        <button class="option" data-value="Premium Middle">Premium Middle</button>
-        <button class="option" data-value="50%">50%</button>
-        <button class="option" data-value="Discount Middle">Discount Middle</button>
-        <button class="option" data-value="Discount Edge">Discount Edge</button>
-        <button class="option" data-value="Breakout">Breakout</button>
+        <button class="option" data-value="Premium Edge" data-i18n="opt.premium_edge">Premium Edge</button>
+        <button class="option" data-value="Premium Middle" data-i18n="opt.premium_middle">Premium Middle</button>
+        <button class="option" data-value="50%" data-i18n="opt.50">50%</button>
+        <button class="option" data-value="Discount Middle" data-i18n="opt.discount_middle">Discount Middle</button>
+        <button class="option" data-value="Discount Edge" data-i18n="opt.discount_edge">Discount Edge</button>
+        <button class="option" data-value="Breakout" data-i18n="opt.breakout">Breakout</button>
       </div>
     </section>
     <section>
       <div class="section-header"><span class="section-num">04</span><span class="section-title" data-i18n="bias.s4.title">Direction</span></div>
-      <p class="section-hint">Current directional bias.</p>
+      <p class="section-hint" data-i18n="hint.current_directional_bias">Current directional bias.</p>
       <div class="options two-col" data-bias="direction">
-        <button class="option" data-value="Bullish">Bullish</button>
-        <button class="option" data-value="Bearish">Bearish</button>
+        <button class="option" data-value="Bullish" data-i18n="opt.bullish">Bullish</button>
+        <button class="option" data-value="Bearish" data-i18n="opt.bearish">Bearish</button>
       </div>
     </section>
     <section>
       <div class="section-header"><span class="section-num">05</span><span class="section-title" data-i18n="bias.s5.title">Charts</span></div>
-      <p class="section-hint">TradingView snapshot links — Discord embeds them automatically. Add as many as you need.</p>
+      <p class="section-hint" data-i18n="hint.tradingview_snapshot_links_discord_embeds_them_aut">TradingView snapshot links — Discord embeds them automatically. Add as many as you need.</p>
       <div id="bias-tv-list" style="margin-left:60px;"></div>
       <button type="button" id="bias-tv-add" style="margin-left:60px;margin-top:8px;background:transparent;border:1px dashed var(--border-2);padding:10px 16px;color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;transition:all 200ms;">+ Add link</button>
     </section>
     <section>
       <div class="section-header"><span class="section-num">06</span><span class="section-title" data-i18n="bias.s6.title">Notes</span></div>
-      <p class="section-hint">Intentions, news risk, mindset reminders.</p>
+      <p class="section-hint" data-i18n="hint.intentions_news_risk_mindset_reminders">Intentions, news risk, mindset reminders.</p>
       <textarea class="textarea" id="bias-notes" placeholder="What would flawless performance look like today..."></textarea>
     </section>
     <div class="preview">
@@ -975,8 +978,8 @@
       <div class="section-header"><span class="section-num">01</span><span class="section-title" data-i18n="review.s1.title">Did you take a trade?</span></div>
       <p class="section-hint" data-i18n="review.s1.hint">If no, the trade-specific sections are skipped.</p>
       <div class="options two-col" data-review="traded">
-        <button class="option" data-value="Yes">Yes</button>
-        <button class="option" data-value="No">No — Observed Only</button>
+        <button class="option" data-value="Yes" data-i18n="opt.yes">Yes</button>
+        <button class="option" data-value="No" data-i18n="opt.no">No — Observed Only</button>
       </div>
     </section>
 
@@ -1014,95 +1017,95 @@
 
     <section id="section-execution" class="hidden">
       <div class="section-header"><span class="section-num">03</span><span class="section-title" data-i18n="review.s3.title">Execution Quality</span></div>
-      <p class="section-hint">Honest self-assessment of how you executed.</p>
+      <p class="section-hint" data-i18n="hint.honest_self_assessment_of_how_you_executed">Honest self-assessment of how you executed.</p>
       <div class="options two-col" data-review="execution">
-        <button class="option" data-value="Flawless">Flawless</button>
-        <button class="option" data-value="Needs Work">Needs Work</button>
+        <button class="option" data-value="Flawless" data-i18n="opt.flawless">Flawless</button>
+        <button class="option" data-value="Needs Work" data-i18n="opt.needs_work">Needs Work</button>
       </div>
     </section>
 
     <section>
       <div class="section-header"><span class="section-num">04</span><span class="section-title" data-i18n="review.s4.title">Focus Level</span></div>
-      <p class="section-hint">How present were you during the session.</p>
+      <p class="section-hint" data-i18n="hint.how_present_were_you_during_the_session">How present were you during the session.</p>
       <div class="options three-col" data-review="focus">
-        <button class="option" data-value="Low">Low</button>
-        <button class="option" data-value="Average">Average</button>
-        <button class="option" data-value="Full">Full</button>
+        <button class="option" data-value="Low" data-i18n="opt.low">Low</button>
+        <button class="option" data-value="Average" data-i18n="opt.average">Average</button>
+        <button class="option" data-value="Full" data-i18n="opt.full">Full</button>
       </div>
     </section>
 
     <section>
       <div class="section-header"><span class="section-num">05</span><span class="section-title" data-i18n="review.s5.title">How Did the Session Close?</span></div>
-      <p class="section-hint">Net directional behaviour during the 2-hour window.</p>
+      <p class="section-hint" data-i18n="hint.net_directional_behaviour_during_the_2_hour_window">Net directional behaviour during the 2-hour window.</p>
       <div class="options three-col" data-review="close">
-        <button class="option" data-value="Bullish">Bullish ↑</button>
-        <button class="option" data-value="Bearish">Bearish ↓</button>
-        <button class="option" data-value="Ranging">Ranging ↔</button>
+        <button class="option" data-value="Bullish" data-i18n="opt.bullish">Bullish ↑</button>
+        <button class="option" data-value="Bearish" data-i18n="opt.bearish">Bearish ↓</button>
+        <button class="option" data-value="Ranging" data-i18n="opt.ranging">Ranging ↔</button>
       </div>
     </section>
 
     <section>
       <div class="section-header"><span class="section-num">06</span><span class="section-title" data-i18n="review.s6.title">RICE Phase Observed</span></div>
-      <p class="section-hint">Range, Initiation, Correction, Extension — the dominant phase you saw.</p>
+      <p class="section-hint" data-i18n="hint.range_initiation_correction_extension_the_dominant">Range, Initiation, Correction, Extension — the dominant phase you saw.</p>
       <div class="options four-col" data-review="rice">
-        <button class="option" data-value="Range">Range</button>
-        <button class="option" data-value="Initiation">Initiation</button>
-        <button class="option" data-value="Correction">Correction</button>
-        <button class="option" data-value="Extension">Extension</button>
+        <button class="option" data-value="Range" data-i18n="opt.range">Range</button>
+        <button class="option" data-value="Initiation" data-i18n="opt.initiation">Initiation</button>
+        <button class="option" data-value="Correction" data-i18n="opt.correction">Correction</button>
+        <button class="option" data-value="Extension" data-i18n="opt.extension">Extension</button>
       </div>
     </section>
 
     <section>
       <div class="section-header"><span class="section-num">07</span><span class="section-title" data-i18n="review.s7.title">Post-Session Charts</span></div>
-      <p class="section-hint">TradingView snapshots of the session — markups encouraged. Add as many as you need.</p>
+      <p class="section-hint" data-i18n="hint.tradingview_snapshots_of_the_session_markups_encou">TradingView snapshots of the session — markups encouraged. Add as many as you need.</p>
       <div id="review-tv-list" style="margin-left:60px;"></div>
       <button type="button" id="review-tv-add" style="margin-left:60px;margin-top:8px;background:transparent;border:1px dashed var(--border-2);padding:10px 16px;color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;transition:all 200ms;">+ Add link</button>
     </section>
 
     <section>
       <div class="section-header"><span class="section-num">08</span><span class="section-title" data-i18n="review.s8.title">Concept Tags</span></div>
-      <p class="section-hint">Select all that applied to your reads today.</p>
+      <p class="section-hint" data-i18n="hint.select_all_that_applied_to_your_reads_today">Select all that applied to your reads today.</p>
       <div class="tags" id="concept-tags">
-        <button class="tag" data-value="Range (R)">Range (R)</button>
-        <button class="tag" data-value="Initiation (I)">Initiation (I)</button>
-        <button class="tag" data-value="Correction (C)">Correction (C)</button>
-        <button class="tag" data-value="Extension (E)">Extension (E)</button>
-        <button class="tag" data-value="Range Phase">Range Phase</button>
-        <button class="tag" data-value="Trend Phase">Trend Phase</button>
-        <button class="tag" data-value="Initiation Phase">Initiation Phase</button>
-        <button class="tag" data-value="Reaction Trade">Reaction Trade</button>
-        <button class="tag" data-value="Continuation Trade">Continuation Trade</button>
-        <button class="tag" data-value="1st Tennis Serve">1st Tennis Serve</button>
-        <button class="tag" data-value="2nd Tennis Serve">2nd Tennis Serve</button>
-        <button class="tag" data-value="Add-On Tennis Serve">Add-On Tennis Serve</button>
-        <button class="tag" data-value="Premium">Premium</button>
-        <button class="tag" data-value="Discount">Discount</button>
-        <button class="tag" data-value="50% / Equilibrium">50% / Equilibrium</button>
-        <button class="tag" data-value="High Sweep">High Sweep</button>
-        <button class="tag" data-value="Low Sweep">Low Sweep</button>
-        <button class="tag" data-value="Prev D/W/M Sweep">Prev D/W/M Sweep</button>
-        <button class="tag" data-value="Strong Rejection">Strong Rejection</button>
-        <button class="tag" data-value="Slow Rejection">Slow Rejection</button>
-        <button class="tag" data-value="Buy High">Buy High</button>
-        <button class="tag" data-value="Sell Low">Sell Low</button>
-        <button class="tag" data-value="Buy Low">Buy Low</button>
-        <button class="tag" data-value="Sell High">Sell High</button>
-        <button class="tag" data-value="Buy 50%">Buy 50%</button>
-        <button class="tag" data-value="Sell 50%">Sell 50%</button>
-        <button class="tag" data-value="LP Trade">LP Trade</button>
-        <button class="tag" data-value="HP Trade">HP Trade</button>
-        <button class="tag" data-value="Fractal MS">Fractal MS</button>
-        <button class="tag" data-value="HDWB Strong">HDWB Strong</button>
-        <button class="tag" data-value="HDWB Weak">HDWB Weak</button>
-        <button class="tag" data-value="A2B Leg">A2B Leg</button>
-        <button class="tag" data-value="SSL Entry">SSL Entry</button>
-        <button class="tag" data-value="Unsafe SL Entry">Unsafe SL Entry</button>
-        <button class="tag" data-value="BFI Move">BFI Move</button>
-        <button class="tag" data-value="B2S Order Block">B2S Order Block</button>
-        <button class="tag" data-value="S2B Order Block">S2B Order Block</button>
-        <button class="tag" data-value="Range Mitigation">Range Mitigation</button>
-        <button class="tag" data-value="50% Mitigation">50% Mitigation</button>
-        <button class="tag" data-value="OB Mitigation">OB Mitigation</button>
+        <button class="tag" data-value="Range (R)" data-i18n="tag.range_r">Range (R)</button>
+        <button class="tag" data-value="Initiation (I)" data-i18n="tag.initiation_i">Initiation (I)</button>
+        <button class="tag" data-value="Correction (C)" data-i18n="tag.correction_c">Correction (C)</button>
+        <button class="tag" data-value="Extension (E)" data-i18n="tag.extension_e">Extension (E)</button>
+        <button class="tag" data-value="Range Phase" data-i18n="tag.range_phase">Range Phase</button>
+        <button class="tag" data-value="Trend Phase" data-i18n="tag.trend_phase">Trend Phase</button>
+        <button class="tag" data-value="Initiation Phase" data-i18n="tag.initiation_phase">Initiation Phase</button>
+        <button class="tag" data-value="Reaction Trade" data-i18n="tag.reaction_trade">Reaction Trade</button>
+        <button class="tag" data-value="Continuation Trade" data-i18n="tag.continuation_trade">Continuation Trade</button>
+        <button class="tag" data-value="1st Tennis Serve" data-i18n="tag.1st_tennis_serve">1st Tennis Serve</button>
+        <button class="tag" data-value="2nd Tennis Serve" data-i18n="tag.2nd_tennis_serve">2nd Tennis Serve</button>
+        <button class="tag" data-value="Add-On Tennis Serve" data-i18n="tag.add_on_tennis_serve">Add-On Tennis Serve</button>
+        <button class="tag" data-value="Premium" data-i18n="tag.premium">Premium</button>
+        <button class="tag" data-value="Discount" data-i18n="tag.discount">Discount</button>
+        <button class="tag" data-value="50% / Equilibrium" data-i18n="tag.50_equilibrium">50% / Equilibrium</button>
+        <button class="tag" data-value="High Sweep" data-i18n="tag.high_sweep">High Sweep</button>
+        <button class="tag" data-value="Low Sweep" data-i18n="tag.low_sweep">Low Sweep</button>
+        <button class="tag" data-value="Prev D/W/M Sweep" data-i18n="tag.prev_d_w_m_sweep">Prev D/W/M Sweep</button>
+        <button class="tag" data-value="Strong Rejection" data-i18n="tag.strong_rejection">Strong Rejection</button>
+        <button class="tag" data-value="Slow Rejection" data-i18n="tag.slow_rejection">Slow Rejection</button>
+        <button class="tag" data-value="Buy High" data-i18n="tag.buy_high">Buy High</button>
+        <button class="tag" data-value="Sell Low" data-i18n="tag.sell_low">Sell Low</button>
+        <button class="tag" data-value="Buy Low" data-i18n="tag.buy_low">Buy Low</button>
+        <button class="tag" data-value="Sell High" data-i18n="tag.sell_high">Sell High</button>
+        <button class="tag" data-value="Buy 50%" data-i18n="tag.buy_50">Buy 50%</button>
+        <button class="tag" data-value="Sell 50%" data-i18n="tag.sell_50">Sell 50%</button>
+        <button class="tag" data-value="LP Trade" data-i18n="tag.lp_trade">LP Trade</button>
+        <button class="tag" data-value="HP Trade" data-i18n="tag.hp_trade">HP Trade</button>
+        <button class="tag" data-value="Fractal MS" data-i18n="tag.fractal_ms">Fractal MS</button>
+        <button class="tag" data-value="HDWB Strong" data-i18n="tag.hdwb_strong">HDWB Strong</button>
+        <button class="tag" data-value="HDWB Weak" data-i18n="tag.hdwb_weak">HDWB Weak</button>
+        <button class="tag" data-value="A2B Leg" data-i18n="tag.a2b_leg">A2B Leg</button>
+        <button class="tag" data-value="SSL Entry" data-i18n="tag.ssl_entry">SSL Entry</button>
+        <button class="tag" data-value="Unsafe SL Entry" data-i18n="tag.unsafe_sl_entry">Unsafe SL Entry</button>
+        <button class="tag" data-value="BFI Move" data-i18n="tag.bfi_move">BFI Move</button>
+        <button class="tag" data-value="B2S Order Block" data-i18n="tag.b2s_order_block">B2S Order Block</button>
+        <button class="tag" data-value="S2B Order Block" data-i18n="tag.s2b_order_block">S2B Order Block</button>
+        <button class="tag" data-value="Range Mitigation" data-i18n="tag.range_mitigation">Range Mitigation</button>
+        <button class="tag" data-value="50% Mitigation" data-i18n="tag.50_mitigation">50% Mitigation</button>
+        <button class="tag" data-value="OB Mitigation" data-i18n="tag.ob_mitigation">OB Mitigation</button>
       </div>
     </section>
 
@@ -1110,36 +1113,36 @@
       <div class="section-header"><span class="section-num">09</span><span class="section-title" data-i18n="review.s9.title">Mindset</span></div>
       <p class="section-hint">Mental state — be honest, this is how you grow.</p>
       <div class="tags" id="mindset-tags">
-        <button class="tag" data-value="Flawless Execution">Flawless Execution</button>
-        <button class="tag" data-value="Perfect Patience">Perfect Patience</button>
-        <button class="tag" data-value="Followed Plan">Followed Plan</button>
-        <button class="tag" data-value="No FOMO">No FOMO</button>
-        <button class="tag" data-value="Calm">Calm</button>
-        <button class="tag" data-value="Focused">Focused</button>
-        <button class="tag" data-value="Familiar Session">Familiar Session</button>
-        <button class="tag" data-value="Unfamiliar Session">Unfamiliar Session</button>
-        <button class="tag" data-value="Well Rested">Well Rested</button>
-        <button class="tag" data-value="Morning Routine">Morning Routine</button>
-        <button class="tag" data-value="Tired">Tired</button>
-        <button class="tag" data-value="Just Rolled Out of Bed">Just Rolled Out of Bed</button>
-        <button class="tag" data-value="Hesitation">Hesitation</button>
-        <button class="tag" data-value="Anxiety">Anxiety</button>
-        <button class="tag" data-value="Fear">Fear</button>
-        <button class="tag" data-value="Analysis Paralysis">Analysis Paralysis</button>
-        <button class="tag" data-value="FOMO">FOMO</button>
-        <button class="tag" data-value="Revenge Traded">Revenge Traded</button>
-        <button class="tag" data-value="Rushed Decisions">Rushed Decisions</button>
-        <button class="tag" data-value="Broke Rules">Broke Rules</button>
-        <button class="tag" data-value="Over-sized">Over-sized</button>
-        <button class="tag" data-value="Moved to BE Early">Moved to BE Early</button>
-        <button class="tag" data-value="Enlarged SL">Enlarged SL</button>
-        <button class="tag" data-value="Removed SL">Removed SL</button>
-        <button class="tag" data-value="Closed Trade Manually">Closed Trade Manually</button>
-        <button class="tag" data-value="Hedged Trade">Hedged Trade</button>
-        <button class="tag" data-value="Cut Winner Early">Cut Winner Early</button>
-        <button class="tag" data-value="Missed Setup">Missed Setup</button>
-        <button class="tag" data-value="Lack of Focus">Lack of Focus</button>
-        <button class="tag" data-value="Emotional">Emotional</button>
+        <button class="tag" data-value="Flawless Execution" data-i18n="tag.flawless_execution">Flawless Execution</button>
+        <button class="tag" data-value="Perfect Patience" data-i18n="tag.perfect_patience">Perfect Patience</button>
+        <button class="tag" data-value="Followed Plan" data-i18n="tag.followed_plan">Followed Plan</button>
+        <button class="tag" data-value="No FOMO" data-i18n="tag.no_fomo">No FOMO</button>
+        <button class="tag" data-value="Calm" data-i18n="tag.calm">Calm</button>
+        <button class="tag" data-value="Focused" data-i18n="tag.focused">Focused</button>
+        <button class="tag" data-value="Familiar Session" data-i18n="tag.familiar_session">Familiar Session</button>
+        <button class="tag" data-value="Unfamiliar Session" data-i18n="tag.unfamiliar_session">Unfamiliar Session</button>
+        <button class="tag" data-value="Well Rested" data-i18n="tag.well_rested">Well Rested</button>
+        <button class="tag" data-value="Morning Routine" data-i18n="tag.morning_routine">Morning Routine</button>
+        <button class="tag" data-value="Tired" data-i18n="tag.tired">Tired</button>
+        <button class="tag" data-value="Just Rolled Out of Bed" data-i18n="tag.just_rolled_out_of_bed">Just Rolled Out of Bed</button>
+        <button class="tag" data-value="Hesitation" data-i18n="tag.hesitation">Hesitation</button>
+        <button class="tag" data-value="Anxiety" data-i18n="tag.anxiety">Anxiety</button>
+        <button class="tag" data-value="Fear" data-i18n="tag.fear">Fear</button>
+        <button class="tag" data-value="Analysis Paralysis" data-i18n="tag.analysis_paralysis">Analysis Paralysis</button>
+        <button class="tag" data-value="FOMO" data-i18n="tag.fomo">FOMO</button>
+        <button class="tag" data-value="Revenge Traded" data-i18n="tag.revenge_traded">Revenge Traded</button>
+        <button class="tag" data-value="Rushed Decisions" data-i18n="tag.rushed_decisions">Rushed Decisions</button>
+        <button class="tag" data-value="Broke Rules" data-i18n="tag.broke_rules">Broke Rules</button>
+        <button class="tag" data-value="Over-sized" data-i18n="tag.over_sized">Over-sized</button>
+        <button class="tag" data-value="Moved to BE Early" data-i18n="tag.moved_to_be_early">Moved to BE Early</button>
+        <button class="tag" data-value="Enlarged SL" data-i18n="tag.enlarged_sl">Enlarged SL</button>
+        <button class="tag" data-value="Removed SL" data-i18n="tag.removed_sl">Removed SL</button>
+        <button class="tag" data-value="Closed Trade Manually" data-i18n="tag.closed_trade_manually">Closed Trade Manually</button>
+        <button class="tag" data-value="Hedged Trade" data-i18n="tag.hedged_trade">Hedged Trade</button>
+        <button class="tag" data-value="Cut Winner Early" data-i18n="tag.cut_winner_early">Cut Winner Early</button>
+        <button class="tag" data-value="Missed Setup" data-i18n="tag.missed_setup">Missed Setup</button>
+        <button class="tag" data-value="Lack of Focus" data-i18n="tag.lack_of_focus">Lack of Focus</button>
+        <button class="tag" data-value="Emotional" data-i18n="tag.emotional">Emotional</button>
       </div>
     </section>
 
@@ -1173,7 +1176,7 @@
             <span class="pnl-toggle-opt" data-mode="gross">Gross P&L</span>
           </span>
         </div>
-        <div class="stat-value" id="stat-pnl">£0</div>
+        <div class="stat-value" id="stat-pnl" data-currency-symbol="{C}0">£0</div>
       </div>
       <div class="stat-cell"><div class="stat-tooltip" id="stat-total-tip">Net R and Net Pips across your current series of 10.</div><div class="stat-label" id="stat-total-label">Total R · Pips</div><div class="stat-value dual" id="stat-total">0</div></div>
       <div class="stat-cell"><div class="stat-tooltip" id="stat-rleft-tip">R and Pips left on the table across wins in your current series. Potential minus actual captured.</div><div class="stat-label" id="stat-rleft-label">Potential R · Pips</div><div class="stat-value dual" id="stat-rleft">—</div></div>
@@ -1210,7 +1213,7 @@
     </div>
 
     <div class="stats-summary stats-summary-4col" style="margin-top:24px;">
-      <div class="stat-cell"><div class="stat-tooltip">Your current account balance: Starting Balance (set above) plus Net P&L.</div><div class="stat-label">Account Balance</div><div class="stat-value medium" id="kpi-balance">£0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Your current account balance: Starting Balance (set above) plus Net P&L.</div><div class="stat-label">Account Balance</div><div class="stat-value medium" id="kpi-balance" data-currency-symbol="{C}0">£0</div></div>
       <div class="stat-cell" id="kpi-pnl-cell">
         <div class="stat-tooltip">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap.</div>
         <div class="stat-label">
@@ -1220,9 +1223,9 @@
             <span class="pnl-toggle-opt" data-mode="gross">Gross P&L</span>
           </span>
         </div>
-        <div class="stat-value" id="kpi-pnl">£0</div>
+        <div class="stat-value" id="kpi-pnl" data-currency-symbol="{C}0">£0</div>
       </div>
-      <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label">Total Costs</div><div class="stat-value medium" id="kpi-costs">£0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label">Total Costs</div><div class="stat-value medium" id="kpi-costs" data-currency-symbol="{C}0">£0</div></div>
       <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) across every trade ever logged. BEs excluded.</div><div class="stat-label">Win Rate</div><div class="stat-value" id="kpi-winrate">—</div></div>
       <div class="stat-cell"><div class="stat-tooltip" id="kpi-totalr-tip">Net R and Net Pips across every trade ever logged.</div><div class="stat-label" id="kpi-totalr-label">Total R · Pips</div><div class="stat-value dual" id="kpi-totalr">0</div></div>
       <div class="stat-cell"><div class="stat-tooltip" id="kpi-rleft-tip">R and Pips left on the table across all winning trades ever logged. Potential minus actual captured.</div><div class="stat-label" id="kpi-rleft-label">Potential R · Pips</div><div class="stat-value dual" id="kpi-rleft">—</div></div>
@@ -1379,6 +1382,15 @@
     <div class="data-actions">
       <a id="data-import" data-i18n="btn.import_data">Import Data</a>
       <a id="data-backup-settings" data-i18n="btn.backup_settings">Backup Settings</a>
+      <select id="currency-select" class="currency-select" title="Currency">
+        <option value="GBP">£ GBP</option>
+        <option value="EUR">€ EUR</option>
+        <option value="USD">$ USD</option>
+        <option value="JPY">¥ JPY</option>
+        <option value="CHF">CHF</option>
+        <option value="CAD">C$ CAD</option>
+        <option value="AUD">A$ AUD</option>
+      </select>
       <span class="lang-toggle" id="lang-toggle">
         <span class="lang-flag active" id="lang-flag-en" data-lang="en" title="English" aria-label="English">🇬🇧</span>
         <span class="lang-flag" id="lang-flag-es" data-lang="es" title="Castellano" aria-label="Castellano">🇪🇸</span>
@@ -1472,13 +1484,13 @@
         <input id="edit-sl" type="number" step="any" placeholder="SL (pips)" />
       </div>
 
-      <div class="label">Gross £</div>
+      <div class="label" data-currency-symbol="Gross {C}">Gross £</div>
       <div class="field"><input id="edit-profit" type="number" step="any" placeholder="(auto from R × Risk if blank)" /></div>
 
-      <div class="label">Costs £</div>
+      <div class="label" data-currency-symbol="Costs {C}">Costs £</div>
       <div class="field"><input id="edit-costs" type="number" step="any" /></div>
 
-      <div class="label">Net £</div>
+      <div class="label" data-currency-symbol="Net {C}">Net £</div>
       <div class="field"><input id="edit-netpl" type="number" step="any" placeholder="(auto = Gross − Costs)" /></div>
     </div>
 
@@ -1723,10 +1735,10 @@
       'tlog.col.side': 'Side',
       'tlog.col.entry': 'Entry',
       'tlog.col.exit': 'Exit',
-      'tlog.col.risk_sl': 'Risk £ · SL',
-      'tlog.col.costs': 'Costs £',
-      'tlog.col.gross': 'Gross £',
-      'tlog.col.net': 'Net £',
+      'tlog.col.risk_sl': 'Risk {C} · SL',
+      'tlog.col.costs': 'Costs {C}',
+      'tlog.col.gross': 'Gross {C}',
+      'tlog.col.net': 'Net {C}',
       // ----- Session date strip -----
       'session_strip.logging_for': 'Logging trades for',
       'session_strip.back_fill_hint': 'Change to back-fill a past session',
@@ -1758,7 +1770,7 @@
       'edit.title': 'Edit Trade',
       // ----- Settings panel (Statistics tab) -----
       'settings.account': 'Account Settings',
-      'settings.starting_balance': 'Starting Balance £',
+      'settings.starting_balance': 'Starting Balance {C}',
       'settings.defaults_hint': 'Risk & Costs defaults are set in Review tab',
       // ----- Toggle / period labels -----
       'period.label': 'Period',
@@ -1786,6 +1798,116 @@
       'review.s1.hint': 'If no, the trade-specific sections are skipped.',
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
+      // ----- Options, tags, hints (added programmatically) -----
+      'opt.observation': 'Observation',
+      'opt.execution': 'Execution',
+      'opt.initiating': 'Initiating',
+      'opt.trending': 'Trending',
+      'opt.ranging': 'Ranging',
+      'opt.premium_edge': 'Premium Edge',
+      'opt.premium_middle': 'Premium Middle',
+      'opt.50': '50%',
+      'opt.discount_middle': 'Discount Middle',
+      'opt.discount_edge': 'Discount Edge',
+      'opt.breakout': 'Breakout',
+      'opt.bullish': 'Bullish',
+      'opt.bearish': 'Bearish',
+      'opt.yes': 'Yes',
+      'opt.no_observed_only': 'No — Observed Only',
+      'opt.flawless': 'Flawless',
+      'opt.needs_work': 'Needs Work',
+      'opt.low': 'Low',
+      'opt.average': 'Average',
+      'opt.full': 'Full',
+      'opt.bullish': 'Bullish ↑',
+      'opt.bearish': 'Bearish ↓',
+      'opt.ranging': 'Ranging ↔',
+      'opt.range': 'Range',
+      'opt.initiation': 'Initiation',
+      'opt.correction': 'Correction',
+      'opt.extension': 'Extension',
+      'tag.range_r': 'Range (R)',
+      'tag.initiation_i': 'Initiation (I)',
+      'tag.correction_c': 'Correction (C)',
+      'tag.extension_e': 'Extension (E)',
+      'tag.range_phase': 'Range Phase',
+      'tag.trend_phase': 'Trend Phase',
+      'tag.initiation_phase': 'Initiation Phase',
+      'tag.reaction_trade': 'Reaction Trade',
+      'tag.continuation_trade': 'Continuation Trade',
+      'tag.1st_tennis_serve': '1st Tennis Serve',
+      'tag.2nd_tennis_serve': '2nd Tennis Serve',
+      'tag.add_on_tennis_serve': 'Add-On Tennis Serve',
+      'tag.premium': 'Premium',
+      'tag.discount': 'Discount',
+      'tag.50_equilibrium': '50% / Equilibrium',
+      'tag.high_sweep': 'High Sweep',
+      'tag.low_sweep': 'Low Sweep',
+      'tag.prev_d_w_m_sweep': 'Prev D/W/M Sweep',
+      'tag.strong_rejection': 'Strong Rejection',
+      'tag.slow_rejection': 'Slow Rejection',
+      'tag.buy_high': 'Buy High',
+      'tag.sell_low': 'Sell Low',
+      'tag.buy_low': 'Buy Low',
+      'tag.sell_high': 'Sell High',
+      'tag.buy_50': 'Buy 50%',
+      'tag.sell_50': 'Sell 50%',
+      'tag.lp_trade': 'LP Trade',
+      'tag.hp_trade': 'HP Trade',
+      'tag.fractal_ms': 'Fractal MS',
+      'tag.hdwb_strong': 'HDWB Strong',
+      'tag.hdwb_weak': 'HDWB Weak',
+      'tag.a2b_leg': 'A2B Leg',
+      'tag.ssl_entry': 'SSL Entry',
+      'tag.unsafe_sl_entry': 'Unsafe SL Entry',
+      'tag.bfi_move': 'BFI Move',
+      'tag.b2s_order_block': 'B2S Order Block',
+      'tag.s2b_order_block': 'S2B Order Block',
+      'tag.range_mitigation': 'Range Mitigation',
+      'tag.50_mitigation': '50% Mitigation',
+      'tag.ob_mitigation': 'OB Mitigation',
+      'tag.flawless_execution': 'Flawless Execution',
+      'tag.perfect_patience': 'Perfect Patience',
+      'tag.followed_plan': 'Followed Plan',
+      'tag.no_fomo': 'No FOMO',
+      'tag.calm': 'Calm',
+      'tag.focused': 'Focused',
+      'tag.familiar_session': 'Familiar Session',
+      'tag.unfamiliar_session': 'Unfamiliar Session',
+      'tag.well_rested': 'Well Rested',
+      'tag.morning_routine': 'Morning Routine',
+      'tag.tired': 'Tired',
+      'tag.just_rolled_out_of_bed': 'Just Rolled Out of Bed',
+      'tag.hesitation': 'Hesitation',
+      'tag.anxiety': 'Anxiety',
+      'tag.fear': 'Fear',
+      'tag.analysis_paralysis': 'Analysis Paralysis',
+      'tag.fomo': 'FOMO',
+      'tag.revenge_traded': 'Revenge Traded',
+      'tag.rushed_decisions': 'Rushed Decisions',
+      'tag.broke_rules': 'Broke Rules',
+      'tag.over_sized': 'Over-sized',
+      'tag.moved_to_be_early': 'Moved to BE Early',
+      'tag.enlarged_sl': 'Enlarged SL',
+      'tag.removed_sl': 'Removed SL',
+      'tag.closed_trade_manually': 'Closed Trade Manually',
+      'tag.hedged_trade': 'Hedged Trade',
+      'tag.cut_winner_early': 'Cut Winner Early',
+      'tag.missed_setup': 'Missed Setup',
+      'tag.lack_of_focus': 'Lack of Focus',
+      'tag.emotional': 'Emotional',
+      'hint.observation_or_execution_this_session': 'Observation or execution this session.',
+      'hint.dominant_structure_across_higher_timeframes': 'Dominant structure across higher timeframes.',
+      'hint.position_relative_to_key_levels': 'Position relative to key levels.',
+      'hint.current_directional_bias': 'Current directional bias.',
+      'hint.tradingview_snapshot_links_discord_embeds_them_aut': 'TradingView snapshot links — Discord embeds them automatically. Add as many as you need.',
+      'hint.intentions_news_risk_mindset_reminders': 'Intentions, news risk, mindset reminders.',
+      'hint.honest_self_assessment_of_how_you_executed': 'Honest self-assessment of how you executed.',
+      'hint.how_present_were_you_during_the_session': 'How present were you during the session.',
+      'hint.net_directional_behaviour_during_the_2_hour_window': 'Net directional behaviour during the 2-hour window.',
+      'hint.range_initiation_correction_extension_the_dominant': 'Range, Initiation, Correction, Extension — the dominant phase you saw.',
+      'hint.tradingview_snapshots_of_the_session_markups_encou': 'TradingView snapshots of the session — markups encouraged. Add as many as you need.',
+      'hint.select_all_that_applied_to_your_reads_today': 'Select all that applied to your reads today.',
     },
     es: {
       // ----- Navigation tabs -----
@@ -1862,10 +1984,10 @@
       'tlog.col.side': 'Dirección',
       'tlog.col.entry': 'Entrada',
       'tlog.col.exit': 'Salida',
-      'tlog.col.risk_sl': 'Riesgo £ · SL',
-      'tlog.col.costs': 'Costes £',
-      'tlog.col.gross': 'Bruto £',
-      'tlog.col.net': 'Neto £',
+      'tlog.col.risk_sl': 'Riesgo {C} · SL',
+      'tlog.col.costs': 'Costes {C}',
+      'tlog.col.gross': 'Bruto {C}',
+      'tlog.col.net': 'Neto {C}',
       // ----- Session date strip -----
       'session_strip.logging_for': 'Registrando operaciones del',
       'session_strip.back_fill_hint': 'Cambia para rellenar una sesión anterior',
@@ -1897,7 +2019,7 @@
       'edit.title': 'Editar Operación',
       // ----- Settings panel (Statistics tab) -----
       'settings.account': 'Configuración de Cuenta',
-      'settings.starting_balance': 'Balance Inicial £',
+      'settings.starting_balance': 'Balance Inicial {C}',
       'settings.defaults_hint': 'Riesgo y Costes por defecto se configuran en Revisión',
       // ----- Toggle / period labels -----
       'period.label': 'Periodo',
@@ -1925,16 +2047,133 @@
       'review.s1.hint': 'Si no, las secciones específicas de operaciones se omiten.',
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
+      // ----- Options, tags, hints (added programmatically) -----
+      'opt.observation': 'Observación',
+      'opt.execution': 'Ejecución',
+      'opt.initiating': 'Inicio',
+      'opt.trending': 'En tendencia',
+      'opt.ranging': 'En rango',
+      'opt.premium_edge': 'Borde Premium',
+      'opt.premium_middle': 'Premium Medio',
+      'opt.50': '50%',
+      'opt.discount_middle': 'Discount Medio',
+      'opt.discount_edge': 'Borde Discount',
+      'opt.breakout': 'Rotura',
+      'opt.bullish': 'Alcista',
+      'opt.bearish': 'Bajista',
+      'opt.yes': 'Sí',
+      'opt.no_observed_only': 'No — Solo Observada',
+      'opt.flawless': 'Impecable',
+      'opt.needs_work': 'A Mejorar',
+      'opt.low': 'Bajo',
+      'opt.average': 'Medio',
+      'opt.full': 'Pleno',
+      'opt.bullish': 'Alcista ↑',
+      'opt.bearish': 'Bajista ↓',
+      'opt.ranging': 'Lateral ↔',
+      'opt.range': 'Rango',
+      'opt.initiation': 'Inicio',
+      'opt.correction': 'Corrección',
+      'opt.extension': 'Extensión',
+      'tag.range_r': 'Rango (R)',
+      'tag.initiation_i': 'Inicio (I)',
+      'tag.correction_c': 'Corrección (C)',
+      'tag.extension_e': 'Extensión (E)',
+      'tag.range_phase': 'Fase de Rango',
+      'tag.trend_phase': 'Fase de Tendencia',
+      'tag.initiation_phase': 'Fase de Inicio',
+      'tag.reaction_trade': 'Operación de Reacción',
+      'tag.continuation_trade': 'Operación de Continuación',
+      'tag.1st_tennis_serve': '1er Saque',
+      'tag.2nd_tennis_serve': '2º Saque',
+      'tag.add_on_tennis_serve': 'Saque Adicional',
+      'tag.premium': 'Premium',
+      'tag.discount': 'Discount',
+      'tag.50_equilibrium': '50% / Equilibrio',
+      'tag.high_sweep': 'Barrido de Máximo',
+      'tag.low_sweep': 'Barrido de Mínimo',
+      'tag.prev_d_w_m_sweep': 'Barrido D/S/M Anterior',
+      'tag.strong_rejection': 'Rechazo Fuerte',
+      'tag.slow_rejection': 'Rechazo Lento',
+      'tag.buy_high': 'Compra en Máximo',
+      'tag.sell_low': 'Venta en Mínimo',
+      'tag.buy_low': 'Compra en Mínimo',
+      'tag.sell_high': 'Venta en Máximo',
+      'tag.buy_50': 'Compra 50%',
+      'tag.sell_50': 'Venta 50%',
+      'tag.lp_trade': 'Operación LP',
+      'tag.hp_trade': 'Operación HP',
+      'tag.fractal_ms': 'MS Fractal',
+      'tag.hdwb_strong': 'HDWB Fuerte',
+      'tag.hdwb_weak': 'HDWB Débil',
+      'tag.a2b_leg': 'Tramo A2B',
+      'tag.ssl_entry': 'Entrada SSL',
+      'tag.unsafe_sl_entry': 'Entrada con SL Inseguro',
+      'tag.bfi_move': 'Movimiento BFI',
+      'tag.b2s_order_block': 'Order Block B2S',
+      'tag.s2b_order_block': 'Order Block S2B',
+      'tag.range_mitigation': 'Mitigación de Rango',
+      'tag.50_mitigation': 'Mitigación 50%',
+      'tag.ob_mitigation': 'Mitigación OB',
+      'tag.flawless_execution': 'Ejecución Impecable',
+      'tag.perfect_patience': 'Paciencia Perfecta',
+      'tag.followed_plan': 'Seguí el Plan',
+      'tag.no_fomo': 'Sin FOMO',
+      'tag.calm': 'En Calma',
+      'tag.focused': 'Concentración',
+      'tag.familiar_session': 'Sesión Familiar',
+      'tag.unfamiliar_session': 'Sesión Desconocida',
+      'tag.well_rested': 'Descansado',
+      'tag.morning_routine': 'Rutina Matutina',
+      'tag.tired': 'Cansancio',
+      'tag.just_rolled_out_of_bed': 'Recién Levantado',
+      'tag.hesitation': 'Duda',
+      'tag.anxiety': 'Ansiedad',
+      'tag.fear': 'Miedo',
+      'tag.analysis_paralysis': 'Parálisis por Análisis',
+      'tag.fomo': 'FOMO',
+      'tag.revenge_traded': 'Operé por Venganza',
+      'tag.rushed_decisions': 'Decisiones Apresuradas',
+      'tag.broke_rules': 'Rompí las Reglas',
+      'tag.over_sized': 'Tamaño Excesivo',
+      'tag.moved_to_be_early': 'Movido a BE Pronto',
+      'tag.enlarged_sl': 'SL Ensanchado',
+      'tag.removed_sl': 'SL Eliminado',
+      'tag.closed_trade_manually': 'Cerrado a Mano',
+      'tag.hedged_trade': 'Cobertura',
+      'tag.cut_winner_early': 'Ganadora Cortada Pronto',
+      'tag.missed_setup': 'Setup Perdido',
+      'tag.lack_of_focus': 'Falta de Concentración',
+      'tag.emotional': 'Emocional',
+      'hint.observation_or_execution_this_session': 'Observación o ejecución esta sesión.',
+      'hint.dominant_structure_across_higher_timeframes': 'Estructura dominante en temporalidades altas.',
+      'hint.position_relative_to_key_levels': 'Posición respecto a niveles clave.',
+      'hint.current_directional_bias': 'Sesgo direccional actual.',
+      'hint.tradingview_snapshot_links_discord_embeds_them_aut': 'Enlaces de capturas de TradingView — Discord los incrusta automáticamente. Añade los que necesites.',
+      'hint.intentions_news_risk_mindset_reminders': 'Intenciones, riesgo de noticias, recordatorios de mentalidad.',
+      'hint.honest_self_assessment_of_how_you_executed': 'Auto-evaluación honesta de cómo ejecutaste.',
+      'hint.how_present_were_you_during_the_session': 'Cuánto presente estuviste durante la sesión.',
+      'hint.net_directional_behaviour_during_the_2_hour_window': 'Comportamiento direccional neto durante la ventana de 2 horas.',
+      'hint.range_initiation_correction_extension_the_dominant': 'Rango, Inicio, Corrección, Extensión — la fase dominante que viste.',
+      'hint.tradingview_snapshots_of_the_session_markups_encou': 'Capturas de TradingView de la sesión — se recomienda marcarlas. Añade las que necesites.',
+      'hint.select_all_that_applied_to_your_reads_today': 'Selecciona las que apliquen a tus lecturas de hoy.',
     }
   };
 
   // Translate a key. Falls back to English, then to the key itself if not found.
+  // Substitutes {C} with the current currency symbol so dictionary entries can be
+  // currency-agnostic, e.g. 'Risk {C} · SL' becomes 'Risk £ · SL' or 'Risk $ · SL'.
   function t(key) {
     const lang = (window.__lang) || 'en';
     const dict = LANG_STRINGS[lang] || LANG_STRINGS.en;
-    if (dict[key] !== undefined) return dict[key];
-    if (LANG_STRINGS.en[key] !== undefined) return LANG_STRINGS.en[key];
-    return key; // last-resort: show the key so missing translations are visible
+    let str;
+    if (dict[key] !== undefined) str = dict[key];
+    else if (LANG_STRINGS.en[key] !== undefined) str = LANG_STRINGS.en[key];
+    else return key;
+    if (typeof str === 'string' && str.indexOf('{C}') !== -1) {
+      str = str.replace(/\{C\}/g, (typeof curSym === 'function') ? curSym() : '£');
+    }
+    return str;
   }
 
   // Locale code for date/number formatting
@@ -1973,6 +2212,8 @@
       saveData();
     }
     applyTranslations();
+    // Re-apply currency symbol since translated labels may contain {C} placeholders
+    if (typeof applyCurrencySymbol === 'function') applyCurrencySymbol();
     // Refresh date displays (header date is locale-sensitive)
     const dateEl = document.getElementById('today');
     if (dateEl) {
@@ -2002,6 +2243,43 @@
   }
   // ============================================================================
   // END i18n
+  // ============================================================================
+
+  // ============================================================================
+  // CURRENCY — user-selectable symbol applied everywhere the app shows money
+  // ============================================================================
+  const CURRENCY_SYMBOLS = {
+    GBP: '£', EUR: '€', USD: '$', JPY: '¥', CHF: 'CHF ', CAD: 'C$', AUD: 'A$',
+  };
+  // Returns the symbol for the user's chosen currency (default £)
+  function curSym() {
+    const code = (typeof data !== 'undefined' && data && data.settings && data.settings.currency) || 'GBP';
+    return CURRENCY_SYMBOLS[code] || '£';
+  }
+  // Re-walks any element tagged data-currency-symbol with a "{C}" template, e.g.
+  //   <span data-currency-symbol="Risk {C}">Risk £</span>
+  function applyCurrencySymbol() {
+    const sym = curSym();
+    document.querySelectorAll('[data-currency-symbol]').forEach(el => {
+      const tmpl = el.getAttribute('data-currency-symbol');
+      el.textContent = tmpl.replace(/\{C\}/g, sym);
+    });
+  }
+  function setCurrency(code) {
+    if (!CURRENCY_SYMBOLS[code]) code = 'GBP';
+    if (!data.settings) data.settings = {};
+    data.settings.currency = code;
+    saveData();
+    applyCurrencySymbol();
+    // Re-render every money-touching view
+    if (typeof renderStats === 'function') try { renderStats(); } catch(e) {}
+    if (typeof renderTradesStats === 'function' && document.getElementById('page-trades')?.classList.contains('active')) try { renderTradesStats(); } catch(e) {}
+    if (typeof renderTradeView === 'function' && document.getElementById('page-tradeview')?.classList.contains('active')) try { renderTradeView(); } catch(e) {}
+    if (typeof renderTrades === 'function') try { renderTrades(); } catch(e) {}
+    if (typeof renderReviewPreview === 'function') try { renderReviewPreview(); } catch(e) {}
+    if (typeof renderBiasPreview === 'function') try { renderBiasPreview(); } catch(e) {}
+    if (typeof updateOverviewStrip === 'function') try { updateOverviewStrip(); } catch(e) {}
+  }
   // ============================================================================
 
   const today = new Date();
@@ -2397,6 +2675,8 @@
     if (d.settings.beThreshold === undefined) d.settings.beThreshold = 10;
     // Default UI language — 'en' or 'es'. Stored so the toggle persists across sessions.
     if (d.settings.lang !== 'en' && d.settings.lang !== 'es') d.settings.lang = 'en';
+    // Currency for all £/$/€ displays. Code only — symbol comes from CURRENCY_SYMBOLS.
+    if (!d.settings.currency) d.settings.currency = 'GBP';
     // Pair is locked to EUR/USD — overwrite any stored override so old data migrates cleanly.
     d.settings.pair = 'EUR/USD';
     if (d.settings.sessionName === undefined) d.settings.sessionName = 'London 8-10AM';
@@ -2679,14 +2959,14 @@
     const sign = v > 0 ? '+' : v < 0 ? '−' : '';
     const abs = Math.abs(v);
     const str = abs.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return `${opts.noSign ? '' : sign}£${str}`;
+    return `${opts.noSign ? '' : sign}${curSym()}${str}`;
   }
   function fmtMoneyShort(v) {
     if (v == null || isNaN(v) || v === 0) return '£0';
     const sign = v > 0 ? '+' : '−';
     const abs = Math.abs(v);
-    if (abs >= 1000) return `${sign}£${(abs/1000).toFixed(1)}k`;
-    return `${sign}£${Math.round(abs)}`;
+    if (abs >= 1000) return `${sign}${curSym()}${(abs/1000).toFixed(1)}k`;
+    return `${sign}${curSym()}${Math.round(abs)}`;
   }
   function tradingViewImageUrl(url) {
     if (!url) return null;
@@ -3933,7 +4213,7 @@
       : 'No losses yet';
     const beCosts = bes.reduce((s,t) => s + (parseFloat(t.costs) || 0), 0);
     document.getElementById('wl-be-detail').innerHTML = bes.length > 0
-      ? `0R contribution<br>Costs: -£${beCosts.toFixed(2)}`
+      ? `0R contribution<br>Costs: -${curSym()}${beCosts.toFixed(2)}`
       : 'No BE trades yet';
 
     let mw=0, ml=0, mb=0, cw=0, cl=0, cb=0;
@@ -4651,7 +4931,7 @@
     const labelMost = kind === 'time' ? 'Most active slot' : 'Most active duration';
 
     function netHtml(b) {
-      const netStr = (b.net >= 0 ? '+' : '-') + '£' + Math.abs(b.net).toFixed(2);
+      const netStr = (b.net >= 0 ? '+' : '-') + curSym() + Math.abs(b.net).toFixed(2);
       const cls = b.net > 0 ? 'good' : b.net < 0 ? 'bad' : '';
       return `${b.trades.length} trade${b.trades.length === 1 ? '' : 's'} <span class="pl ${cls}">${netStr}</span>`;
     }
@@ -4861,7 +5141,7 @@
           weekCount += dTrades.length;
         }
         const wCls = weekNet > 0 ? 'good' : weekNet < 0 ? 'bad' : '';
-        const wLabel = weekCount > 0 ? fmtMoneyShort(weekNet) : '£0';
+        const wLabel = weekCount > 0 ? fmtMoneyShort(weekNet) : curSym() + '0';
         const wSub = weekCount > 0 ? `${weekCount} trade${weekCount === 1 ? '' : 's'}` : '';
         // Determine weekKey for dedup-matching against saved reviews
         const yearStart = new Date(fridayDate.getFullYear(), 0, 1);
@@ -6243,10 +6523,10 @@
     const reflection = pickReviewReflection(greetingNoun, stats);
 
     // P&L breakdown — match daily modal exactly: Gross + Costs as separate cards.
-    const grossStr = (stats.gross >= 0 ? '+' : '-') + '£' + Math.abs(stats.gross || 0).toFixed(2);
+    const grossStr = (stats.gross >= 0 ? '+' : '-') + curSym() + Math.abs(stats.gross || 0).toFixed(2);
     const grossCls = (stats.gross || 0) > 0 ? 'good' : (stats.gross || 0) < 0 ? 'bad' : '';
-    const costsStr = '£' + Math.abs(stats.costs || 0).toFixed(2);
-    const netStr = (stats.net >= 0 ? '+' : '-') + '£' + Math.abs(stats.net).toFixed(2);
+    const costsStr = curSym() + Math.abs(stats.costs || 0).toFixed(2);
+    const netStr = (stats.net >= 0 ? '+' : '-') + curSym() + Math.abs(stats.net).toFixed(2);
     const netCls = stats.net > 0 ? 'good' : stats.net < 0 ? 'bad' : '';
 
     // Total R · Pips
@@ -6684,7 +6964,7 @@
     wrap.innerHTML = sorted.map(r => {
       const s = r.stats;
       const wrStr = s.wr != null ? Math.round(s.wr * 100) + '%' : '—';
-      const netStr = (s.net >= 0 ? '+' : '-') + '£' + Math.abs(s.net).toFixed(2);
+      const netStr = (s.net >= 0 ? '+' : '-') + curSym() + Math.abs(s.net).toFixed(2);
       const netCls = s.net > 0 ? 'good' : s.net < 0 ? 'bad' : '';
       // Legacy reviews may not have totalPips stored — fall back to '—' if missing.
       let totalLabel, totalStr, totalCls;
@@ -8726,6 +9006,8 @@
   // Initial load: restore saved language (or default to English) and apply translations
   // to all data-i18n elements on first paint.
   setLanguage(data.settings.lang || 'en');
+  // Apply currency symbol to static HTML labels (the dynamic renderers use curSym() directly)
+  applyCurrencySymbol();
   // Click handlers on the flag icons
   document.querySelectorAll('.lang-flag').forEach(flag => {
     flag.addEventListener('click', () => {
@@ -8733,6 +9015,13 @@
       if (lang) setLanguage(lang);
     });
   });
+  // Wire currency selector — sync value from settings + handle changes
+  (function wireCurrency() {
+    const sel = document.getElementById('currency-select');
+    if (!sel) return;
+    sel.value = (data.settings.currency || 'GBP');
+    sel.addEventListener('change', e => setCurrency(e.target.value));
+  })();
 
   // ===== MT5 Import =====
   // Parses an MT5 Trade History Report (HTML, typically UTF-16 LE encoded) and
