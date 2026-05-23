@@ -164,7 +164,16 @@
     .potr-trade-cell { padding: 9px 8px; font-size: 11px; }
     .potr-trade-row.headers .potr-trade-cell { padding: 7px 8px; }
   }
-  .options { display: grid; gap: 1px; background: #383838; border: 1px solid #383838; margin-left: 60px; }
+  .options { display: grid; gap: 0; background: var(--bg); border: 1px solid #383838; margin-left: 60px; }
+  /* Vertical separator lines between option buttons (last button has no right border) */
+  .options > .option { border-right: 1px solid #383838; }
+  .options.two-col > .option:nth-child(2),
+  .options.three-col > .option:nth-child(3),
+  .options.four-col > .option:nth-child(4),
+  .options.six-col > .option:nth-child(3),
+  .options.six-col > .option:nth-child(6) { border-right: none; }
+  /* Horizontal separator for six-col grid (2 rows of 3) */
+  .options.six-col > .option:nth-child(-n+3) { border-bottom: 1px solid #383838; }
   .options.two-col   { grid-template-columns: 1fr 1fr; }
   .options.three-col { grid-template-columns: repeat(3, 1fr); }
   .options.four-col  { grid-template-columns: repeat(4, 1fr); }
@@ -809,8 +818,20 @@
   .lang-flag:hover { opacity: 0.85; transform: scale(1.1); }
   .lang-flag.active { opacity: 1; }
   /* Currency selector — matches link styling */
-  .currency-select { background: transparent; border: 1px solid var(--border-2); color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; padding: 3px 6px; cursor: pointer; vertical-align: middle; outline: none; transition: all 200ms; }
+  .currency-select {
+    background: var(--bg-elev); border: 1px solid var(--border-2); color: var(--text-dim);
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.3em;
+    text-transform: uppercase; padding: 3px 8px; cursor: pointer; vertical-align: middle;
+    outline: none; transition: all 200ms; appearance: none; -webkit-appearance: none;
+    -moz-appearance: none; padding-right: 18px;
+    background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%),
+                      linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+    background-position: calc(100% - 9px) 50%, calc(100% - 5px) 50%;
+    background-size: 4px 4px, 4px 4px; background-repeat: no-repeat;
+  }
   .currency-select:hover { color: var(--text); border-color: var(--text-mid); }
+  /* Style the dropdown options panel (Firefox/Chrome respect these on <option>) */
+  .currency-select option { background: var(--bg-elev); color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; }
   .empty { padding: 56px 28px; text-align: center; border: 1px dashed var(--border-2); color: var(--text-dim); font-family: 'Fraunces', serif; font-style: italic; font-size: 16px; }
   .edit-trade-form { display: grid; grid-template-columns: 130px 1fr; gap: 14px 18px; align-items: center; margin-bottom: 16px; }
   .edit-trade-form .label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
@@ -941,16 +962,16 @@
       <div class="section-header"><span class="section-num">05</span><span class="section-title" data-i18n="bias.s5.title">Charts</span></div>
       <p class="section-hint" data-i18n="hint.tradingview_snapshot_links_discord_embeds_them_aut">TradingView snapshot links — Discord embeds them automatically. Add as many as you need.</p>
       <div id="bias-tv-list" style="margin-left:60px;"></div>
-      <button type="button" id="bias-tv-add" style="margin-left:60px;margin-top:8px;background:transparent;border:1px dashed var(--border-2);padding:10px 16px;color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;transition:all 200ms;">+ Add link</button>
+      <button type="button" id="bias-tv-add" data-i18n="btn.add_link" style="margin-left:60px;margin-top:8px;background:transparent;border:1px dashed var(--border-2);padding:10px 16px;color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;transition:all 200ms;">+ Add link</button>
     </section>
     <section>
       <div class="section-header"><span class="section-num">06</span><span class="section-title" data-i18n="bias.s6.title">Notes</span></div>
       <p class="section-hint" data-i18n="hint.intentions_news_risk_mindset_reminders">Intentions, news risk, mindset reminders.</p>
-      <textarea class="textarea" id="bias-notes" placeholder="What would flawless performance look like today..."></textarea>
+      <textarea class="textarea" id="bias-notes" data-i18n-placeholder="ph.notes" placeholder="What would flawless performance look like today..."></textarea>
     </section>
     <div class="preview">
-      <div class="preview-label">Discord Preview</div>
-      <div class="preview-output" id="bias-preview"><em>Fill in the form to preview your Discord post.</em></div>
+      <div class="preview-label" data-i18n="discord_preview.label">Discord Preview</div>
+      <div class="preview-output" id="bias-preview"><em data-i18n="discord_preview.empty">Fill in the form to preview your Discord post.</em></div>
       <div class="actions">
         <button class="btn" id="bias-copy" data-i18n="btn.copy_discord">Copy for Discord</button>
         <button class="btn" id="bias-reset" data-i18n="btn.reset">Reset</button>
@@ -1059,7 +1080,7 @@
       <div class="section-header"><span class="section-num">07</span><span class="section-title" data-i18n="review.s7.title">Post-Session Charts</span></div>
       <p class="section-hint" data-i18n="hint.tradingview_snapshots_of_the_session_markups_encou">TradingView snapshots of the session — markups encouraged. Add as many as you need.</p>
       <div id="review-tv-list" style="margin-left:60px;"></div>
-      <button type="button" id="review-tv-add" style="margin-left:60px;margin-top:8px;background:transparent;border:1px dashed var(--border-2);padding:10px 16px;color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;transition:all 200ms;">+ Add link</button>
+      <button type="button" id="review-tv-add" data-i18n="btn.add_link" style="margin-left:60px;margin-top:8px;background:transparent;border:1px dashed var(--border-2);padding:10px 16px;color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;transition:all 200ms;">+ Add link</button>
     </section>
 
     <section>
@@ -1148,13 +1169,13 @@
 
     <section>
       <div class="section-header"><span class="section-num">10</span><span class="section-title" data-i18n="review.s10.title">Reflection</span></div>
-      <p class="section-hint">What went well. What needs improvement. Don't skip this.</p>
-      <textarea class="textarea" id="review-reflection" placeholder="Today I noticed... I will improve... Tomorrow I commit to..."></textarea>
+      <p class="section-hint" data-i18n="review.s10.hint">What went well. What needs improvement. Don't skip this.</p>
+      <textarea class="textarea" id="review-reflection" data-i18n-placeholder="ph.reflection_long" placeholder="Today I noticed... I will improve... Tomorrow I commit to..."></textarea>
     </section>
 
     <div class="preview">
-      <div class="preview-label">Discord Preview</div>
-      <div class="preview-output" id="review-preview"><em>Fill in the form to preview your Discord post.</em></div>
+      <div class="preview-label" data-i18n="discord_preview.label">Discord Preview</div>
+      <div class="preview-output" id="review-preview"><em data-i18n="discord_preview.empty">Fill in the form to preview your Discord post.</em></div>
       <div class="actions">
         <button class="btn" id="review-copy" data-i18n="btn.copy_discord">Copy for Discord</button>
         <button class="btn" id="review-save-stats" data-i18n="btn.save_series">Save to Series of 10</button>
@@ -1295,7 +1316,7 @@
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title" data-i18n="trades.s4.title">Hold Time Analysis</span></div>
-      <p class="section-hint">Average time in trade by result.</p>
+      <p class="section-hint" data-i18n="hint.hold_time">Average time in trade by result.</p>
       <div class="holdtime-grid">
         <div class="holdtime-cell">
           <div class="stat-tooltip">Average time you held winning trades. Short avg = you take quick wins. Long avg = you let winners run.</div>
@@ -1314,7 +1335,7 @@
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title" data-i18n="trades.s5.title">Trade Time Analysis</span></div>
-      <p class="section-hint">When you trade best, worst, and most often. Bucket size adapts to your sample size — narrower as you log more trades.</p>
+      <p class="section-hint" data-i18n="hint.trade_time">When you trade best, worst, and most often. Bucket size adapts to your sample size — narrower as you log more trades.</p>
       <div id="time-analysis-summary"></div>
     </section>
 
@@ -1431,25 +1452,25 @@
     </div>
 
     <div class="edit-trade-form">
-      <div class="label">Date</div>
+      <div class="label" data-i18n="edit.lbl.date">Date</div>
       <div class="field">
         <input id="edit-date" type="date" />
         <div style="font-size:9px;color:var(--text-dim);margin-top:6px;letter-spacing:0.05em;line-height:1.5;">Change this to move the trade to a different day on the calendar — use it to back-fill past sessions.</div>
       </div>
 
-      <div class="label">Result</div>
+      <div class="label" data-i18n="edit.lbl.result">Result</div>
       <div class="field">
         <div class="edit-result-toggle">
-          <button type="button" data-result="Win">Win</button>
-          <button type="button" data-result="Lose">Lose</button>
-          <button type="button" data-result="BE">BE</button>
+          <button type="button" data-result="Win" data-i18n="res.win">Win</button>
+          <button type="button" data-result="Lose" data-i18n="res.lose">Lose</button>
+          <button type="button" data-result="BE" data-i18n="res.be">BE</button>
         </div>
       </div>
 
-      <div class="label">R-Multiple &amp; Pips</div>
+      <div class="label" data-i18n="edit.lbl.r_pips">R-Multiple &amp; Pips</div>
       <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <input id="edit-r" type="number" step="any" placeholder="R" />
-        <input id="edit-pips" type="number" step="any" placeholder="Pips" />
+        <input id="edit-r" type="number" step="any" data-i18n-placeholder="ph.r" placeholder="R" />
+        <input id="edit-pips" type="number" step="any" data-i18n-placeholder="ph.pips" placeholder="Pips" />
       </div>
 
       <div class="label edit-potr-row" style="display:none;">Potential R &amp; Pips <span style="color:var(--text-dim);font-size:10px;text-transform:none;letter-spacing:0;">(how far the move actually went)</span></div>
@@ -1458,29 +1479,29 @@
         <input id="edit-potpips" type="number" step="any" placeholder="Potential pips" />
       </div>
 
-      <div class="label">Side</div>
+      <div class="label" data-i18n="edit.lbl.side">Side</div>
       <div class="field"><select id="edit-side">
         <option value="">—</option>
         <option value="Long">Long</option>
         <option value="Short">Short</option>
       </select></div>
 
-      <div class="label">Type</div>
+      <div class="label" data-i18n="edit.lbl.type">Type</div>
       <div class="field"><select id="edit-type">
         <option value="">—</option>
         <option value="Reaction">Reaction</option>
         <option value="Continuation">Continuation</option>
       </select></div>
 
-      <div class="label">Entry Time</div>
+      <div class="label" data-i18n="edit.lbl.entry_time">Entry Time</div>
       <div class="field"><input id="edit-entry" type="time" /></div>
 
-      <div class="label">Exit Time</div>
+      <div class="label" data-i18n="edit.lbl.exit_time">Exit Time</div>
       <div class="field"><input id="edit-exit" type="time" /></div>
 
-      <div class="label">Risk £ &amp; SL <span style="color:var(--text-dim);font-size:10px;text-transform:none;letter-spacing:0;">(SL = stop distance in pips)</span></div>
+      <div class="label" data-currency-symbol="Risk {C} &amp; SL"><span data-i18n="edit.lbl.risk_sl_short">Risk £ &amp; SL</span> <span style="color:var(--text-dim);font-size:10px;text-transform:none;letter-spacing:0;">(SL = stop distance in pips)</span></div>
       <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <input id="edit-risk" type="number" step="any" placeholder="Risk £" />
+        <input id="edit-risk" type="number" step="any" data-currency-placeholder="Risk {C}" placeholder="Risk £" />
         <input id="edit-sl" type="number" step="any" placeholder="SL (pips)" />
       </div>
 
@@ -1798,6 +1819,58 @@
       'review.s1.hint': 'If no, the trade-specific sections are skipped.',
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
+      // ----- Dynamic JS strings, result values, placeholders -----
+      'edit.lbl.entry_time': 'Entry Time',
+      'edit.lbl.exit_time': 'Exit Time',
+      'edit.lbl.risk_sl_short': 'Risk {C} & SL',
+      'ph.reflection_long': 'Today I noticed... I will improve... Tomorrow I commit to...',
+      'review.s10.hint': "What went well. What needs improvement. Don't skip this.",
+      'res.win': 'Win',
+      'res.lose': 'Lose',
+      'res.be': 'BE',
+      'mtbl.time': 'Time',
+      'mtbl.side': 'Side',
+      'mtbl.result': 'Result',
+      'mtbl.rp': 'R · P',
+      'mtbl.pot_rp': 'Pot R · P',
+      'mtbl.net': 'Net {C}',
+      'mtbl.hold': 'Hold',
+      'mtbl.date': 'Date',
+      'mtbl.entry_exit': 'Entry / Exit',
+      'mtbl.type': 'Type',
+      'mtbl.r': 'R',
+      'mtbl.edit': 'Edit',
+      'empty.no_trades_logged': 'No trades logged yet.',
+      'hint.hold_time': 'Average time in trade by result.',
+      'hint.trade_time': 'When you trade best, worst, and most often. Bucket size adapts to your sample size — narrower as you log more trades.',
+      'ph.notes': 'What would flawless performance look like today...',
+      'ph.chart_notes': 'Notes for this chart (e.g. \'London open execution\', \'Missed entry\')...',
+      'ph.reflection': 'Reflection: what worked, what didn\'t, anything to remember next time...',
+      'ph.tv_link': 'https://www.tradingview.com/x/...',
+      'ph.risk': 'Risk {C}',
+      'ph.costs': '{C}',
+      'ph.r': 'R',
+      'ph.pips': 'Pips',
+      'btn.add_link': '+ Add link',
+      'discord_preview.label': 'Discord Preview',
+      'discord_preview.empty': 'Fill in the form to preview your Discord post.',
+      'mt5.session_live': 'Session live',
+      'edit.lbl.result': 'Result',
+      'edit.lbl.r_pips': 'R / Pips',
+      'edit.lbl.risk_sl': 'Risk {C} & SL',
+      'edit.lbl.date': 'Date',
+      'edit.lbl.type': 'Type',
+      'edit.lbl.side': 'Side',
+      'edit.lbl.times': 'Times',
+      'edit.lbl.potential_r': 'Potential R',
+      'edit.lbl.potential_pips': 'Potential Pips',
+      'tlog.col.r': 'R',
+      'tlog.col.p': 'P',
+      'reflection.header': 'Reflection',
+      'brk.col.trades': 'Trades',
+      'brk.col.wr': 'WR',
+      'brk.col.wlbe': 'W / L / BE',
+      'brk.col.netr': 'Net R',
       // ----- Options, tags, hints (added programmatically) -----
       'opt.observation': 'Observation',
       'opt.execution': 'Execution',
@@ -2047,6 +2120,58 @@
       'review.s1.hint': 'Si no, las secciones específicas de operaciones se omiten.',
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
+      // ----- Dynamic JS strings, result values, placeholders -----
+      'edit.lbl.entry_time': 'Hora Entrada',
+      'edit.lbl.exit_time': 'Hora Salida',
+      'edit.lbl.risk_sl_short': 'Riesgo {C} y SL',
+      'ph.reflection_long': 'Hoy noté... Voy a mejorar... Mañana me comprometo a...',
+      'review.s10.hint': 'Qué fue bien. Qué hay que mejorar. No te lo saltes.',
+      'res.win': 'Ganadora',
+      'res.lose': 'Pérdida',
+      'res.be': 'BE',
+      'mtbl.time': 'Hora',
+      'mtbl.side': 'Dirección',
+      'mtbl.result': 'Resultado',
+      'mtbl.rp': 'R · P',
+      'mtbl.pot_rp': 'R · P Pot.',
+      'mtbl.net': 'Neto {C}',
+      'mtbl.hold': 'Tiempo',
+      'mtbl.date': 'Fecha',
+      'mtbl.entry_exit': 'Entrada / Salida',
+      'mtbl.type': 'Tipo',
+      'mtbl.r': 'R',
+      'mtbl.edit': 'Editar',
+      'empty.no_trades_logged': 'Todavía no has registrado operaciones.',
+      'hint.hold_time': 'Tiempo medio en operación por resultado.',
+      'hint.trade_time': 'Cuándo operas mejor, peor y con más frecuencia. El tamaño del bloque se adapta al tamaño de tu muestra — más estrecho cuanto más operes.',
+      'ph.notes': '¿Cómo sería una ejecución impecable hoy...',
+      'ph.chart_notes': 'Notas sobre este gráfico (ej. \'Ejecución apertura Londres\', \'Entrada perdida\')...',
+      'ph.reflection': 'Reflexión: qué funcionó, qué no, algo que recordar la próxima vez...',
+      'ph.tv_link': 'https://www.tradingview.com/x/...',
+      'ph.risk': 'Riesgo {C}',
+      'ph.costs': '{C}',
+      'ph.r': 'R',
+      'ph.pips': 'Pips',
+      'btn.add_link': '+ Añadir enlace',
+      'discord_preview.label': 'Vista previa de Discord',
+      'discord_preview.empty': 'Rellena el formulario para previsualizar tu mensaje de Discord.',
+      'mt5.session_live': 'Sesión en directo',
+      'edit.lbl.result': 'Resultado',
+      'edit.lbl.r_pips': 'R / Pips',
+      'edit.lbl.risk_sl': 'Riesgo {C} y SL',
+      'edit.lbl.date': 'Fecha',
+      'edit.lbl.type': 'Tipo',
+      'edit.lbl.side': 'Dirección',
+      'edit.lbl.times': 'Horas',
+      'edit.lbl.potential_r': 'R Potencial',
+      'edit.lbl.potential_pips': 'Pips Potenciales',
+      'tlog.col.r': 'R',
+      'tlog.col.p': 'P',
+      'reflection.header': 'Reflexión',
+      'brk.col.trades': 'Trades',
+      'brk.col.wr': 'WR',
+      'brk.col.wlbe': 'G / P / BE',
+      'brk.col.netr': 'R Neto',
       // ----- Options, tags, hints (added programmatically) -----
       'opt.observation': 'Observación',
       'opt.execution': 'Ejecución',
@@ -2177,6 +2302,14 @@
   }
 
   // Locale code for date/number formatting
+  // Translate a result value (Win/Lose/BE) — used everywhere result text is shown.
+  function tResult(r) {
+    if (r === 'Win')  return t('res.win');
+    if (r === 'Lose') return t('res.lose');
+    if (r === 'BE')   return t('res.be');
+    return r || '—';
+  }
+
   function tLocale() {
     return (window.__lang === 'es') ? 'es-ES' : 'en-GB';
   }
@@ -2263,6 +2396,11 @@
     document.querySelectorAll('[data-currency-symbol]').forEach(el => {
       const tmpl = el.getAttribute('data-currency-symbol');
       el.textContent = tmpl.replace(/\{C\}/g, sym);
+    });
+    // Currency-aware input placeholders
+    document.querySelectorAll('[data-currency-placeholder]').forEach(el => {
+      const tmpl = el.getAttribute('data-currency-placeholder');
+      el.setAttribute('placeholder', tmpl.replace(/\{C\}/g, sym));
     });
   }
   function setCurrency(code) {
@@ -3028,7 +3166,7 @@
           <button type="button" class="tv-link-remove" title="Remove link">×</button>
         </div>
         <div class="tv-link-preview-wrap"></div>
-        <textarea class="tv-link-notes" placeholder="Notes for this chart (e.g. 'Daily HTF', 'Entry close-up')..." rows="2"></textarea>
+        <textarea class="tv-link-notes" placeholder="${t('ph.chart_notes')}" rows="2"></textarea>
       `;
       const urlInput   = card.querySelector('.tv-link-url');
       const notesInput = card.querySelector('.tv-link-notes');
@@ -3324,11 +3462,11 @@
         <div class="trade-cell"><input class="trade-input entry-input" type="time" /></div>
         <div class="trade-cell"><input class="trade-input exit-input" type="time" /></div>
         <div class="trade-cell trade-cell-dual">
-          <input class="trade-input trade-input-tiny risk-input" type="number" step="any" placeholder="£" title="Risk in £" />
+          <input class="trade-input trade-input-tiny risk-input" type="number" step="any" data-currency-placeholder="{C}" placeholder="£" title="Risk in £" />
           <span class="trade-sep">·</span>
           <input class="trade-input trade-input-tiny sl-input" type="number" step="any" placeholder="SL" title="Stop loss distance in pips" />
         </div>
-        <div class="trade-cell"><input class="trade-input costs-input" type="number" step="any" placeholder="£" /></div>
+        <div class="trade-cell"><input class="trade-input costs-input" type="number" step="any" data-currency-placeholder="{C}" placeholder="£" /></div>
         <div class="trade-cell"><input class="trade-input gross-input" type="number" step="any" placeholder="auto" style="font-family:'Fraunces',serif;font-size:13px;" /></div>
         <div class="trade-cell"><input class="trade-input net-input" type="number" step="any" placeholder="auto" style="font-family:'Fraunces',serif;font-size:13px;" /></div>
         <div class="trade-cell"><button class="trade-remove" title="Remove">×</button></div>
@@ -3564,7 +3702,7 @@
           <button type="button" class="tv-link-remove" title="Remove link">×</button>
         </div>
         <div class="tv-link-preview-wrap"></div>
-        <textarea class="tv-link-notes" placeholder="Notes for this chart (e.g. 'London open execution', 'Missed entry')..." rows="2"></textarea>
+        <textarea class="tv-link-notes" placeholder="${t('ph.chart_notes')}" rows="2"></textarea>
       `;
       const urlInput   = card.querySelector('.tv-link-url');
       const notesInput = card.querySelector('.tv-link-notes');
@@ -3967,7 +4105,7 @@
     }
 
     const histWrap = document.getElementById('history-list');
-    if (data.history.length === 0) { histWrap.innerHTML = '<div class="empty">Complete your first series of 10 to see history.</div>'; return; }
+    if (data.history.length === 0) { histWrap.innerHTML = `<div class="empty">${t('empty.first_series')}</div>`; return; }
     histWrap.innerHTML = '';
     data.history.forEach((s, idx) => {
       const st = calcSeriesStats(s.trades);
@@ -5280,13 +5418,13 @@
 
     let tHtml = `<div class="modal-trade-row headers" style="background:var(--bg-elev);">
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">#</div>
-      <div class="modal-trade-cell" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Time</div>
-      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Side</div>
-      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Result</div>
-      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">R · P</div>
-      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;" title="Potential R / Potential pips — how far the move went">Pot R · P</div>
-      <div class="modal-trade-cell right" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Net £</div>
-      <div class="modal-trade-cell right" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">Hold</div>
+      <div class="modal-trade-cell" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.time')}</div>
+      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.side')}</div>
+      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.result')}</div>
+      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.rp')}</div>
+      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;" title="Potential R / Potential pips — how far the move went">${t('mtbl.pot_rp')}</div>
+      <div class="modal-trade-cell right" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.net')}</div>
+      <div class="modal-trade-cell right" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.hold')}</div>
     </div>`;
     dayTrades.forEach((t, i) => {
       const tn = tradeNetPL(t);
@@ -5308,7 +5446,7 @@
         <div class="modal-trade-cell center">${i + 1}</div>
         <div class="modal-trade-cell">${time}</div>
         <div class="modal-trade-cell center">${t.side || '—'}</div>
-        <div class="modal-trade-cell center"><span class="modal-tag ${tagCls}">${t.result}</span></div>
+        <div class="modal-trade-cell center"><span class="modal-tag ${tagCls}">${tResult(t.result)}</span></div>
         <div class="modal-trade-cell center">${rStr} <span class="modal-trade-sub-inline">· ${pStr}</span></div>
         <div class="modal-trade-cell center ${potRowCls}">${potRStr} <span class="modal-trade-sub-inline">· ${potPStr}</span></div>
         <div class="modal-trade-cell right ${cls}">${fmtMoney(tn)}</div>
@@ -5372,17 +5510,17 @@
   function renderFlatTradeList() {
     const all = getAllLifetimeTrades().slice().sort((a,b) => new Date(b.date) - new Date(a.date));
     const wrap = document.getElementById('trade-view-list');
-    if (all.length === 0) { wrap.innerHTML = '<div class="empty">No trades logged yet.</div>'; return; }
+    if (all.length === 0) { wrap.innerHTML = `<div class="empty">${t('empty.no_trades_logged')}</div>`; return; }
     let html = `<div class="tv-row headers">
-      <div class="tv-cell">Date</div>
-      <div class="tv-cell center">Result</div>
-      <div class="tv-cell">Entry / Exit</div>
-      <div class="tv-cell center">Side</div>
-      <div class="tv-cell center">R</div>
-      <div class="tv-cell center">Type</div>
-      <div class="tv-cell right">Net £</div>
-      <div class="tv-cell right">Hold</div>
-      <div class="tv-cell center">Edit</div>
+      <div class="tv-cell">${t('mtbl.date')}</div>
+      <div class="tv-cell center">${t('mtbl.result')}</div>
+      <div class="tv-cell">${t('mtbl.entry_exit')}</div>
+      <div class="tv-cell center">${t('mtbl.side')}</div>
+      <div class="tv-cell center">${t('mtbl.r')}</div>
+      <div class="tv-cell center">${t('mtbl.type')}</div>
+      <div class="tv-cell right">${t('mtbl.net')}</div>
+      <div class="tv-cell right">${t('mtbl.hold')}</div>
+      <div class="tv-cell center">${t('mtbl.edit')}</div>
     </div>`;
     all.forEach(t => {
       const tn = tradeNetPL(t);
@@ -5394,7 +5532,7 @@
       const hm = holdMinutes(t);
       html += `<div class="tv-row" data-id="${t.id}">
         <div class="tv-cell">${dateStr}</div>
-        <div class="tv-cell center"><span class="tv-tag ${tagCls}">${t.result}</span></div>
+        <div class="tv-cell center"><span class="tv-tag ${tagCls}">${tResult(t.result)}</span></div>
         <div class="tv-cell">${time}</div>
         <div class="tv-cell center">${t.side || '—'}</div>
         <div class="tv-cell center">${typeof t.r === 'number' ? t.r.toFixed(2) : (t.r || '—')}</div>
