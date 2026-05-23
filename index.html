@@ -768,6 +768,33 @@
   .toast.with-action .toast-msg { font-weight: 500; }
   .toast-action-btn { background: transparent; color: var(--bg); border: 1px solid rgba(0,0,0,0.35); padding: 9px 18px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; cursor: pointer; transition: all 180ms; }
   .toast-action-btn:hover { background: var(--bg); color: var(--text); border-color: var(--bg); }
+  /* MT5 import modal */
+  #mt5-import-btn:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+  #mt5-pick-btn:hover { background: var(--text); color: var(--bg); }
+  #mt5-drop-zone.dragover { border-color: var(--good); background: var(--good-bg2); }
+  #mt5-back-btn:hover { background: var(--bg-elev); color: var(--text); }
+  #mt5-import-confirm:hover { background: var(--good); color: var(--bg); }
+  #mt5-import-confirm:disabled { opacity: 0.35; cursor: not-allowed; }
+  #mt5-quick-today:hover, #mt5-quick-latest:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+  #mt5-quick-today.empty, #mt5-quick-latest.empty { opacity: 0.4; cursor: not-allowed; }
+  #mt5-quick-today.empty:hover, #mt5-quick-latest.empty:hover { background: transparent; color: var(--text-mid); border-color: var(--border-2); }
+  .mt5-day-group { border-bottom: 1px solid var(--border); background: var(--bg); }
+  .mt5-day-group:last-child { border-bottom: none; }
+  .mt5-day-header { display: flex; align-items: center; gap: 14px; padding: 12px 18px; background: var(--bg-elev); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-mid); border-bottom: 1px solid var(--border-2); }
+  .mt5-day-header .mt5-day-check { margin-right: 4px; cursor: pointer; }
+  .mt5-day-meta { margin-left: auto; font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; }
+  .mt5-trade-row { display: grid; grid-template-columns: 30px 70px 60px 80px 90px 90px 1fr; gap: 12px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: background 150ms; }
+  .mt5-trade-row:last-child { border-bottom: none; }
+  .mt5-trade-row:hover { background: var(--bg-elev); }
+  .mt5-trade-row.deselected { opacity: 0.35; }
+  .mt5-trade-row .mt5-check { cursor: pointer; }
+  .mt5-trade-row .mt5-result { font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; }
+  .mt5-trade-row .mt5-result.win  { color: var(--good); }
+  .mt5-trade-row .mt5-result.loss { color: var(--bad); }
+  .mt5-trade-row .mt5-result.be   { color: var(--info); }
+  .mt5-trade-row .mt5-profit.win  { color: var(--good); }
+  .mt5-trade-row .mt5-profit.loss { color: var(--bad); }
+  .mt5-trade-row .mt5-profit.be   { color: var(--info); }
   /* Session-alert variant — larger, mixed case, longer message */
   .toast.session-alert { font-size: 14px; letter-spacing: 0.02em; text-transform: none; padding: 20px 32px; font-family: 'Fraunces', serif; font-weight: 400; border: 1px solid var(--border-2); box-shadow: 0 4px 24px rgba(0,0,0,0.45); }
   /* Both start and end session toasts now inherit the base white-bg / black-text styling.
@@ -850,7 +877,7 @@
     </div>
 
     <div class="meta">
-      <div class="meta-cell"><span class="meta-label">Pair</span><span class="meta-value meta-editable" id="meta-pair" data-field="pair" title="Click to edit">EUR/USD</span></div>
+      <div class="meta-cell"><span class="meta-label">Pair</span><span class="meta-value" id="meta-pair">EUR/USD</span></div>
       <div class="meta-cell"><span class="meta-label">Session</span><span class="meta-value meta-editable" id="meta-session" data-field="sessionName" title="Click to edit. Type e.g. 'London 8-10AM' to set the trading window inline.">London</span></div>
       <div class="meta-cell"><span class="meta-label">Date</span><span class="meta-value" id="today">—</span></div>
       <div class="meta-cell"><span class="meta-label">Time</span><span class="meta-value" id="meta-time">—</span></div>
@@ -956,7 +983,7 @@
         <input type="date" id="session-date" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text);padding:8px 12px;font-family:'DM Mono',monospace;font-size:13px;outline:none;" />
         <span id="session-date-status" style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;"></span>
         <button type="button" id="session-date-today" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Today</button>
-        <span style="font-size:10px;color:var(--text-dim);font-style:italic;margin-left:auto;">Change to back-fill a past session</span>
+        <button type="button" id="mt5-import-btn" style="background:transparent;border:1px solid var(--text-mid);color:var(--text);padding:6px 14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:all 200ms;margin-left:auto;">↓ Import from MT5</button>
       </div>
 
       <div class="trades-wrap">
@@ -1453,6 +1480,54 @@
   </div>
 </div>
 
+<!-- MT5 Import Modal -->
+<div class="modal-bg" id="mt5-modal-bg">
+  <div class="modal" style="max-width:920px;">
+    <div class="modal-header">
+      <div>
+        <h2>Import from MT5</h2>
+        <p style="margin:6px 0 0;color:var(--text-mid);font-size:13px;">Upload your MT5 Trade History Report (HTML format). Trades auto-fill into the Review tab.</p>
+      </div>
+      <button class="modal-close" id="mt5-modal-close" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Step 1: file drop / picker -->
+      <div id="mt5-step-pick">
+        <div id="mt5-drop-zone" style="border:2px dashed var(--border-2);padding:48px 24px;text-align:center;cursor:pointer;transition:all 200ms;">
+          <div style="font-family:'Fraunces',serif;font-size:18px;color:var(--text);margin-bottom:8px;">Drop your MT5 report here</div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:20px;">.html exported from MT5 Terminal → History → Report → "Open in Web"</div>
+          <button type="button" id="mt5-pick-btn" style="background:transparent;border:1px solid var(--text);color:var(--text);padding:10px 24px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;">Choose File</button>
+          <input type="file" id="mt5-file-input" accept=".html,.htm,.csv" style="display:none;" />
+        </div>
+        <div id="mt5-pick-error" style="margin-top:16px;padding:12px 16px;background:var(--bad-bg2);border:1px solid var(--bad);color:var(--bad);font-family:'DM Mono',monospace;font-size:12px;display:none;"></div>
+        <div style="margin-top:24px;font-size:12px;color:var(--text-dim);line-height:1.7;font-style:italic;font-family:'Fraunces',serif;">
+          <strong style="color:var(--text-mid);font-style:normal;">How to export from MT5:</strong> In MT5 desktop, open the <em>Toolbox</em> → <em>History</em> tab. Right-click the table → choose your timeframe (e.g. "Custom Period") → right-click again → <em>Report</em> → <em>Open in Web</em>. Save the resulting <code style="background:var(--bg-elev);padding:1px 6px;font-family:'DM Mono',monospace;font-style:normal;">.html</code> file and drop it here.
+        </div>
+      </div>
+
+      <!-- Step 2: preview parsed trades -->
+      <div id="mt5-step-preview" style="display:none;">
+        <div id="mt5-preview-meta" style="margin-bottom:20px;padding:14px 18px;background:var(--bg-elev);border:1px solid var(--border-2);font-family:'DM Mono',monospace;font-size:12px;color:var(--text-mid);"></div>
+        <div style="margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:var(--text-dim);letter-spacing:0.25em;text-transform:uppercase;">Filter by date</span>
+          <select id="mt5-date-filter" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text);padding:7px 12px;font-family:'DM Mono',monospace;font-size:13px;outline:none;"></select>
+          <button type="button" id="mt5-quick-today" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Today</button>
+          <button type="button" id="mt5-quick-latest" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Most Recent</button>
+          <span style="font-size:10px;color:var(--text-dim);letter-spacing:0.1em;font-style:italic;font-family:'Fraunces',serif;margin-left:auto;" id="mt5-preview-summary"></span>
+        </div>
+        <div id="mt5-preview-list" style="border:1px solid var(--border-2);max-height:380px;overflow-y:auto;"></div>
+        <div style="margin-top:18px;display:flex;gap:12px;justify-content:flex-end;align-items:center;">
+          <span id="mt5-import-warn" style="font-size:11px;color:var(--text-dim);font-style:italic;font-family:'Fraunces',serif;margin-right:auto;"></span>
+          <button type="button" id="mt5-back-btn" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:10px 20px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;">← Back</button>
+          <button type="button" id="mt5-import-confirm" style="background:transparent;border:1px solid var(--good);color:var(--good);padding:10px 24px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;">Import Selected</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="backup-modal-bg">
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
@@ -1943,7 +2018,8 @@
     if (!d.defaults) d.defaults = { risk: '', costs: '' };
     if (!d.settings) d.settings = { startingBalance: 10000, beThreshold: 10 };
     if (d.settings.beThreshold === undefined) d.settings.beThreshold = 10;
-    if (d.settings.pair === undefined) d.settings.pair = 'EUR/USD';
+    // Pair is locked to EUR/USD — overwrite any stored override so old data migrates cleanly.
+    d.settings.pair = 'EUR/USD';
     if (d.settings.sessionName === undefined) d.settings.sessionName = 'London 8-10AM';
     if (d.settings.windowStart === undefined) d.settings.windowStart = '08:00';
     if (d.settings.windowEnd === undefined) d.settings.windowEnd = '10:00';
@@ -7477,7 +7553,464 @@
   // the user clicks any tab.
   ['stats', 'trades', 'tradeview'].forEach(refreshPageCaption);
 
-  // ===== Session-live coaching banner (Review tab) =====
+  // ===== MT5 Import =====
+  // Parses an MT5 Trade History Report (HTML, typically UTF-16 LE encoded) and
+  // lets the user select which trades to import into the Review tab. Each
+  // imported trade pre-fills: side, entry/exit times, pips, costs, gross P&L,
+  // result, R (using default risk from settings). User adds subjective fields
+  // (Reaction/Continuation, tags, notes) before saving to Series of 10.
+
+  let _mt5ParsedTrades = [];   // [{ openTime, closeTime, type, volume, entryPrice, slPrice, closePrice, commission, swap, profit, ... derived ... }]
+  let _mt5SelectedIds = new Set(); // positions selected by checkbox
+  let _mt5MetaInfo = null;     // { accountName, brokerName, reportDate, sourceFileName }
+
+  // ----- Open / close the modal -----
+  function openMt5Modal() {
+    document.getElementById('mt5-step-pick').style.display = '';
+    document.getElementById('mt5-step-preview').style.display = 'none';
+    document.getElementById('mt5-pick-error').style.display = 'none';
+    document.getElementById('mt5-file-input').value = '';
+    document.getElementById('mt5-modal-bg').classList.add('show');
+  }
+  function closeMt5Modal() {
+    document.getElementById('mt5-modal-bg').classList.remove('show');
+  }
+  document.getElementById('mt5-import-btn').addEventListener('click', openMt5Modal);
+  document.getElementById('mt5-modal-close').addEventListener('click', closeMt5Modal);
+  document.getElementById('mt5-modal-bg').addEventListener('click', e => {
+    if (e.target.id === 'mt5-modal-bg') closeMt5Modal();
+  });
+
+  // ----- File pick / drop -----
+  document.getElementById('mt5-pick-btn').addEventListener('click', () => {
+    document.getElementById('mt5-file-input').click();
+  });
+  document.getElementById('mt5-file-input').addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if (file) handleMt5File(file);
+  });
+  const dropZone = document.getElementById('mt5-drop-zone');
+  ['dragenter', 'dragover'].forEach(ev => {
+    dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach(ev => {
+    dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) handleMt5File(file);
+  });
+  dropZone.addEventListener('click', e => {
+    // Click anywhere on the drop zone (except the button itself) opens picker
+    if (e.target.id === 'mt5-pick-btn') return;
+    document.getElementById('mt5-file-input').click();
+  });
+
+  // ----- File reader: detect encoding (MT5 typically UTF-16 LE), decode, parse -----
+  function handleMt5File(file) {
+    const errEl = document.getElementById('mt5-pick-error');
+    errEl.style.display = 'none';
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const buffer = ev.target.result; // ArrayBuffer
+        const text = decodeMt5Buffer(buffer);
+        const parsed = parseMt5Report(text);
+        if (parsed.trades.length === 0) {
+          errEl.textContent = 'No trades found in this file. Make sure you exported the Trade History Report (not the Account Statement).';
+          errEl.style.display = 'block';
+          return;
+        }
+        _mt5ParsedTrades = parsed.trades;
+        _mt5MetaInfo = Object.assign({}, parsed.meta, { sourceFileName: file.name });
+        renderMt5Preview();
+      } catch (err) {
+        console.error('MT5 parse error:', err);
+        errEl.textContent = 'Could not parse this file. Is it an MT5 Trade History Report? (' + (err.message || err) + ')';
+        errEl.style.display = 'block';
+      }
+    };
+    reader.onerror = () => {
+      errEl.textContent = 'Could not read this file.';
+      errEl.style.display = 'block';
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // MT5 reports come UTF-16 LE encoded (with optional BOM). Detect by BOM or by null-byte pattern.
+  function decodeMt5Buffer(buffer) {
+    const bytes = new Uint8Array(buffer);
+    // Check BOM (FF FE = UTF-16 LE, FE FF = UTF-16 BE)
+    if (bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xFE) {
+      return new TextDecoder('utf-16le').decode(bytes.subarray(2));
+    }
+    if (bytes.length >= 2 && bytes[0] === 0xFE && bytes[1] === 0xFF) {
+      return new TextDecoder('utf-16be').decode(bytes.subarray(2));
+    }
+    // No BOM — heuristic: if >25% of even-indexed bytes are 0, it's UTF-16 LE
+    let nullCount = 0, sample = Math.min(2000, bytes.length);
+    for (let i = 1; i < sample; i += 2) if (bytes[i] === 0) nullCount++;
+    if (nullCount > sample / 8) return new TextDecoder('utf-16le').decode(bytes);
+    // Default to UTF-8
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+
+  // ----- Parser: extracts metadata + Positions table from MT5 HTML report -----
+  function parseMt5Report(html) {
+    // Metadata: account name, broker name, report date
+    const meta = {
+      accountName: (html.match(/Name:[\s\S]*?<b>([^<]+)<\/b>/) || [])[1] || '',
+      accountNumber: '',
+      brokerName: (html.match(/Company:[\s\S]*?<b>([^<]+)<\/b>/) || [])[1] || '',
+      reportDate: (html.match(/<th[^>]*>Date:<\/th>[\s\S]*?<b>([^<]+)<\/b>/) || [])[1] || ''
+    };
+    const acctMatch = html.match(/Account:[\s\S]*?<b>([^<]+)<\/b>/);
+    if (acctMatch) meta.accountNumber = acctMatch[1].split(/&nbsp;|\s/)[0];
+
+    // Find Positions section bounds — runs from <b>Positions</b> to <b>Orders</b> (or end of doc)
+    const positionsIdx = html.indexOf('<b>Positions</b>');
+    if (positionsIdx === -1) throw new Error('Positions section not found');
+    const ordersIdx = html.indexOf('<b>Orders</b>', positionsIdx);
+    const section = html.slice(positionsIdx, ordersIdx === -1 ? html.length : ordersIdx);
+
+    // Each position row is <tr bgcolor="#FFFFFF" align="right"> or "#F7F7F7" align="right"
+    const rowRe = /<tr bgcolor="#(?:FFFFFF|F7F7F7)" align="right">([\s\S]*?)<\/tr>/g;
+    const trades = [];
+    let match;
+    while ((match = rowRe.exec(section)) !== null) {
+      const cells = [...match[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(m => stripHtml(m[1]));
+      // Expected cell schema (14 cells, with cell index 4 being a hidden comment that we skip):
+      //  0: open time, 1: position ID, 2: symbol, 3: type, [4: hidden comment skipped]
+      //  5: volume, 6: entry price, 7: SL price, 8: TP price, 9: close time, 10: close price,
+      //  11: commission, 12: swap, 13: profit
+      if (cells.length < 14) continue;
+      const t = {
+        openTime: cells[0],
+        position: cells[1],
+        symbol: cells[2],
+        type: cells[3].toLowerCase(),
+        volume: parseFloat(cells[5]) || 0,
+        entryPrice: parseFloat(cells[6]) || 0,
+        slPrice: parseFloat(cells[7]) || 0,
+        tpPrice: parseFloat(cells[8]) || 0,
+        closeTime: cells[9],
+        closePrice: parseFloat(cells[10]) || 0,
+        commission: parseFloat(cells[11]) || 0,
+        swap: parseFloat(cells[12]) || 0,
+        profit: parseFloat(cells[13]) || 0
+      };
+      // Skip rows with no position ID (probably summary/total rows)
+      if (!t.position || isNaN(t.entryPrice) || t.entryPrice === 0) continue;
+      // Derive fields:
+      // pips = direction-aware price move × 10000 (for EUR/USD style 5-decimal pairs)
+      // Adjust to 100 for JPY pairs (symbol ends with JPY)
+      const pipMult = /JPY$/i.test(t.symbol) ? 100 : 10000;
+      const priceMove = (t.type === 'buy' ? (t.closePrice - t.entryPrice) : (t.entryPrice - t.closePrice));
+      t.pips = Math.round(priceMove * pipMult * 10) / 10;
+      t.slPips = t.slPrice ? Math.round(Math.abs(t.entryPrice - t.slPrice) * pipMult * 10) / 10 : null;
+      // Net P&L = profit + commission + swap (commission and swap are negative numbers)
+      t.netPL = t.profit + t.commission + t.swap;
+      t.costs = Math.abs(t.commission + t.swap);
+      // Result: BE if within £10 net, else Win/Loss based on net
+      const beAbs = data.settings.beThreshold || 10;
+      if (Math.abs(t.netPL) < beAbs) t.result = 'BE';
+      else if (t.netPL > 0) t.result = 'Win';
+      else t.result = 'Loss';
+      // Parse times into Date objects for date grouping
+      t.openDate = parseMt5DateTime(t.openTime);
+      t.closeDate = parseMt5DateTime(t.closeTime);
+      // Session date = close date (when the trade was closed determines which session it belongs to)
+      t.sessionDateStr = t.closeDate ? dateToIsoStr(t.closeDate) : '';
+      // HH:MM for entry/exit
+      t.entryTimeHHMM = t.openDate ? hhmm(t.openDate) : '';
+      t.exitTimeHHMM = t.closeDate ? hhmm(t.closeDate) : '';
+      trades.push(t);
+    }
+    return { meta, trades };
+  }
+
+  function stripHtml(s) {
+    return String(s || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+  }
+  function parseMt5DateTime(s) {
+    // Format: "2026.04.30 10:09:11"
+    const m = String(s || '').match(/^(\d{4})\.(\d{2})\.(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
+    if (!m) return null;
+    return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]));
+  }
+  function dateToIsoStr(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function hhmm(d) {
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  // ----- Render preview step -----
+  function renderMt5Preview() {
+    document.getElementById('mt5-step-pick').style.display = 'none';
+    document.getElementById('mt5-step-preview').style.display = '';
+
+    // Metadata line
+    const meta = _mt5MetaInfo || {};
+    const metaParts = [];
+    if (meta.sourceFileName) metaParts.push(meta.sourceFileName);
+    if (meta.accountName) metaParts.push(meta.accountName);
+    if (meta.accountNumber) metaParts.push('Account ' + meta.accountNumber);
+    metaParts.push(_mt5ParsedTrades.length + ' trade' + (_mt5ParsedTrades.length === 1 ? '' : 's'));
+    document.getElementById('mt5-preview-meta').textContent = metaParts.join(' · ');
+
+    // Build date filter dropdown — group trades by sessionDateStr
+    const dates = [...new Set(_mt5ParsedTrades.map(t => t.sessionDateStr).filter(Boolean))].sort().reverse();
+    const sel = document.getElementById('mt5-date-filter');
+    sel.innerHTML = '<option value="__all__">All dates (' + dates.length + ')</option>' +
+      dates.map(d => {
+        const n = _mt5ParsedTrades.filter(t => t.sessionDateStr === d).length;
+        return `<option value="${d}">${formatDateLabel(d)} (${n} trade${n === 1 ? '' : 's'})</option>`;
+      }).join('');
+    // Default: prefer today's trades if they exist in the file, else most recent date.
+    // Both are common cases — Today for "I just finished today's session", Most Recent for
+    // back-filling yesterday's session this morning.
+    const todayIso = dateToIsoStr(new Date());
+    if (dates.includes(todayIso)) sel.value = todayIso;
+    else if (dates.length > 0) sel.value = dates[0];
+
+    // Pre-select trades for the chosen default date only
+    _mt5SelectedIds = new Set(_mt5ParsedTrades.filter(t => t.sessionDateStr === sel.value).map(t => t.position));
+
+    sel.onchange = () => {
+      // Refresh selection to match new date (avoids stale selections from other dates)
+      if (sel.value === '__all__') {
+        _mt5SelectedIds = new Set(_mt5ParsedTrades.map(t => t.position));
+      } else {
+        _mt5SelectedIds = new Set(_mt5ParsedTrades.filter(t => t.sessionDateStr === sel.value).map(t => t.position));
+      }
+      renderMt5TradeList();
+    };
+
+    // Wire "Today" + "Most Recent" quick filters
+    const todayStr = dateToIsoStr(new Date());
+    const todayBtn = document.getElementById('mt5-quick-today');
+    const latestBtn = document.getElementById('mt5-quick-latest');
+    const hasToday = dates.includes(todayStr);
+    todayBtn.classList.toggle('empty', !hasToday);
+    todayBtn.disabled = !hasToday;
+    todayBtn.title = hasToday
+      ? `Show today's trades (${todayStr})`
+      : `No trades from today (${todayStr}) in this file`;
+    latestBtn.classList.toggle('empty', dates.length === 0);
+    latestBtn.disabled = dates.length === 0;
+    latestBtn.title = dates.length > 0
+      ? `Show the most recent date (${dates[0]})`
+      : 'No trades to show';
+    todayBtn.onclick = () => {
+      if (!hasToday) return;
+      sel.value = todayStr;
+      // Pre-select only today's trades to avoid carrying selections from other dates
+      _mt5SelectedIds = new Set(_mt5ParsedTrades.filter(t => t.sessionDateStr === todayStr).map(t => t.position));
+      renderMt5TradeList();
+    };
+    latestBtn.onclick = () => {
+      if (dates.length === 0) return;
+      sel.value = dates[0];
+      _mt5SelectedIds = new Set(_mt5ParsedTrades.filter(t => t.sessionDateStr === dates[0]).map(t => t.position));
+      renderMt5TradeList();
+    };
+
+    renderMt5TradeList();
+  }
+  function formatDateLabel(isoStr) {
+    const d = new Date(isoStr + 'T12:00:00');
+    return d.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  function renderMt5TradeList() {
+    const sel = document.getElementById('mt5-date-filter');
+    const filter = sel.value;
+    const list = document.getElementById('mt5-preview-list');
+    const visible = filter === '__all__'
+      ? _mt5ParsedTrades
+      : _mt5ParsedTrades.filter(t => t.sessionDateStr === filter);
+    // Group by date
+    const byDate = {};
+    visible.forEach(t => {
+      if (!byDate[t.sessionDateStr]) byDate[t.sessionDateStr] = [];
+      byDate[t.sessionDateStr].push(t);
+    });
+    const dates = Object.keys(byDate).sort().reverse();
+    if (dates.length === 0) {
+      list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-dim);font-style:italic;font-family:Fraunces,serif;">No trades match the selected filter.</div>';
+    } else {
+      list.innerHTML = dates.map(d => {
+        const dayTrades = byDate[d];
+        const allDaySelected = dayTrades.every(t => _mt5SelectedIds.has(t.position));
+        const selectedCount = dayTrades.filter(t => _mt5SelectedIds.has(t.position)).length;
+        const dayNet = dayTrades.reduce((s, t) => s + t.netPL, 0);
+        const netCls = dayNet > 0 ? 'win' : dayNet < 0 ? 'loss' : 'be';
+        return `
+          <div class="mt5-day-group">
+            <div class="mt5-day-header">
+              <input type="checkbox" class="mt5-day-check" data-date="${d}" ${allDaySelected ? 'checked' : ''} />
+              <span>${formatDateLabel(d)}</span>
+              <span class="mt5-day-meta">${selectedCount}/${dayTrades.length} selected · <span class="mt5-profit ${netCls}">${dayNet >= 0 ? '+' : ''}${dayNet.toFixed(2)} GBP</span></span>
+            </div>
+            ${dayTrades.map(t => {
+              const isSel = _mt5SelectedIds.has(t.position);
+              const resCls = t.result === 'Win' ? 'win' : t.result === 'Loss' ? 'loss' : 'be';
+              return `
+                <div class="mt5-trade-row ${isSel ? '' : 'deselected'}" data-pos="${t.position}">
+                  <input type="checkbox" class="mt5-check" data-pos="${t.position}" ${isSel ? 'checked' : ''} />
+                  <span>${t.entryTimeHHMM}</span>
+                  <span style="text-transform:capitalize;color:var(--text-mid);">${t.type === 'buy' ? 'Long' : 'Short'}</span>
+                  <span class="mt5-result ${resCls}">${t.result}</span>
+                  <span class="mt5-profit ${resCls}">${t.netPL >= 0 ? '+' : ''}${t.netPL.toFixed(2)}</span>
+                  <span style="color:var(--text-mid);">${t.pips >= 0 ? '+' : ''}${t.pips.toFixed(1)}p</span>
+                  <span style="color:var(--text-dim);font-size:11px;">${t.symbol} · Vol ${t.volume}${t.slPips ? ' · SL ' + t.slPips.toFixed(1) + 'p' : ''}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }).join('');
+    }
+    // Wire checkboxes (event delegation)
+    list.querySelectorAll('.mt5-check').forEach(cb => {
+      cb.addEventListener('change', e => {
+        const pos = e.target.dataset.pos;
+        if (e.target.checked) _mt5SelectedIds.add(pos);
+        else _mt5SelectedIds.delete(pos);
+        renderMt5TradeList();
+        updateMt5ImportSummary();
+      });
+    });
+    list.querySelectorAll('.mt5-day-check').forEach(cb => {
+      cb.addEventListener('change', e => {
+        const d = e.target.dataset.date;
+        const dayTrades = _mt5ParsedTrades.filter(t => t.sessionDateStr === d);
+        if (e.target.checked) dayTrades.forEach(t => _mt5SelectedIds.add(t.position));
+        else dayTrades.forEach(t => _mt5SelectedIds.delete(t.position));
+        renderMt5TradeList();
+        updateMt5ImportSummary();
+      });
+    });
+    // Make whole row clickable (except the checkbox itself, which has its own handler)
+    list.querySelectorAll('.mt5-trade-row').forEach(row => {
+      row.addEventListener('click', e => {
+        if (e.target.tagName === 'INPUT') return;
+        const pos = row.dataset.pos;
+        if (_mt5SelectedIds.has(pos)) _mt5SelectedIds.delete(pos);
+        else _mt5SelectedIds.add(pos);
+        renderMt5TradeList();
+        updateMt5ImportSummary();
+      });
+    });
+    updateMt5ImportSummary();
+  }
+  function updateMt5ImportSummary() {
+    const sel = document.getElementById('mt5-date-filter');
+    const filter = sel.value;
+    const visible = filter === '__all__'
+      ? _mt5ParsedTrades
+      : _mt5ParsedTrades.filter(t => t.sessionDateStr === filter);
+    const selectedHere = visible.filter(t => _mt5SelectedIds.has(t.position));
+    const distinctDays = new Set(selectedHere.map(t => t.sessionDateStr));
+    document.getElementById('mt5-preview-summary').textContent =
+      `${selectedHere.length} of ${visible.length} selected`;
+    const warnEl = document.getElementById('mt5-import-warn');
+    if (distinctDays.size > 1) {
+      warnEl.textContent = `${distinctDays.size} different dates selected — only one session date can be active in the Review tab. Import will use the most recent.`;
+    } else {
+      warnEl.textContent = '';
+    }
+    const btn = document.getElementById('mt5-import-confirm');
+    btn.disabled = selectedHere.length === 0;
+  }
+
+  // ----- Back button: return to file pick step -----
+  document.getElementById('mt5-back-btn').addEventListener('click', () => {
+    document.getElementById('mt5-step-pick').style.display = '';
+    document.getElementById('mt5-step-preview').style.display = 'none';
+  });
+
+  // ----- Confirm import: push selected trades into data.review.trades -----
+  document.getElementById('mt5-import-confirm').addEventListener('click', () => {
+    const sel = document.getElementById('mt5-date-filter');
+    const filter = sel.value;
+    const visible = filter === '__all__'
+      ? _mt5ParsedTrades
+      : _mt5ParsedTrades.filter(t => t.sessionDateStr === filter);
+    const selected = visible.filter(t => _mt5SelectedIds.has(t.position));
+    if (selected.length === 0) return;
+    // Choose session date: most recent date present in selection
+    const sessionDates = [...new Set(selected.map(t => t.sessionDateStr))].sort();
+    const targetDate = sessionDates[sessionDates.length - 1];
+    const selectedForDate = selected.filter(t => t.sessionDateStr === targetDate);
+
+    // Snapshot for undo
+    const snap = _snapshotData();
+
+    // Set the Review tab's session date
+    data.review.sessionDate = targetDate;
+
+    // Default risk for R calculation (user can override per-trade later)
+    const defaultRisk = parseFloat(data.defaults.risk) || 0;
+
+    // Convert each MT5 trade into a review-tab trade row.
+    // Existing rows are preserved — imported trades append. User can delete blanks if needed.
+    selectedForDate.forEach(t => {
+      // R: net P&L divided by user's intended risk. If risk not set, leave R blank for user to fill.
+      let rVal = '';
+      if (defaultRisk > 0) {
+        rVal = (t.netPL / defaultRisk).toFixed(2);
+      }
+      data.review.trades.push({
+        id: genId(),
+        result: t.result,
+        r: rVal,
+        type: '',   // Subjective — user fills (Reaction / Continuation)
+        side: t.type === 'buy' ? 'Long' : 'Short',
+        entryTime: t.entryTimeHHMM,
+        exitTime: t.exitTimeHHMM,
+        risk: defaultRisk > 0 ? String(defaultRisk) : '',
+        sl: t.slPips != null ? String(t.slPips) : '',
+        costs: t.costs.toFixed(2),
+        actualGross: t.profit,   // MT5's "profit" is gross from price action
+        pips: t.pips,
+        potentialR: null,
+        potentialPips: null
+      });
+    });
+
+    saveData();
+
+    // Make sure the Trade Log section is visible (it's hidden until "Did you take a trade?" = Yes)
+    if (data.review.traded !== 'Yes') {
+      data.review.traded = 'Yes';
+      document.querySelectorAll('[data-review="traded"] .option').forEach(b => {
+        b.classList.toggle('selected', b.dataset.value === 'Yes');
+      });
+      document.getElementById('section-trades').classList.remove('hidden');
+      document.getElementById('section-execution').classList.remove('hidden');
+    }
+
+    // Refresh the session date picker and trade rows
+    const picker = document.getElementById('session-date');
+    if (picker) { picker.value = targetDate; if (typeof updateSessionDateStatus === 'function') updateSessionDateStatus(); }
+    renderTrades();
+    renderReviewPreview();
+
+    // Close modal + offer undo
+    closeMt5Modal();
+    showUndoToast(`Imported ${selectedForDate.length} trade${selectedForDate.length === 1 ? '' : 's'}`, () => {
+      _applySnapshot(snap);
+      // Restore the date picker and re-render
+      const p = document.getElementById('session-date');
+      if (p && data.review.sessionDate) { p.value = data.review.sessionDate; if (typeof updateSessionDateStatus === 'function') updateSessionDateStatus(); }
+      renderTrades();
+      renderReviewPreview();
+      showToast('Import undone');
+    });
+  });
+
   // Wire the dismiss button and show the banner immediately if the session is
   // already live when the app loads (e.g. user opens at 09:15).
   (function wireSessionLiveBanner() {
