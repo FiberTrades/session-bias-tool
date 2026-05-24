@@ -1265,6 +1265,17 @@
     <div class="settings-panel">
       <span class="label" data-i18n="settings.account">Account Settings</span>
       <div class="settings-field"><span class="k" data-i18n="settings.starting_balance">Starting Balance £</span><input id="setting-balance" type="number" step="any" placeholder="10000" /></div>
+      <div class="settings-field">
+        <span class="k" data-i18n="settings.rule_reminder">Rule Reminder</span>
+        <select id="setting-rule-reminder" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text);padding:7px 12px;font-family:'DM Mono',monospace;font-size:13px;outline:none;">
+          <option value="off"   data-i18n="settings.rule_reminder_off">Off</option>
+          <option value="start" data-i18n="settings.rule_reminder_start">At session start</option>
+          <option value="5"     data-i18n="settings.rule_reminder_5">Every 5 min</option>
+          <option value="15"    data-i18n="settings.rule_reminder_15">Every 15 min</option>
+          <option value="30"    data-i18n="settings.rule_reminder_30">Every 30 min</option>
+          <option value="60"    data-i18n="settings.rule_reminder_60">Every hour</option>
+        </select>
+      </div>
       <span class="defaults-label" style="font-size:8px;margin-left:auto;"><span data-i18n="settings.defaults_hint_inline">Risk &amp; Costs defaults are set in Review tab</span></span>
     </div>
 
@@ -1813,7 +1824,7 @@
       'dmodal.gross_pnl': 'Gross P&L',
       'dmodal.costs': 'Costs',
       'dmodal.total_rp': 'Total R · Pips',
-      'dmodal.pot_rp': 'Potential R · Pips',
+      'dmodal.pot_rp': 'Pot R · Pips',
       // ----- MT5 import modal -----
       'mt5.title': 'Import from MT5',
       'mt5.subtitle': 'Upload your MT5 Trade History Report (HTML format). Trades auto-fill into the Review tab.',
@@ -1855,6 +1866,15 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'settings.rule_reminder': "Rule Reminder",
+      'settings.rule_reminder_off': "Off",
+      'settings.rule_reminder_start': "At session start",
+      'settings.rule_reminder_5': "Every 5 min",
+      'settings.rule_reminder_15': "Every 15 min",
+      'settings.rule_reminder_30': "Every 30 min",
+      'settings.rule_reminder_60': "Every hour",
+      'rule.midsession_prefix': "Quick check \u2014",
+      'rule.midsession_dismiss': "Got it",
       'bias.bias_for': "Bias for",
       'rule.eyebrow_pending': "Rule from last week \u2014 grade it",
       'rule.eyebrow_next': "Rule for next week",
@@ -1994,7 +2014,7 @@
       'kpi.net_pnl': 'Net P&L',
       'kpi.gross_pnl': 'Gross P&L',
       'kpi.total_rp': 'Total R · Pips',
-      'kpi.potential_rp': 'Potential R · Pips',
+      'kpi.potential_rp': 'Pot R · Pips',
       'kpi.account_balance': 'Account Balance',
       'kpi.total_costs': 'Total Costs',
       'kpi.win_rate': 'Win Rate',
@@ -2361,7 +2381,7 @@
       'dmodal.gross_pnl': 'P&G Bruto',
       'dmodal.costs': 'Costes',
       'dmodal.total_rp': 'R · Pips Total',
-      'dmodal.pot_rp': 'R · Pips Potencial',
+      'dmodal.pot_rp': 'Pot R · Pips',
       // ----- MT5 import modal -----
       'mt5.title': 'Importar de MT5',
       'mt5.subtitle': 'Sube tu Informe de Historial de Operaciones de MT5 (formato HTML). Las operaciones se rellenan automáticamente en la pestaña Revisión.',
@@ -2403,6 +2423,15 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'settings.rule_reminder': "Recordatorio de la Regla",
+      'settings.rule_reminder_off': "Apagado",
+      'settings.rule_reminder_start': "Al inicio de la sesi\u00f3n",
+      'settings.rule_reminder_5': "Cada 5 min",
+      'settings.rule_reminder_15': "Cada 15 min",
+      'settings.rule_reminder_30': "Cada 30 min",
+      'settings.rule_reminder_60': "Cada hora",
+      'rule.midsession_prefix': "Revisi\u00f3n r\u00e1pida \u2014",
+      'rule.midsession_dismiss': "Entendido",
       'bias.bias_for': "Sesgo para",
       'rule.eyebrow_pending': "Regla de la semana pasada \u2014 calif\u00edcala",
       'rule.eyebrow_next': "Regla para la pr\u00f3xima semana",
@@ -2542,7 +2571,7 @@
       'kpi.net_pnl': 'P&G Neto',
       'kpi.gross_pnl': 'P&G Bruto',
       'kpi.total_rp': 'R · Pips Total',
-      'kpi.potential_rp': 'R · Pips Potencial',
+      'kpi.potential_rp': 'Pot R · Pips',
       'kpi.account_balance': 'Balance de Cuenta',
       'kpi.total_costs': 'Costes Totales',
       'kpi.win_rate': 'Ratio de Acierto',
@@ -3029,9 +3058,60 @@
       saveData();
       fireSessionAlert('end');
     }
+    // Rule-of-the-week reminder, cadence-aware. Fires at the configured frequency
+    // during the session window. Silent if no rule set, or cadence is 'off'.
+    if (shouldFireRuleReminderNow(ws, we, hhmm, todayKey)) {
+      data._ruleReminderFlags = data._ruleReminderFlags || {};
+      data._ruleReminderFlags[todayKey + ' ' + hhmm] = true;
+      saveData();
+      fireMidSessionRuleReminder();
+      // Garbage-collect old flags (keep only today's)
+      Object.keys(data._ruleReminderFlags).forEach(k => {
+        if (!k.startsWith(todayKey)) delete data._ruleReminderFlags[k];
+      });
+    }
     // Refresh the session-live coaching banner on every tick — cheap, and keeps
     // the banner in sync as we cross the start/end boundaries.
     updateSessionLiveBanner();
+  }
+
+  // Decide whether to fire the rule reminder at the current HH:MM tick.
+  // - 'off'        → never
+  // - 'start'      → exactly once when hhmm === windowStart
+  // - '5'/'15'/'30'/'60' → every N minutes inside (windowStart, windowEnd), excluding the exact start
+  // Each (date,hhmm) pair fires at most once via the _ruleReminderFlags map.
+  function shouldFireRuleReminderNow(windowStart, windowEnd, hhmm, todayKey) {
+    if (!data || !data.settings) return false;
+    const cadence = data.settings.ruleReminderCadence || 'start';
+    if (cadence === 'off') return false;
+    const flags = data._ruleReminderFlags || {};
+    if (flags[todayKey + ' ' + hhmm]) return false;
+    // Helper: minutes-since-midnight from HH:MM
+    const m = str => { const [h, mm] = str.split(':').map(Number); return h * 60 + mm; };
+    const startMins = m(windowStart);
+    const endMins = m(windowEnd);
+    const nowMins = m(hhmm);
+    if (cadence === 'start') {
+      return hhmm === windowStart;
+    }
+    // Interval cadence: must be strictly inside the window (start fires once via 'start' or skipped)
+    const interval = parseInt(cadence, 10);
+    if (!interval) return false;
+    // Allow firing AT windowStart too if cadence is interval-based — gives the user the first prompt
+    if (nowMins < startMins || nowMins >= endMins) return false;
+    return ((nowMins - startMins) % interval) === 0;
+  }
+
+  // Show a gentle snackbar nudging the user about this week's rule. Only fires if a rule exists.
+  function fireMidSessionRuleReminder() {
+    const rule = (typeof getRuleForWeek === 'function' && typeof getCalendarWeekKey === 'function')
+      ? getRuleForWeek(getCalendarWeekKey(new Date()))
+      : null;
+    if (!rule || !rule.rule) return;
+    if (typeof showUndoToast !== 'function') return;
+    const msg = `${t('rule.midsession_prefix')} "${rule.rule}"`;
+    // 15-second snackbar with a Dismiss action that just closes (no-op undoFn).
+    showUndoToast(msg, () => {}, 15000, t('rule.midsession_dismiss'));
   }
 
   // Is the current local time within the configured session window?
@@ -3405,6 +3485,11 @@
     if (d.settings.windowStart === undefined) d.settings.windowStart = '08:00';
     if (d.settings.windowEnd === undefined) d.settings.windowEnd = '10:00';
     if (d.settings.sessionDayCutoff === undefined) d.settings.sessionDayCutoff = '22:00';
+    // Rule-of-the-week reminder cadence during session window.
+    // 'off' | 'start' | '5' | '15' | '30' | '60' (minutes).
+    if (!['off','start','5','15','30','60'].includes(d.settings.ruleReminderCadence)) {
+      d.settings.ruleReminderCadence = 'start';
+    }
     if (d.settings.pnlView === undefined) d.settings.pnlView = 'net';
     // Tool-wide display unit. 'r' shows R as primary, pips as secondary. 'pips' is the inverse.
     if (d.settings.unitView !== 'r' && d.settings.unitView !== 'pips') d.settings.unitView = 'r';
@@ -4857,11 +4942,18 @@
 
   function syncSettingsInputs() {
     document.getElementById('setting-balance').value = data.settings.startingBalance || '';
+    const sel = document.getElementById('setting-rule-reminder');
+    if (sel) sel.value = data.settings.ruleReminderCadence || 'start';
   }
   document.getElementById('setting-balance').addEventListener('input', e => {
     data.settings.startingBalance = parseFloat(e.target.value) || 0;
     saveData();
     if (document.getElementById('page-trades').classList.contains('active')) renderTradesStats();
+  });
+  // Rule-of-the-week reminder cadence dropdown.
+  document.getElementById('setting-rule-reminder').addEventListener('change', e => {
+    data.settings.ruleReminderCadence = e.target.value;
+    saveData();
   });
 
   // Net / Gross P&L toggle inside the Statistics tab KPI grid. Event delegated to handle clicks on either label.
