@@ -1837,6 +1837,8 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'rule.eyebrow_pending': "Rule from last week \u2014 grade it",
+      'rule.eyebrow_next': "Rule for next week",
       'backup.title_trades_saved': "Trades saved",
       'backup.title_settings': "Backup settings",
       'backup.sub_want_backup': "Want to back up your data?",
@@ -2382,6 +2384,8 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'rule.eyebrow_pending': "Regla de la semana pasada \u2014 calif\u00edcala",
+      'rule.eyebrow_next': "Regla para la pr\u00f3xima semana",
       'backup.title_trades_saved': "Operaciones guardadas",
       'backup.title_settings': "Configuraci\u00f3n de copias",
       'backup.sub_want_backup': "\u00bfQuieres hacer una copia de tus datos?",
@@ -3090,7 +3094,7 @@
     showSessionToast(msg, kind);
     playChime(kind);
     if (kind === 'end' && new Date().getDay() === 5) {
-      const cur = getRuleForWeek(getCurrentWeekKey());
+      const cur = getRuleForWeek(getCalendarWeekKey(new Date()));
       if (cur && cur.followed === null && typeof showUndoToast === 'function') {
         setTimeout(() => {
           showUndoToast(t('rule.friday_prompt'), () => {
@@ -6560,6 +6564,21 @@
     next.setDate(next.getDate() + 7);
     return getCurrentWeekBounds(next).weekKey;
   }
+  // Calendar-week key (Mon-Sun, ignoring sessionDayCutoff). Used for the rule banner
+  // so the rule appears on Monday morning, not Monday evening when the session cutoff
+  // would otherwise flip the week. We feed Wednesday noon of the target week into
+  // getCurrentWeekBounds to dodge any cutoff edge cases and keep the key format consistent.
+  function getCalendarWeekKey(refDate) {
+    const d = new Date(refDate || new Date());
+    const dow = d.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const daysFromMonday = (dow + 6) % 7;
+    const monday = new Date(d);
+    monday.setDate(monday.getDate() - daysFromMonday);
+    const wedNoon = new Date(monday);
+    wedNoon.setDate(wedNoon.getDate() + 2);
+    wedNoon.setHours(12, 0, 0, 0);
+    return getCurrentWeekBounds(wedNoon).weekKey;
+  }
   function getRuleForWeek(weekKey) {
     if (!weekKey || !data.weeklyRules) return null;
     const r = data.weeklyRules[weekKey];
@@ -6583,19 +6602,46 @@
     refreshRuleBanners();
   }
   function refreshRuleBanners() {
-    const cur = getRuleForWeek(getCurrentWeekKey());
+    const today = new Date();
+    const dow = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    let displayKey, context;
+    if (dow >= 1 && dow <= 5) {
+      // Mon-Fri: show this week's rule
+      displayKey = getCalendarWeekKey(today);
+      context = 'current';
+    } else {
+      // Sat or Sun
+      const lastKey = getCalendarWeekKey(new Date(today.getTime() - 7*24*3600*1000));
+      const lastRule = getRuleForWeek(lastKey);
+      if (lastRule && lastRule.followed === null) {
+        // Ungraded — keep showing as a reminder
+        displayKey = lastKey;
+        context = 'pending-grade';
+      } else {
+        // Preview next week's rule (so users see confirmation right after setting it)
+        displayKey = getCalendarWeekKey(new Date(today.getTime() + 7*24*3600*1000));
+        context = 'next-preview';
+      }
+    }
+    const rule = getRuleForWeek(displayKey);
+    // Pick the right eyebrow label based on context
+    let eyebrowText = t('rule.eyebrow');
+    if (context === 'pending-grade') eyebrowText = t('rule.eyebrow_pending');
+    else if (context === 'next-preview') eyebrowText = t('rule.eyebrow_next');
     ['bias', 'review'].forEach(tab => {
       const banner = document.getElementById('rule-banner-' + tab);
       const textEl = document.getElementById('rule-banner-text-' + tab);
       const metaEl = document.getElementById('rule-banner-meta-' + tab);
+      const eyebrowEl = banner ? banner.querySelector('.rule-banner-eyebrow') : null;
       if (!banner || !textEl || !metaEl) return;
-      if (!cur) { banner.classList.add('hidden'); return; }
+      if (!rule) { banner.classList.add('hidden'); return; }
       banner.classList.remove('hidden');
-      textEl.textContent = cur.rule;
-      if (cur.followed === true) {
+      if (eyebrowEl) eyebrowEl.textContent = eyebrowText;
+      textEl.textContent = rule.rule;
+      if (rule.followed === true) {
         metaEl.textContent = t('rule.graded_followed');
         metaEl.className = 'rule-banner-meta rule-banner-graded good';
-      } else if (cur.followed === false) {
+      } else if (rule.followed === false) {
         metaEl.textContent = t('rule.graded_broken');
         metaEl.className = 'rule-banner-meta rule-banner-graded bad';
       } else {
@@ -7387,7 +7433,6 @@
 
     const monthlyExtra = (greetingNoun === 'month' && monthRange) ? renderMonthlyInsights(monthRange.start, monthRange.end) : '';
     document.getElementById('review-modal-body').innerHTML = `
-      <p style="color:var(--text-mid);font-size:13px;margin-bottom:8px;">${greeting}</p>
       <p class="review-reflection">${reflection}</p>
       <div class="modal-stats" style="margin-top:0;margin-bottom:20px;">
         <div class="modal-stat"><div class="label">${t('dmodal.wlbe')}</div><div class="v"><span class="wlbe-w">${stats.wins}</span><span class="wlbe-sep">/</span><span class="wlbe-l">${stats.losses}</span><span class="wlbe-sep">/</span><span class="wlbe-be">${stats.bes}</span></div></div>
@@ -7597,7 +7642,7 @@
       const nextKey = (function() {
         const next = new Date(weekEnd);
         next.setDate(next.getDate() + 3);
-        return getCurrentWeekBounds(next).weekKey;
+        return getCalendarWeekKey(next);
       })();
       const thisRule = getRuleForWeek(thisWeekKey);
       const nextRule = getRuleForWeek(nextKey);
