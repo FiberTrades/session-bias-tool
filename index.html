@@ -941,12 +941,6 @@
         <button type="button" id="skip-nudge-dismiss" style="background:transparent;border:1px solid var(--border-2);color:var(--text-dim);cursor:pointer;padding:4px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;flex-shrink:0;">Dismiss</button>
       </div>
     </div>
-    <!-- Rule for the week — pinned above the form. -->
-    <div class="rule-banner hidden" id="rule-banner-bias">
-      <span class="rule-banner-eyebrow" data-i18n="rule.eyebrow">Rule for the week</span>
-      <span class="rule-banner-text" id="rule-banner-text-bias"></span>
-      <span class="rule-banner-meta" id="rule-banner-meta-bias"></span>
-    </div>
     <div id="bias-greeting" class="bias-greeting"></div>
     <section>
       <div class="section-header">
@@ -1222,6 +1216,8 @@
   </div>
 
   <div class="page" id="page-stats">
+    <!-- Contextual encouragement / math-based feedback about the current series. -->
+    <div id="current-series-message" style="margin-top:32px;margin-bottom:24px;font-family:'Fraunces',serif;font-size:18px;color:var(--text);line-height:1.5;letter-spacing:-0.005em;display:none;"></div>
 
     <div class="stats-summary stats-summary-3col">
       <div class="stat-cell" id="stat-pnl-cell">
@@ -1238,9 +1234,6 @@
       <div class="stat-cell"><div class="stat-tooltip" id="stat-total-tip">Net R and Net Pips across your current series of 10.</div><div class="stat-label" id="stat-total-label" data-i18n="kpi.total_rp">Total R · Pips</div><div class="stat-value dual" id="stat-total">0</div></div>
       <div class="stat-cell"><div class="stat-tooltip" id="stat-rleft-tip">R and Pips left on the table across wins in your current series. Potential minus actual captured.</div><div class="stat-label" id="stat-rleft-label" data-i18n="kpi.potential_rp">Potential R · Pips</div><div class="stat-value dual" id="stat-rleft">—</div></div>
     </div>
-
-    <!-- Contextual encouragement / math-based feedback about the current series. -->
-    <div id="current-series-message" style="margin-top:32px;margin-bottom:8px;font-family:'Fraunces',serif;font-size:18px;color:var(--text);line-height:1.5;letter-spacing:-0.005em;display:none;"></div>
 
     <div class="current-series">
       <div class="current-series-header">
@@ -1469,7 +1462,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:16px;">
         <div class="modal-net" id="modal-net">—</div>
-        <button class="modal-close" id="modal-close">Close</button>
+        <button class="modal-close" id="modal-close" data-i18n="btn.done">Done</button>
       </div>
     </div>
     <!-- Stat-aware greeting + reflection question for this trading day. -->
@@ -1701,7 +1694,7 @@
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="review-modal-title">Your Period</div>
-      <button type="button" class="modal-close" id="review-modal-close">Done</button>
+      <button type="button" class="modal-close" id="review-modal-close" data-i18n="btn.done">Done</button>
     </div>
     <div id="review-modal-body"></div>
     <div id="review-modal-reflection" style="margin-top:24px;"></div>
@@ -1861,6 +1854,7 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'btn.done': "Done",
       'rule.cadence_hint': "How often to show a snackbar reminder of your rule during the session.",
       'settings.rule_reminder': "Rule Reminder",
       'settings.rule_reminder_off': "Off",
@@ -2419,6 +2413,7 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'btn.done': "Hecho",
       'rule.cadence_hint': "Con qu\u00e9 frecuencia mostrar un aviso con tu regla durante la sesi\u00f3n.",
       'settings.rule_reminder': "Recordatorio de la Regla",
       'settings.rule_reminder_off': "Apagado",
@@ -3955,6 +3950,16 @@
     if (b.structure) lines.push(`Structure   ${b.structure}`);
     if (b.location)  lines.push(`Location    ${b.location}`);
     if (b.direction) lines.push(`Direction   ${dir} ${b.direction}`);
+    // Rule for the week — include in Discord post so the rule travels with the morning bias.
+    try {
+      if (typeof getRuleForWeek === 'function' && typeof getCalendarWeekKey === 'function') {
+        const ruleRefDate = b.sessionDate ? new Date(b.sessionDate + 'T12:00:00') : new Date();
+        const rule = getRuleForWeek(getCalendarWeekKey(ruleRefDate));
+        if (rule && rule.rule) {
+          lines.push(`Rule        ${rule.rule}`);
+        }
+      }
+    } catch(e) {}
     const links = (b.tvLinks || []).filter(l => l && l.url);
     if (links.length > 0) {
       lines.push('');
@@ -9672,16 +9677,80 @@
     const avgWinR = winRs.length > 0 ? winRs.reduce((a, b) => a + b, 0) / winRs.length : 0;
     const remaining = 10 - n;
 
-    // How many more losses could the remaining trades take, and break-even still hold?
-    // Pessimistic floor: assume the rest are all losses (-1R each); is total still >= 0?
-    const floorR = totalR - remaining;
-    // Optimistic ceiling: assume rest are all wins at the running avgWinR
-    const ceilR = (avgWinR > 0) ? totalR + (remaining * avgWinR) : totalR;
+    // --- Costs-aware NET £ math ---
+    // Compute actual net £ across logged trades + average costs/risk to project remaining trades.
+    // For early trades (1-2) where the current series has too little cost data, fall back to
+    // lifetime averages so the projection isn't built on a single outlier trade.
+    const netSoFar = cs.reduce((sum, t) => sum + (tradeGross(t) - tradeCosts(t)), 0);
+
+    // Helper: average a list of positive values, returns 0 if empty.
+    const avgOf = (list) => list.length > 0 ? list.reduce((a, b) => a + b, 0) / list.length : 0;
+
+    // Current-series cost/risk samples (excluding zeros — missing data shouldn't drag the avg down).
+    const seriesCosts = cs.map(t => tradeCosts(t)).filter(c => c > 0);
+    const seriesRisks = cs.map(t => parseFloat(t.risk) || 0).filter(r => r > 0);
+
+    // Lifetime fallback samples — used when the series has <3 cost/risk data points.
+    // Reactive to current conditions takes priority once you have enough series data.
+    const MIN_SAMPLES = 3;
+    let avgCost, avgRisk;
+    if (seriesCosts.length >= MIN_SAMPLES) {
+      avgCost = avgOf(seriesCosts);
+    } else {
+      const lifetimeCosts = (typeof getAllLifetimeTrades === 'function')
+        ? getAllLifetimeTrades().map(t => tradeCosts(t)).filter(c => c > 0)
+        : [];
+      // Use whichever pool has data; prefer combined if both partial
+      avgCost = seriesCosts.length > 0 || lifetimeCosts.length > 0
+        ? avgOf([...seriesCosts, ...lifetimeCosts])
+        : 0;
+    }
+    if (seriesRisks.length >= MIN_SAMPLES) {
+      avgRisk = avgOf(seriesRisks);
+    } else {
+      const lifetimeRisks = (typeof getAllLifetimeTrades === 'function')
+        ? getAllLifetimeTrades().map(t => parseFloat(t.risk) || 0).filter(r => r > 0)
+        : [];
+      avgRisk = seriesRisks.length > 0 || lifetimeRisks.length > 0
+        ? avgOf([...seriesRisks, ...lifetimeRisks])
+        : 0;
+    }
+
+    // Avg win gross £ — from actual winning trades only (uses logged r × risk)
+    const winGrosses = cs.filter(t => t.result === 'Win').map(t => tradeGross(t));
+    const avgWinGross = winGrosses.length > 0 ? winGrosses.reduce((a, b) => a + b, 0) / winGrosses.length : 0;
+    // Avg loss gross £ — projected from avgRisk (loss = -1R × risk). Falls back to 0 if no risk data.
+    const avgLossGross = avgRisk;
+
+    // Solve for max affordable losses x such that:
+    //   netSoFar + (remaining-x) × avgWinGross - x × avgLossGross - remaining × avgCost >= 0
+    //   → netSoFar + remaining × avgWinGross - x × (avgWinGross + avgLossGross) - remaining × avgCost >= 0
+    //   → x <= (netSoFar + remaining × avgWinGross - remaining × avgCost) / (avgWinGross + avgLossGross)
+    let lossesCapped = 0;
+    const haveCostsData = (avgCost > 0 || avgRisk > 0);
+    if (haveCostsData && (avgWinGross + avgLossGross) > 0) {
+      const lossesAffordableNet = Math.floor(
+        (netSoFar + remaining * avgWinGross - remaining * avgCost) /
+        (avgWinGross + avgLossGross)
+      );
+      lossesCapped = Math.max(0, Math.min(remaining, lossesAffordableNet));
+    } else if (avgWinR > 0) {
+      // Fallback to pure-R math when costs/risk aren't logged yet
+      const lossesAffordableR = Math.floor((totalR + remaining * avgWinR) / (1 + avgWinR));
+      lossesCapped = Math.max(0, Math.min(remaining, lossesAffordableR));
+    }
 
     // --- Series complete (10 trades) ---
     if (n >= 10) {
       el.style.display = 'block';
-      if (totalR >= 5) {
+      // Pure-R lens for the message. But: if R is green and net £ is negative,
+      // we flag costs eating the edge — that's a real signal worth surfacing.
+      const costsAteIt = (totalR > 0 && netSoFar <= 0);
+      if (costsAteIt) {
+        el.textContent = (lang === 'es')
+          ? `Serie cerrada en +${totalR.toFixed(2)}R, pero los costes se comieron el resultado. R positivo, neto plano o negativo. Mira spread, slippage, o sobreoperar.`
+          : `Series closed +${totalR.toFixed(2)}R, but costs ate the result. R green, net flat or red. Look at spread, slippage, or over-trading.`;
+      } else if (totalR >= 5) {
         el.textContent = (lang === 'es')
           ? `Serie cerrada en +${totalR.toFixed(2)}R. Una serie sólida — la pregunta no es si fue suerte, es qué hábito te la dio.`
           : `Series closed +${totalR.toFixed(2)}R. A proper run — the question isn't whether it was luck, it's which habit gave it to you.`;
@@ -9704,32 +9773,20 @@
     // --- Partial series (1–9 trades) ---
     el.style.display = 'block';
 
-    // The math-based "you can still lose X" framing — the user's specific ask.
-    // Only triggered when there's at least one win logged, so we have an avgWinR to project from.
     if (winRs.length > 0 && remaining > 0) {
-      // How many of the remaining could be losses (the rest wins at avgWinR) and total still >= 0?
-      // total + wins * avgWinR - losses = 0  →  losses_max ≈ total + (remaining - losses) * avgWinR
-      // Simpler: assume the rest split into x losses + (remaining - x) wins at avgWinR.
-      // Solve: totalR - x + (remaining - x) * avgWinR >= 0
-      //        → x <= (totalR + remaining * avgWinR) / (1 + avgWinR)
-      const lossesAffordable = Math.floor((totalR + remaining * avgWinR) / (1 + avgWinR));
-      const lossesCapped = Math.max(0, Math.min(remaining, lossesAffordable));
-
-      // Multiple narrative variants — pick by current trade count for stability through the day
       const pickIdx = n % 4;
 
       if (totalR > 0 && lossesCapped >= remaining) {
-        // Already so green that even all losses ahead would still keep break-even
+        // Even all losses ahead (costs included) still leaves you green
         el.textContent = (lang === 'es')
           ? `+${totalR.toFixed(2)}R con ${n}/10. Avg ganadora ${avgWinR.toFixed(2)}R. Incluso si las ${remaining} restantes fueran pérdidas, cerrarías en positivo. La serie ya está asegurada.`
           : `+${totalR.toFixed(2)}R at ${n}/10. Avg win ${avgWinR.toFixed(2)}R. Even if the remaining ${remaining} were all losses, you'd still close green. Series is locked in.`;
       } else if (totalR > 0 && lossesCapped > 0) {
-        // Standard "you can afford X losses" message
         const lines = (lang === 'es') ? [
-          `+${totalR.toFixed(2)}R con ${n}/10. Con avg ganadora ${avgWinR.toFixed(2)}R, puedes perder ${lossesCapped} de las ${remaining} restantes y seguir en positivo.`,
+          `+${totalR.toFixed(2)}R con ${n}/10. Con avg ganadora ${avgWinR.toFixed(2)}R, puedes perder ${lossesCapped} de las ${remaining} restantes y seguir verde.`,
           `${n} operaciones, ${wins}G/${losses}P/${bes}BE, +${totalR.toFixed(2)}R. Margen: ${lossesCapped} pérdidas más permitidas. Sigue ejecutando tu plan.`,
           `Vas +${totalR.toFixed(2)}R. Aunque pierdas ${lossesCapped} de las próximas ${remaining}, cierras la serie verde. Eso es lo que hace el edge.`,
-          `+${totalR.toFixed(2)}R con avg ${avgWinR.toFixed(2)}R por ganadora. Te quedan ${remaining} operaciones y un colchón de ${lossesCapped} pérdidas. No fuerces.`
+          `+${totalR.toFixed(2)}R, avg ${avgWinR.toFixed(2)}R por ganadora. Te quedan ${remaining} operaciones con un colchón de ${lossesCapped} pérdidas. No fuerces.`
         ] : [
           `+${totalR.toFixed(2)}R at ${n}/10. With avg win ${avgWinR.toFixed(2)}R, you could lose ${lossesCapped} of the next ${remaining} and still close green.`,
           `${n} trades in, ${wins}W/${losses}L/${bes}BE, +${totalR.toFixed(2)}R. Headroom: ${lossesCapped} more losses tolerable. Keep executing the plan.`,
@@ -9738,16 +9795,22 @@
         ];
         el.textContent = lines[pickIdx];
       } else if (totalR > 0 && lossesCapped === 0) {
-        // Green but tight — one more loss and you're underwater
         el.textContent = (lang === 'es')
-          ? `+${totalR.toFixed(2)}R, pero margen mínimo. Necesitas ganadoras en las ${remaining} restantes para cerrar verde. Selectividad ahora, no cantidad.`
-          : `+${totalR.toFixed(2)}R, but margin's thin. You need wins on the remaining ${remaining} to close green. Selectivity now, not volume.`;
-      } else if (totalR < 0) {
-        // In the red — what do we need to recover?
-        const winsNeeded = avgWinR > 0 ? Math.ceil(-totalR / avgWinR) : null;
+          ? `+${totalR.toFixed(2)}R con ${n}/10. Margen mínimo — necesitas ganadoras en las ${remaining} restantes para cerrar verde. Selectividad ahora, no cantidad.`
+          : `+${totalR.toFixed(2)}R at ${n}/10. Margin's thin — you need wins on the remaining ${remaining} to close green. Selectivity now, not volume.`;
+      } else if (totalR < 0 || netSoFar < 0) {
+        // In the red — how many wins needed if rest are losses?
+        // Solve with cost-aware math: winsNeeded × avgWinGross - (rem-winsNeeded) × avgLossGross - rem × avgCost = -netSoFar
+        // → winsNeeded = (-netSoFar + remaining × (avgLossGross + avgCost)) / (avgWinGross + avgLossGross)
+        let winsNeeded = null;
+        if (avgWinGross > 0 && (avgWinGross + avgLossGross) > 0) {
+          winsNeeded = Math.ceil((-netSoFar + remaining * (avgLossGross + avgCost)) / (avgWinGross + avgLossGross));
+        } else if (avgWinR > 0) {
+          winsNeeded = Math.ceil(-totalR / avgWinR);
+        }
         if (winsNeeded != null && winsNeeded <= remaining) {
           el.textContent = (lang === 'es')
-            ? `${totalR.toFixed(2)}R con ${n}/10. Con tu avg ganadora de ${avgWinR.toFixed(2)}R, necesitas ${winsNeeded} ganadora${winsNeeded === 1 ? '' : 's'} de las ${remaining} restantes para volver a positivo. Aún es posible.`
+            ? `${totalR.toFixed(2)}R con ${n}/10. Con tu avg ganadora de ${avgWinR.toFixed(2)}R, necesitas ${winsNeeded} ganadora${winsNeeded === 1 ? '' : 's'} de las ${remaining} restantes para volver a verde. Aún es posible.`
             : `${totalR.toFixed(2)}R at ${n}/10. With your avg win of ${avgWinR.toFixed(2)}R, you need ${winsNeeded} win${winsNeeded === 1 ? '' : 's'} from the remaining ${remaining} to get back to green. Still possible.`;
         } else if (winsNeeded != null) {
           el.textContent = (lang === 'es')
