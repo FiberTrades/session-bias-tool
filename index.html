@@ -825,7 +825,8 @@
   .mt5-trade-row .mt5-profit.loss { color: var(--bad); }
   .mt5-trade-row .mt5-profit.be   { color: var(--info); }
   /* Session-alert variant — larger, mixed case, longer message */
-  .toast.session-alert { font-size: 14px; letter-spacing: 0.02em; text-transform: none; padding: 20px 32px; font-family: 'Fraunces', serif; font-weight: 400; border: 1px solid var(--border-2); box-shadow: 0 4px 24px rgba(0,0,0,0.45); }
+  .toast.session-alert { font-size: 14px; letter-spacing: 0.02em; text-transform: none; padding: 20px 32px; font-family: 'Fraunces', serif; font-weight: 400; border: 1px solid var(--border-2); box-shadow: 0 4px 24px rgba(0,0,0,0.45); cursor: pointer; }
+  .toast.session-alert:hover { border-color: var(--text-mid); }
   /* Both start and end session toasts now inherit the base white-bg / black-text styling.
      The session-alert variant just adds size, serif typography, and a subtle border for editorial weight. */
   .footer { margin-top: 80px; color: var(--text-dim); font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; text-align: center; }
@@ -3055,7 +3056,17 @@
       data._ruleReminderFlags = data._ruleReminderFlags || {};
       data._ruleReminderFlags[todayKey + ' ' + hhmm] = true;
       saveData();
-      fireMidSessionRuleReminder();
+      // If this fire coincides with the session-start moment, wait for the open toast
+      // to be dismissed (either user-clicked or auto-hidden) before showing the rule
+      // snackbar, plus a short breathing space. Otherwise it would overwrite the
+      // "Session opened" toast immediately.
+      if (hhmm === ws) {
+        const openToast = document.getElementById('toast');
+        const waitFor = (openToast && openToast._dismissPromise) ? openToast._dismissPromise : Promise.resolve();
+        waitFor.then(() => setTimeout(() => fireMidSessionRuleReminder(), 600));
+      } else {
+        fireMidSessionRuleReminder();
+      }
       // Garbage-collect old flags (keep only today's)
       Object.keys(data._ruleReminderFlags).forEach(k => {
         if (!k.startsWith(todayKey)) delete data._ruleReminderFlags[k];
@@ -3069,7 +3080,9 @@
   // Decide whether to fire the rule reminder at the current HH:MM tick.
   // - 'off'        → never
   // - 'start'      → exactly once when hhmm === windowStart
-  // - '5'/'15'/'30'/'60' → every N minutes inside (windowStart, windowEnd), excluding the exact start
+  // - '5'/'15'/'30'/'60' → at windowStart, then every N minutes until just before windowEnd
+  //                        (e.g. 8:00-10:00 with '15' → 8:00, 8:15, 8:30, ... 9:45; 10:00 is skipped
+  //                        because that's when the session-close chime fires)
   // Each (date,hhmm) pair fires at most once via the _ruleReminderFlags map.
   function shouldFireRuleReminderNow(windowStart, windowEnd, hhmm, todayKey) {
     if (!data || !data.settings) return false;
@@ -3162,18 +3175,29 @@
     });
   }
 
-  // Show the session-alert variant of the toast (larger, longer-lasting, color-coded)
+  // Show the session-alert variant of the toast (larger, longer-lasting, color-coded).
+  // Resolves toast._dismissPromise when the toast leaves the screen (auto-hide or user click).
   function showSessionToast(message, kind) {
     const toast = document.getElementById('toast');
     if (!toast) return;
     toast.textContent = message;
     toast.classList.add('session-alert', kind, 'show');
+    // Set up a fresh dismiss promise so any code waiting on this toast knows when it's gone.
+    toast._dismissResolve && toast._dismissResolve();
+    toast._dismissPromise = new Promise(resolve => { toast._dismissResolve = resolve; });
     clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => {
+    const hide = () => {
       toast.classList.remove('show');
+      toast.removeEventListener('click', hide);
       // Defer the variant-class cleanup until after the slide-out transition completes
-      setTimeout(() => toast.classList.remove('session-alert', 'start', 'end'), 400);
-    }, 5000);
+      setTimeout(() => {
+        toast.classList.remove('session-alert', 'start', 'end');
+        if (toast._dismissResolve) { toast._dismissResolve(); toast._dismissResolve = null; }
+      }, 400);
+    };
+    // Auto-hide after 5s, OR user clicks the toast to dismiss early.
+    toast._timer = setTimeout(hide, 5000);
+    toast.addEventListener('click', hide);
   }
 
   function fireSessionAlert(kind) {
@@ -3187,12 +3211,16 @@
     if (kind === 'end' && new Date().getDay() === 5) {
       const cur = getRuleForWeek(getCalendarWeekKey(new Date()));
       if (cur && cur.followed === null && typeof showUndoToast === 'function') {
-        setTimeout(() => {
+        // Wait for the session-closed toast to clear (user click OR auto-hide), then a
+        // short breathing space, before the Friday grade nudge takes the slot.
+        const closeToast = document.getElementById('toast');
+        const waitFor = (closeToast && closeToast._dismissPromise) ? closeToast._dismissPromise : Promise.resolve();
+        waitFor.then(() => setTimeout(() => {
           showUndoToast(t('rule.friday_prompt'), () => {
             const { weekStart, weekEnd } = getCurrentWeekBounds(new Date());
             if (typeof openWeeklyReviewModal === 'function') openWeeklyReviewModal(weekStart, weekEnd);
           }, 12000, t('rule.friday_prompt_action'));
-        }, 2200);
+        }, 600));
       }
     }
   }
