@@ -1248,6 +1248,8 @@
       <div class="series-dots" id="current-dots"></div>
       <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-top:8px;" id="current-tally">No trades logged yet</div>
       <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;font-style:italic;" data-i18n="modal.click_dot_edit">CLICK ANY TRADE DOT TO EDIT OR DELETE</div>
+      <!-- Contextual encouragement / math-based feedback about the current series. -->
+      <div id="current-series-message" style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--border-2);font-family:'Fraunces',serif;font-size:14px;font-style:italic;color:var(--text-mid);line-height:1.5;display:none;"></div>
     </div>
 
     <section>
@@ -1470,6 +1472,8 @@
         <button class="modal-close" id="modal-close">Close</button>
       </div>
     </div>
+    <!-- Stat-aware greeting + reflection question for this trading day. -->
+    <div id="modal-day-greeting" style="margin-top:18px;margin-bottom:18px;padding:14px 18px;background:var(--bg-elev);border-left:3px solid var(--text-mid);font-family:'Fraunces',serif;line-height:1.5;"></div>
     <div class="modal-stats" id="modal-stats"></div>
     <div id="modal-mfe"></div>
     <div class="modal-section-title"><span data-i18n="modal.trades_header">Trades</span> <span style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;font-family:'DM Mono',monospace;font-style:normal;font-weight:300;margin-left:12px;">— <span data-i18n="modal.click_row_edit_lower">click any row to edit or delete</span></span></div>
@@ -4829,6 +4833,8 @@
 
     const cs = data.currentSeries;
     document.getElementById('current-progress').textContent = cs.length + ' / 10';
+    // Refresh the contextual message under the dots whenever the series renders.
+    try { renderSeriesMessage(); } catch(e) {}
     const dotsWrap = document.getElementById('current-dots');
     dotsWrap.innerHTML = '';
     // Pre-compute translated W/L/BE labels — inside the loop below, `t` is the trade,
@@ -6173,6 +6179,23 @@
       <div class="modal-stat"><div class="label">${t('dmodal.costs')}</div><div class="v">${fmtMoney(costs, { noSign: true })}</div></div>
       <div class="modal-stat"><div class="label">${t('dmodal.total_rp')}</div><div class="v dual ${dayTotalRCls}"><span class="dual-primary">${dayTotalRStr}</span><span class="dual-secondary ${dayTotalPipsCls}">${dayTotalPipsStr}</span></div></div>
       <div class="modal-stat"><div class="label">${t('dmodal.pot_rp')}</div><div class="v dual ${dayPotRCls}"><span class="dual-primary">${dayPotRStr}</span><span class="dual-secondary ${dayPotPipsCls}">${dayPotPipsStr}</span></div></div>`;
+
+    // Stat-aware greeting + question for this day. Uses the existing REVIEW_GREETINGS.day / REVIEW_REFLECTIONS.day pools.
+    try {
+      const greetEl = document.getElementById('modal-day-greeting');
+      if (greetEl) {
+        const dayStats = {
+          totalTrades: dayTrades.length,
+          totalR: dayTotalR,
+          netR: dayTotalR,
+          wins, losses, bes,
+          net,
+        };
+        const greet = pickReviewGreeting('day', getName());
+        const reflection = pickReviewReflection('day', dayStats);
+        greetEl.innerHTML = `<div style="color:var(--text);font-size:13px;letter-spacing:0.02em;margin-bottom:6px;">${esc(greet)}</div><div style="color:var(--text-mid);font-style:italic;font-size:14px;">${esc(reflection)}</div>`;
+      }
+    } catch(e) {}
 
     // Removed: the separate Potential R block below (now folded into the stat row above).
     const mfeContainer = document.getElementById('modal-mfe');
@@ -8736,7 +8759,7 @@
     ],
     afternoon: [
       'Afternoon', 'Back at it', 'Still here, are we', 'Right, afternoon', 'Post-lunch lull',
-      'Hello again', 'The morning\'s optimism has departed', 'Mid-session check-in',
+      'Hello again', 'The morning\'s optimism has departed',
       'Round two', 'Afternoon. The fight continues', 'Resuming hostilities',
       'Eyes back on the chart, allegedly', 'Afternoon, then', 'Still going, fair enough'
     ],
@@ -8790,7 +8813,7 @@
     'yesterday: A+. Today: also A+, or no trade. Simple.',
     'one good day in the book. Don\'t spend it on a worse one.',
     'yesterday\'s win is yesterday\'s. It doesn\'t roll over, sorry.',
-    'the tape gave, you took. Polite. Take that politeness into today.',
+    'the market gave, you took. Polite. Take that politeness into today.',
     'patient eyes won yesterday. Patient eyes today, please.',
     'won yesterday. Dopamine\'s doing laps. Let it tire itself out.',
     'good read, good trigger, good size, good exit. Don\'t get used to all four.',
@@ -8884,7 +8907,7 @@
     'no edge yesterday, no trade taken. That\'s the discipline most miss.',
     'flat day, sharp eyes. The only acceptable combination.',
     'you didn\'t feed the market yesterday. Small victory. Take it.',
-    'BE in messy tape is a quiet win.',
+    'BE in messy conditions is a quiet win.',
     'yesterday offered nothing. You accepted nothing. Fair exchange.',
     'capital alive. That\'s genuinely enough, even if it doesn\'t feel like it.',
     'a flat day, well played. Dull by design.',
@@ -9009,6 +9032,52 @@
   // and returns either a question string or null (if its preconditions aren't met).
   // The picker only chooses from ones that returned a question.
   const PERFORMANCE_QUESTIONS = [
+    // === Previous trading day (high priority — morning anchor) ===
+    // "Yesterday" here means the most recent trading day within the last 7 days, not literally yesterday.
+    // Multiple winners, no losses
+    s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0)
+      ? `${s.yesterday.w} winners yesterday, no losses. Are you opening today calmer, or hungrier?`
+      : null,
+    s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0 && s.yesterday.totalR >= 3)
+      ? `+${s.yesterday.totalR.toFixed(1)}R yesterday. The harder question — was it process, or did the market gift you one?`
+      : null,
+    s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0 && s.yesterday.onlySide)
+      ? `${s.yesterday.w} wins yesterday, all ${s.yesterday.onlySide}. Worth checking if you skipped valid ${s.yesterday.onlySide === 'Long' ? 'Shorts' : 'Longs'}.`
+      : null,
+    // Single winner
+    s => (s.yesterday && s.yesterday.w === 1 && s.yesterday.l === 0 && s.yesterday.be === 0)
+      ? `One winner yesterday, clean read. Repeatable?`
+      : null,
+    // Losses only
+    s => (s.yesterday && s.yesterday.l >= 1 && s.yesterday.w === 0)
+      ? `Yesterday was red, ${s.yesterday.l === 1 ? 'one loss' : s.yesterday.l + ' losses'}. Do you know which decision did the damage?`
+      : null,
+    s => (s.yesterday && s.yesterday.l >= 2 && s.yesterday.w === 0)
+      ? `${s.yesterday.l} losses yesterday, no wins. Lower size today, or normal? Honest answer.`
+      : null,
+    s => (s.yesterday && s.yesterday.l >= 1 && s.yesterday.w === 0 && s.yesterday.totalR <= -2)
+      ? `${s.yesterday.totalR.toFixed(1)}R yesterday. Sit with this — was the loss in the setup, or the management?`
+      : null,
+    // Mixed day
+    s => (s.yesterday && s.yesterday.w > 0 && s.yesterday.l > 0)
+      ? `Yesterday: ${s.yesterday.w}W / ${s.yesterday.l}L. Net ${s.yesterday.totalR >= 0 ? '+' : ''}${s.yesterday.totalR.toFixed(1)}R. Which trade would you keep, which would you bin?`
+      : null,
+    // BE-heavy
+    s => (s.yesterday && s.yesterday.be >= 2 && s.yesterday.w === 0 && s.yesterday.l === 0)
+      ? `${s.yesterday.be} BEs yesterday, no decisions either way. Discipline or hesitation?`
+      : null,
+    s => (s.yesterday && s.yesterday.be >= 1 && s.yesterday.w === 0 && s.yesterday.l === 0 && s.yesterday.count === 1)
+      ? `One BE yesterday. Sometimes that's the right read. Sometimes it's flinching. Which was it?`
+      : null,
+    // Yesterday wasn't actually yesterday — gap of a few days
+    s => (s.yesterday && s.yesterday.daysAgo >= 3 && s.yesterday.daysAgo <= 7)
+      ? `Last trading day was ${s.yesterday.daysAgo} days ago. Did the gap clear your head, or rust your read?`
+      : null,
+    // Pure positive day, single trade
+    s => (s.yesterday && s.yesterday.count === 1 && s.yesterday.w === 1)
+      ? `One trade yesterday, green. Patience or under-trading? Both are possible.`
+      : null,
+
     // === Streak questions ===
     s => (s.curStreak >= 5 && s.streakKind === 'Win')
       ? `${s.curStreak} wins in a row. Fair play. Now sit down before the ego catches up.`
@@ -9041,7 +9110,7 @@
       ? `${s.curStreak} losses in a row. Mate, log off. Genuinely.`
       : null,
     s => (s.curStreak >= 3 && s.streakKind === 'BE')
-      ? `${s.curStreak} BEs in a row. Either the tape\'s chop, or you\'re managing too tight. Probably both, if I\'m honest.`
+      ? `${s.curStreak} BEs in a row. Either the market is choppy, or you\'re managing too tight. Probably both, if I\'m honest.`
       : null,
 
     // === Recent 10 win-rate ===
@@ -9052,7 +9121,7 @@
       ? `${s.recent10WR}% over 10. Lovely. Statistically it won\'t last. Just maths, mind.`
       : null,
     s => (s.recent10WR != null && s.recent10WR <= 30 && s.recent10Decided >= 6)
-      ? `${s.recent10WR}% over 10. Either the tape changed, or your filter loosened. Probably the second.`
+      ? `${s.recent10WR}% over 10. Either conditions changed, or your filter loosened. Probably the second.`
       : null,
     s => (s.recent10WR != null && s.recent10WR <= 20 && s.recent10Decided >= 6)
       ? `${s.recent10WR}% over 10. That\'s not a slump, mate. That\'s a flag.`
@@ -9097,7 +9166,7 @@
 
     // === Sample size milestones ===
     s => (s.totalTrades > 0 && s.totalTrades < 10)
-      ? `${s.totalTrades} trade${s.totalTrades === 1 ? '' : 's'} logged so far. What would 'one rule per week' actually look like?`
+      ? `${s.totalTrades} trade${s.totalTrades === 1 ? '' : 's'} in. Early days — what did yesterday teach you?`
       : null,
     s => (s.totalTrades >= 10 && s.totalTrades < 25)
       ? `${s.totalTrades} trades in. What pattern do you already see in your wins? Say it out loud.`
@@ -9313,6 +9382,42 @@
     const last30Be = last30.filter(t => t.result === 'BE').length;
     const last30BeRate = last30.length > 0 ? (last30Be / last30.length) * 100 : null;
 
+    // Most-recent trading day (skipping today) — for "yesterday was X" questions on the Bias tab.
+    // Walks backwards through trades, groups by toDateString(), takes the first day that isn't today
+    // AND is within the last 7 days. Mirrors getRecentDayOutcome() logic.
+    let yesterday = null;
+    const todayMidnight = new Date(); todayMidnight.setHours(0, 0, 0, 0);
+    const dayBuckets = {};
+    sorted.forEach(t => {
+      if (!t.date) return;
+      const k = new Date(t.date).toDateString();
+      if (!dayBuckets[k]) dayBuckets[k] = [];
+      dayBuckets[k].push(t);
+    });
+    const dayKeys = Object.keys(dayBuckets).sort((a, b) => new Date(b) - new Date(a));
+    for (const k of dayKeys) {
+      const d = new Date(k); d.setHours(0, 0, 0, 0);
+      const daysAgo = Math.round((todayMidnight - d) / (1000 * 60 * 60 * 24));
+      if (daysAgo <= 0) continue; // skip today
+      if (daysAgo > 7)  break;    // outside window
+      const trades = dayBuckets[k];
+      const w = trades.filter(t => t.result === 'Win').length;
+      const l = trades.filter(t => t.result === 'Lose').length;
+      const be = trades.filter(t => t.result === 'BE').length;
+      const totalR = trades.reduce((s, t) => {
+        if (t.result === 'Win')  return s + (parseFloat(t.r) || 0);
+        if (t.result === 'Lose') return s - 1;
+        return s;
+      }, 0);
+      // Dominant side (if any)
+      const longs = trades.filter(t => t.side === 'Long').length;
+      const shorts = trades.filter(t => t.side === 'Short').length;
+      const onlySide = (longs > 0 && shorts === 0) ? 'Long'
+                     : (shorts > 0 && longs === 0) ? 'Short' : null;
+      yesterday = { daysAgo, count: trades.length, w, l, be, totalR, onlySide };
+      break;
+    }
+
     return {
       totalTrades: sorted.length,
       recent10Decided, recent10WR, avgRLast10,
@@ -9324,13 +9429,52 @@
       last3W, last3L,
       lastResultWasLossAfterStreak, lastResultWasWinAfterStreak,
       daysSinceLastTrade,
-      trackedRWins, captureRPct
+      trackedRWins, captureRPct,
+      yesterday
     };
   }
 
   // Spanish PERFORMANCE_QUESTIONS — same structure (stat-aware lambda functions),
   // adapted phrasing for Castilian register. Gender-neutral throughout.
   const PERFORMANCE_QUESTIONS_ES = [
+    // === Día anterior (alta prioridad — anclaje matinal) ===
+    s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0)
+      ? `${s.yesterday.w} ganadoras ayer, sin pérdidas. ¿Abres hoy más tranquilo o más hambriento?`
+      : null,
+    s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0 && s.yesterday.totalR >= 3)
+      ? `+${s.yesterday.totalR.toFixed(1)}R ayer. La pregunta difícil — ¿fue proceso, o regalo del mercado?`
+      : null,
+    s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0 && s.yesterday.onlySide)
+      ? `${s.yesterday.w} ganadoras ayer, todas ${s.yesterday.onlySide === 'Long' ? 'Largas' : 'Cortas'}. Revisa si te saltaste alguna ${s.yesterday.onlySide === 'Long' ? 'Corta' : 'Larga'} válida.`
+      : null,
+    s => (s.yesterday && s.yesterday.w === 1 && s.yesterday.l === 0 && s.yesterday.be === 0)
+      ? `Una ganadora ayer, lectura limpia. ¿Repetible?`
+      : null,
+    s => (s.yesterday && s.yesterday.l >= 1 && s.yesterday.w === 0)
+      ? `Ayer fue rojo, ${s.yesterday.l === 1 ? 'una pérdida' : s.yesterday.l + ' pérdidas'}. ¿Sabes qué decisión hizo el daño?`
+      : null,
+    s => (s.yesterday && s.yesterday.l >= 2 && s.yesterday.w === 0)
+      ? `${s.yesterday.l} pérdidas ayer, sin ganadoras. ¿Tamaño menor hoy, o normal? Respuesta honesta.`
+      : null,
+    s => (s.yesterday && s.yesterday.l >= 1 && s.yesterday.w === 0 && s.yesterday.totalR <= -2)
+      ? `${s.yesterday.totalR.toFixed(1)}R ayer. Siéntate con esto — ¿el fallo estuvo en el setup o en la gestión?`
+      : null,
+    s => (s.yesterday && s.yesterday.w > 0 && s.yesterday.l > 0)
+      ? `Ayer: ${s.yesterday.w}G / ${s.yesterday.l}P. Neto ${s.yesterday.totalR >= 0 ? '+' : ''}${s.yesterday.totalR.toFixed(1)}R. ¿Cuál operación guardarías, cuál tirarías?`
+      : null,
+    s => (s.yesterday && s.yesterday.be >= 2 && s.yesterday.w === 0 && s.yesterday.l === 0)
+      ? `${s.yesterday.be} BEs ayer, sin decisiones claras. ¿Disciplina o duda?`
+      : null,
+    s => (s.yesterday && s.yesterday.be >= 1 && s.yesterday.w === 0 && s.yesterday.l === 0 && s.yesterday.count === 1)
+      ? `Un BE ayer. A veces es la lectura correcta. A veces es retirarse antes de tiempo. ¿Cuál fue?`
+      : null,
+    s => (s.yesterday && s.yesterday.daysAgo >= 3 && s.yesterday.daysAgo <= 7)
+      ? `Último día operado hace ${s.yesterday.daysAgo} días. ¿La pausa te despejó la mente, u oxidó la lectura?`
+      : null,
+    s => (s.yesterday && s.yesterday.count === 1 && s.yesterday.w === 1)
+      ? `Una operación ayer, verde. ¿Paciencia o sub-operar? Las dos son posibles.`
+      : null,
+
     s => (s.curStreak >= 5 && s.streakKind === 'Win')
       ? `${s.curStreak} ganadoras seguidas. Bien hecho. Ahora siéntate antes de que el ego te alcance.`
       : null,
@@ -9498,6 +9642,145 @@
       : null,
   ];
 
+  // ===========================================================================
+  // Series-of-10 contextual message — encouraging, math-aware feedback.
+  // Sits under the current-series tally on the Statistics tab.
+  // ===========================================================================
+  function renderSeriesMessage() {
+    const el = document.getElementById('current-series-message');
+    if (!el) return;
+    const cs = data.currentSeries || [];
+    const n = cs.length;
+    const lang = window.__lang === 'es' ? 'es' : 'en';
+
+    // --- Empty series ---
+    if (n === 0) {
+      el.style.display = 'block';
+      el.textContent = (lang === 'es')
+        ? 'Serie nueva. 10 operaciones por delante — cada una cuenta igual.'
+        : 'Fresh series. 10 trades ahead — each one weighs the same.';
+      return;
+    }
+
+    // --- Compute series stats ---
+    const wins   = cs.filter(t => t.result === 'Win').length;
+    const losses = cs.filter(t => t.result === 'Lose').length;
+    const bes    = cs.filter(t => t.result === 'BE').length;
+    const totalR = cs.reduce((sum, t) => {
+      if (t.result === 'Win')  return sum + (parseFloat(t.r) || 0);
+      if (t.result === 'Lose') return sum - 1;
+      return sum;
+    }, 0);
+    const winRs = cs.filter(t => t.result === 'Win').map(t => parseFloat(t.r) || 0).filter(r => r > 0);
+    const avgWinR = winRs.length > 0 ? winRs.reduce((a, b) => a + b, 0) / winRs.length : 0;
+    const remaining = 10 - n;
+
+    // How many more losses could the remaining trades take, and break-even still hold?
+    // Pessimistic floor: assume the rest are all losses (-1R each); is total still >= 0?
+    const floorR = totalR - remaining;
+    // Optimistic ceiling: assume rest are all wins at the running avgWinR
+    const ceilR = (avgWinR > 0) ? totalR + (remaining * avgWinR) : totalR;
+
+    // --- Series complete (10 trades) ---
+    if (n >= 10) {
+      el.style.display = 'block';
+      if (totalR >= 5) {
+        el.textContent = (lang === 'es')
+          ? `Serie cerrada en +${totalR.toFixed(2)}R. Una serie sólida — la pregunta no es si fue suerte, es qué hábito te la dio.`
+          : `Series closed +${totalR.toFixed(2)}R. A proper run — the question isn't whether it was luck, it's which habit gave it to you.`;
+      } else if (totalR > 0) {
+        el.textContent = (lang === 'es')
+          ? `Serie cerrada en +${totalR.toFixed(2)}R. Verde. Modesto, pero verde. Sigue así.`
+          : `Series closed +${totalR.toFixed(2)}R. Green. Modest, but green. Keep at it.`;
+      } else if (totalR < -3) {
+        el.textContent = (lang === 'es')
+          ? `Serie cerrada en ${totalR.toFixed(2)}R. Dura. Pero las series duras enseñan lo que las verdes no — ¿qué te llevas?`
+          : `Series closed ${totalR.toFixed(2)}R. Rough. But rough series teach what green ones don't — what's the takeaway?`;
+      } else {
+        el.textContent = (lang === 'es')
+          ? `Serie cerrada en ${totalR.toFixed(2)}R. Cerca del cero. El edge no se demuestra en 10 — necesita más datos.`
+          : `Series closed ${totalR.toFixed(2)}R. Hovering at zero. Edge isn't proven in 10 — needs more data.`;
+      }
+      return;
+    }
+
+    // --- Partial series (1–9 trades) ---
+    el.style.display = 'block';
+
+    // The math-based "you can still lose X" framing — the user's specific ask.
+    // Only triggered when there's at least one win logged, so we have an avgWinR to project from.
+    if (winRs.length > 0 && remaining > 0) {
+      // How many of the remaining could be losses (the rest wins at avgWinR) and total still >= 0?
+      // total + wins * avgWinR - losses = 0  →  losses_max ≈ total + (remaining - losses) * avgWinR
+      // Simpler: assume the rest split into x losses + (remaining - x) wins at avgWinR.
+      // Solve: totalR - x + (remaining - x) * avgWinR >= 0
+      //        → x <= (totalR + remaining * avgWinR) / (1 + avgWinR)
+      const lossesAffordable = Math.floor((totalR + remaining * avgWinR) / (1 + avgWinR));
+      const lossesCapped = Math.max(0, Math.min(remaining, lossesAffordable));
+
+      // Multiple narrative variants — pick by current trade count for stability through the day
+      const pickIdx = n % 4;
+
+      if (totalR > 0 && lossesCapped >= remaining) {
+        // Already so green that even all losses ahead would still keep break-even
+        el.textContent = (lang === 'es')
+          ? `+${totalR.toFixed(2)}R con ${n}/10. Avg ganadora ${avgWinR.toFixed(2)}R. Incluso si las ${remaining} restantes fueran pérdidas, cerrarías en positivo. La serie ya está asegurada.`
+          : `+${totalR.toFixed(2)}R at ${n}/10. Avg win ${avgWinR.toFixed(2)}R. Even if the remaining ${remaining} were all losses, you'd still close green. Series is locked in.`;
+      } else if (totalR > 0 && lossesCapped > 0) {
+        // Standard "you can afford X losses" message
+        const lines = (lang === 'es') ? [
+          `+${totalR.toFixed(2)}R con ${n}/10. Con avg ganadora ${avgWinR.toFixed(2)}R, puedes perder ${lossesCapped} de las ${remaining} restantes y seguir en positivo.`,
+          `${n} operaciones, ${wins}G/${losses}P/${bes}BE, +${totalR.toFixed(2)}R. Margen: ${lossesCapped} pérdidas más permitidas. Sigue ejecutando tu plan.`,
+          `Vas +${totalR.toFixed(2)}R. Aunque pierdas ${lossesCapped} de las próximas ${remaining}, cierras la serie verde. Eso es lo que hace el edge.`,
+          `+${totalR.toFixed(2)}R con avg ${avgWinR.toFixed(2)}R por ganadora. Te quedan ${remaining} operaciones y un colchón de ${lossesCapped} pérdidas. No fuerces.`
+        ] : [
+          `+${totalR.toFixed(2)}R at ${n}/10. With avg win ${avgWinR.toFixed(2)}R, you could lose ${lossesCapped} of the next ${remaining} and still close green.`,
+          `${n} trades in, ${wins}W/${losses}L/${bes}BE, +${totalR.toFixed(2)}R. Headroom: ${lossesCapped} more losses tolerable. Keep executing the plan.`,
+          `You're +${totalR.toFixed(2)}R. Even if you lose ${lossesCapped} of the next ${remaining}, you finish the series green. That's what edge looks like.`,
+          `+${totalR.toFixed(2)}R, avg ${avgWinR.toFixed(2)}R per win. ${remaining} trades left, with a ${lossesCapped}-loss cushion. Don't force.`
+        ];
+        el.textContent = lines[pickIdx];
+      } else if (totalR > 0 && lossesCapped === 0) {
+        // Green but tight — one more loss and you're underwater
+        el.textContent = (lang === 'es')
+          ? `+${totalR.toFixed(2)}R, pero margen mínimo. Necesitas ganadoras en las ${remaining} restantes para cerrar verde. Selectividad ahora, no cantidad.`
+          : `+${totalR.toFixed(2)}R, but margin's thin. You need wins on the remaining ${remaining} to close green. Selectivity now, not volume.`;
+      } else if (totalR < 0) {
+        // In the red — what do we need to recover?
+        const winsNeeded = avgWinR > 0 ? Math.ceil(-totalR / avgWinR) : null;
+        if (winsNeeded != null && winsNeeded <= remaining) {
+          el.textContent = (lang === 'es')
+            ? `${totalR.toFixed(2)}R con ${n}/10. Con tu avg ganadora de ${avgWinR.toFixed(2)}R, necesitas ${winsNeeded} ganadora${winsNeeded === 1 ? '' : 's'} de las ${remaining} restantes para volver a positivo. Aún es posible.`
+            : `${totalR.toFixed(2)}R at ${n}/10. With your avg win of ${avgWinR.toFixed(2)}R, you need ${winsNeeded} win${winsNeeded === 1 ? '' : 's'} from the remaining ${remaining} to get back to green. Still possible.`;
+        } else if (winsNeeded != null) {
+          el.textContent = (lang === 'es')
+            ? `${totalR.toFixed(2)}R con ${n}/10. Cerrar verde es matemáticamente difícil ahora. La meta cambia: no forzar la recuperación, terminar limpio.`
+            : `${totalR.toFixed(2)}R at ${n}/10. Closing green is mathematically tough now. The goal shifts: don't force the comeback, finish clean.`;
+        } else {
+          el.textContent = (lang === 'es')
+            ? `${totalR.toFixed(2)}R con ${n}/10 y sin ganadoras todavía. Ajusta los criterios de entrada, no el tamaño.`
+            : `${totalR.toFixed(2)}R at ${n}/10 with no wins yet. Tighten entry criteria, not size.`;
+        }
+      } else {
+        // Exactly 0R — flat
+        el.textContent = (lang === 'es')
+          ? `${n} operaciones, exactamente en cero. Quedan ${remaining}. Una ganadora cambia el tono completo.`
+          : `${n} trades in, dead flat. ${remaining} to go. One win shifts the whole tone.`;
+      }
+    } else {
+      // No wins logged yet — different framing
+      if (losses + bes === n && n < 5) {
+        el.textContent = (lang === 'es')
+          ? `${n}/10 sin ganadoras todavía. Pronto en la serie — el resultado de 10 importa más que el de 3.`
+          : `${n}/10 with no wins yet. Early in the series — what 10 looks like matters more than what 3 looks like.`;
+      } else if (losses + bes === n && n >= 5) {
+        el.textContent = (lang === 'es')
+          ? `${n} operaciones, ${losses} pérdidas, ${bes} BE, ninguna ganadora. ¿Es el mercado, o tus filtros?`
+          : `${n} trades in, ${losses} losses, ${bes} BEs, no wins. Is it the market, or your filter?`;
+      }
+    }
+  }
+
   function pickPerformanceQuestion() {
     const s = getRecentSnapshot();
     if (!s) return null;
@@ -9522,13 +9805,13 @@
       "Day in. Let's grade it",
       "Pencils down",
       "Closing bell rung",
-      "End of tape. Let's read it together",
+      "End of session. Let's read it together",
       "Right then — session over",
       "Day filed. Audit time",
       "Trading day's done. Reflection follows",
       "Eyes here. Let's look at today",
       "The candles have settled. So should we",
-      "Day's tape, signed and dated",
+      "Day's record, signed and dated",
       "Closed out. Honest review",
       "Day done. Let's be honest",
       "Session over. No spin",
@@ -9553,7 +9836,7 @@
       "Week wrapped. Honest look incoming",
       "Friday's reckoning",
       "Week filed. Let's grade it",
-      "Five sessions of tape. Sit with it",
+      "Five sessions of data. Sit with it",
       "Weekend approaches. Read it first",
       "Trading week's over. Process time",
       "The week's in. So are you",
@@ -9565,7 +9848,7 @@
       "Week complete. Spin will not help",
       "Five days, end to end. Have a look",
       "Trading week filed. Now the lessons",
-      "Week's tape, signed and sealed",
+      "Week's record, signed and sealed",
       "Right, weekend's earned. Audit first",
       "Five sessions of you, here for review",
       "Week closed. Honest version, please",
@@ -9576,7 +9859,7 @@
     month: [
       "Right, month's done",
       "Calendar flip. Audit time",
-      "Month's tape, end to end",
+      "Month's record, end to end",
       "Thirty-ish sessions, all yours to review",
       "Step back. The month is in",
       "Big-picture time",
@@ -9675,7 +9958,7 @@
       "what part of your morning prep paid off?",
       "what didn't you do this week that you should have?",
       "if a mentor reviewed this week, what would they point to first?",
-      "what surprised you about the tape this week?",
+      "what surprised you about the market this week?",
       "what's the smallest change you could make for next week that compounds?",
       "what trade do you most want to forget? most want to repeat?",
       "what's the trade idea you brought into Monday and never deployed?",
@@ -9823,7 +10106,7 @@
       if (s.bes >= 2 && s.wins === 0 && s.losses === 0)
         candidates.push(`${s.bes} BEs and nothing decisive. Was the chart noisy, or were you?`);
       if (s.wins >= 3 && s.losses === 0)
-        candidates.push(`${s.wins} wins, no losses. Fair play. Clean read, or kind tape? You should know which.`);
+        candidates.push(`${s.wins} wins, no losses. Fair play. Clean read, or kind market? You should know which.`);
       if (s.wins >= 4)
         candidates.push(`${s.wins} winners today. The dog\'s bollocks. Which one would you happily take again at half-size?`);
       if (s.wins >= 1 && s.losses >= 1 && s.totalR > 0 && s.totalR >= 2)
@@ -9857,7 +10140,7 @@
       if (s.wins >= 5 && s.losses === 0)
         candidates.push(`${s.wins} wins, zero losses. Fair play. A pattern, or about to find out it isn't?`);
       if (s.losses >= 5 && s.wins <= 1)
-        candidates.push(`${s.losses} losses, barely a win. Has the tape changed, or has your filter quietly loosened?`);
+        candidates.push(`${s.losses} losses, barely a win. Have conditions changed, or has your filter quietly loosened?`);
       if (s.totalR >= 8)
         candidates.push(`+${s.totalR.toFixed(1)}R on the week. Cracking. What conditions made it easy — and are they likely to repeat?`);
       if (s.totalR <= -5)
