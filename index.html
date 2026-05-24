@@ -938,7 +938,7 @@
     <div id="skip-nudge-banner" style="display:none;margin-bottom:32px;padding:16px 20px;background:var(--bg-elev);border:1px solid var(--info);">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
         <div style="flex:1;font-size:13px;line-height:1.6;color:var(--text-mid);" id="skip-nudge-text">…</div>
-        <button type="button" id="skip-nudge-dismiss" style="background:transparent;border:1px solid var(--border-2);color:var(--text-dim);cursor:pointer;padding:4px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;flex-shrink:0;">Dismiss</button>
+        <button type="button" id="skip-nudge-dismiss" data-i18n="btn.dismiss" style="background:transparent;border:1px solid var(--border-2);color:var(--text-dim);cursor:pointer;padding:4px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;flex-shrink:0;">Dismiss</button>
       </div>
     </div>
     <div id="bias-greeting" class="bias-greeting"></div>
@@ -1052,6 +1052,11 @@
           <div class="trade-header-cell" data-i18n="tlog.col.gross">Gross £</div>
           <div class="trade-header-cell" data-i18n="tlog.col.net">Net £</div>
           <div class="trade-header-cell"></div>
+        </div>
+        <!-- Completion reminder banner: fires when MT5-imported trades still need manual fields. -->
+        <div id="mt5-completion-banner" style="display:none;margin-bottom:14px;padding:12px 16px;background:var(--bg-elev);border-left:3px solid var(--info);font-family:'Fraunces',serif;font-size:13px;color:var(--text-mid);line-height:1.5;">
+          <strong style="color:var(--text);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;font-style:normal;display:block;margin-bottom:4px;" data-i18n="mt5_banner.label">Finish logging your imports</strong>
+          <span id="mt5-completion-banner-body" data-i18n-html="mt5_banner.body">Your imported trades still need <em>Pot R / Pips</em> and <em>Type</em>. Click the cells in each row to fill them in — the banner will disappear once everything's logged.</span>
         </div>
         <div id="trade-rows"></div>
         <button class="add-trade" id="add-trade" data-i18n="btn.add_trade">+ Add Trade</button>
@@ -1208,7 +1213,7 @@
 
     <div class="stats-summary stats-summary-3col">
       <div class="stat-cell" id="stat-pnl-cell">
-        <div class="stat-tooltip">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap. Shared with the Statistics tab.</div>
+        <div class="stat-tooltip" data-i18n="tip.pnl_series">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap. Shared with the Statistics tab.</div>
         <div class="stat-label">
           <span class="pnl-toggle">
             <span class="pnl-toggle-opt" data-mode="net" data-i18n="kpi.net_pnl">Net P&L</span>
@@ -1218,8 +1223,8 @@
         </div>
         <div class="stat-value" id="stat-pnl" data-currency-symbol="{C}0">£0</div>
       </div>
-      <div class="stat-cell"><div class="stat-tooltip" id="stat-total-tip">Net R and Net Pips across your current series of 10.</div><div class="stat-label" id="stat-total-label" data-i18n="kpi.total_rp">Total R · Pips</div><div class="stat-value dual" id="stat-total">0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="stat-rleft-tip">R and Pips left on the table across wins in your current series. Potential minus actual captured.</div><div class="stat-label" id="stat-rleft-label" data-i18n="kpi.potential_rp">Potential R · Pips</div><div class="stat-value dual" id="stat-rleft">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="stat-total-tip" data-i18n="tip.total_rp_series">Net R and Net Pips across your current series of 10.</div><div class="stat-label" id="stat-total-label" data-i18n="kpi.total_rp">Total R · Pips</div><div class="stat-value dual" id="stat-total">0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="stat-rleft-tip" data-i18n="tip.potential_rp_series">R and Pips left on the table across wins in your current series. Potential minus actual captured.</div><div class="stat-label" id="stat-rleft-label" data-i18n="kpi.potential_rp">Potential R · Pips</div><div class="stat-value dual" id="stat-rleft">—</div></div>
     </div>
 
     <div class="current-series">
@@ -1228,7 +1233,7 @@
         <div class="current-series-progress" id="current-progress">0 / 10</div>
       </div>
       <div class="series-dots" id="current-dots"></div>
-      <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-top:8px;" id="current-tally">No trades logged yet</div>
+      <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-top:8px;" id="current-tally" data-i18n="series.no_trades_yet">No trades logged yet</div>
       <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;font-style:italic;" data-i18n="modal.click_dot_edit">CLICK ANY TRADE DOT TO EDIT OR DELETE</div>
     </div>
 
@@ -1253,9 +1258,9 @@
     </div>
 
     <div class="stats-summary stats-summary-4col" style="margin-top:24px;">
-      <div class="stat-cell"><div class="stat-tooltip">Your current account balance: Starting Balance (set above) plus Net P&L.</div><div class="stat-label" data-i18n="kpi.account_balance">Account Balance</div><div class="stat-value medium" id="kpi-balance" data-currency-symbol="{C}0">£0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" data-i18n="tip.account_balance">Your current account balance: Starting Balance (set above) plus Net P&L.</div><div class="stat-label" data-i18n="kpi.account_balance">Account Balance</div><div class="stat-value medium" id="kpi-balance" data-currency-symbol="{C}0">£0</div></div>
       <div class="stat-cell" id="kpi-pnl-cell">
-        <div class="stat-tooltip">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap.</div>
+        <div class="stat-tooltip" data-i18n="tip.pnl_lifetime">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap.</div>
         <div class="stat-label">
           <span class="pnl-toggle">
             <span class="pnl-toggle-opt" data-mode="net" data-i18n="kpi.net_pnl">Net P&L</span>
@@ -1265,12 +1270,12 @@
         </div>
         <div class="stat-value" id="kpi-pnl" data-currency-symbol="{C}0">£0</div>
       </div>
-      <div class="stat-cell"><div class="stat-tooltip">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label" data-i18n="kpi.total_costs">Total Costs</div><div class="stat-value medium" id="kpi-costs" data-currency-symbol="{C}0">£0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Wins ÷ (Wins + Losses) across every trade ever logged. BEs excluded.</div><div class="stat-label" data-i18n="kpi.win_rate">Win Rate</div><div class="stat-value" id="kpi-winrate">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="kpi-totalr-tip">Net R and Net Pips across every trade ever logged.</div><div class="stat-label" id="kpi-totalr-label">Total R · Pips</div><div class="stat-value dual" id="kpi-totalr">0</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="kpi-rleft-tip">R and Pips left on the table across all winning trades ever logged. Potential minus actual captured.</div><div class="stat-label" id="kpi-rleft-label" data-i18n="kpi.potential_rp">Potential R · Pips</div><div class="stat-value dual" id="kpi-rleft">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip" id="kpi-exp-tip">Average R and average Pips per trade.</div><div class="stat-label" id="kpi-exp-label" data-i18n="kpi.expectancy">Expectancy</div><div class="stat-value dual" id="kpi-exp">—</div></div>
-      <div class="stat-cell"><div class="stat-tooltip">Total winning R ÷ total losing R across all trades. Above 1.5 = solid edge.</div><div class="stat-label" data-i18n="kpi.profit_factor">Profit Factor</div><div class="stat-value" id="kpi-pf">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" data-i18n="tip.total_costs">Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.</div><div class="stat-label" data-i18n="kpi.total_costs">Total Costs</div><div class="stat-value medium" id="kpi-costs" data-currency-symbol="{C}0">£0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" data-i18n="tip.win_rate">Wins ÷ (Wins + Losses) across every trade ever logged. BEs excluded.</div><div class="stat-label" data-i18n="kpi.win_rate">Win Rate</div><div class="stat-value" id="kpi-winrate">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="kpi-totalr-tip" data-i18n="tip.total_rp_lifetime">Net R and Net Pips across every trade ever logged.</div><div class="stat-label" id="kpi-totalr-label">Total R · Pips</div><div class="stat-value dual" id="kpi-totalr">0</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="kpi-rleft-tip" data-i18n="tip.potential_rp_lifetime">R and Pips left on the table across all winning trades ever logged. Potential minus actual captured.</div><div class="stat-label" id="kpi-rleft-label" data-i18n="kpi.potential_rp">Potential R · Pips</div><div class="stat-value dual" id="kpi-rleft">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" id="kpi-exp-tip" data-i18n="tip.expectancy">Average R and average Pips per trade.</div><div class="stat-label" id="kpi-exp-label" data-i18n="kpi.expectancy">Expectancy</div><div class="stat-value dual" id="kpi-exp">—</div></div>
+      <div class="stat-cell"><div class="stat-tooltip" data-i18n="tip.profit_factor">Total winning R ÷ total losing R across all trades. Above 1.5 = solid edge.</div><div class="stat-label" data-i18n="kpi.profit_factor">Profit Factor</div><div class="stat-value" id="kpi-pf">—</div></div>
     </div>
 
     <div class="chart-card">
@@ -1288,19 +1293,19 @@
       <p class="section-hint" data-i18n="hint.wins_vs_losses">Side-by-side comparison of your winning and losing trades.</p>
       <div class="wl-summary">
         <div class="wl-cell win">
-          <div class="stat-tooltip">Total number of winning trades, total R captured, and average R per win. Higher avg R = bigger winners on average.</div>
+          <div class="stat-tooltip" data-i18n="tip.wins_breakdown">Total number of winning trades, total R captured, and average R per win. Higher avg R = bigger winners on average.</div>
           <div class="label" data-i18n="kpi.wins">Wins</div>
           <div class="big" id="wl-win-count">0</div>
           <div class="detail" id="wl-win-detail">—</div>
         </div>
         <div class="wl-cell loss">
-          <div class="stat-tooltip">Total number of losing trades. Each loss counts as -1R by default. If your imported actual losses were bigger than 1R (slippage), they show as higher R in the average.</div>
+          <div class="stat-tooltip" data-i18n="tip.losses_breakdown">Total number of losing trades. Each loss counts as -1R by default. If your imported actual losses were bigger than 1R (slippage), they show as higher R in the average.</div>
           <div class="label" data-i18n="kpi.losses">Losses</div>
           <div class="big" id="wl-loss-count">0</div>
           <div class="detail" id="wl-loss-detail">—</div>
         </div>
         <div class="wl-cell be">
-          <div class="stat-tooltip">Trades that closed at or near entry, often with SL moved to BE. They contribute 0R to stats but may carry small £ costs (commission + spread).</div>
+          <div class="stat-tooltip" data-i18n="tip.bes_breakdown">Trades that closed at or near entry, often with SL moved to BE. They contribute 0R to stats but may carry small £ costs (commission + spread).</div>
           <div class="label" data-i18n="kpi.bes">Break-evens</div>
           <div class="big" id="wl-be-count">0</div>
           <div class="detail" id="wl-be-detail">—</div>
@@ -1312,7 +1317,7 @@
       <div class="section-header"><span class="section-num">—</span><span class="section-title" data-i18n="stats.s3.title">Max Consecutive Streaks</span></div>
       <p class="section-hint" data-i18n="hint.max_streaks">Longest runs across all history. Critical for position sizing.</p>
       <div class="stats-summary" style="margin-top:0;grid-template-columns:repeat(3, 1fr);">
-        <div class="stat-cell"><div class="stat-tooltip">Longest unbroken run of winning trades. Critical for confidence — and for understanding what you can ride.</div><div class="stat-label" data-i18n="kpi.max_win_streak">Max Win Streak</div><div class="stat-value good" id="stat-max-wins">0</div></div>
+        <div class="stat-cell"><div class="stat-tooltip" data-i18n="tip.max_win_streak">Longest unbroken run of winning trades. Critical for confidence — and for understanding what you can ride.</div><div class="stat-label" data-i18n="kpi.max_win_streak">Max Win Streak</div><div class="stat-value good" id="stat-max-wins">0</div></div>
         <div class="stat-cell"><div class="stat-tooltip">Longest unbroken run of losses. The worst stretch you've survived. Position-size for at least this many in a row.</div><div class="stat-label" data-i18n="kpi.max_loss_streak">Max Loss Streak</div><div class="stat-value bad" id="stat-max-losses">0</div></div>
         <div class="stat-cell"><div class="stat-tooltip">Longest run of break-even trades in a row. High values can mean you're consistently moving to BE too early.</div><div class="stat-label" data-i18n="kpi.max_be_streak">Max BE Streak</div><div class="stat-value be" id="stat-max-bes">0</div></div>
       </div>
@@ -1549,7 +1554,7 @@
     <div class="modal-header">
       <div>
         <h2 data-i18n="mt5.title">Import from MT5</h2>
-        <p style="margin:6px 0 0;color:var(--text-mid);font-size:13px;">Upload your MT5 Trade History Report (HTML format). Trades auto-fill into the Review tab.</p>
+        <p style="margin:6px 0 0;color:var(--text-mid);font-size:13px;" data-i18n="mt5.subtitle">Upload your MT5 Trade History Report (HTML format). Trades auto-fill into the Review tab.</p>
       </div>
       <button class="modal-close" id="mt5-modal-close" aria-label="Close">×</button>
     </div>
@@ -1558,14 +1563,14 @@
       <!-- Step 1: file drop / picker -->
       <div id="mt5-step-pick">
         <div id="mt5-drop-zone" style="border:2px dashed var(--border-2);padding:48px 24px;text-align:center;cursor:pointer;transition:all 200ms;">
-          <div style="font-family:'Fraunces',serif;font-size:18px;color:var(--text);margin-bottom:8px;">Drop your MT5 report here</div>
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:20px;">.html exported from MT5 Terminal → History → Report → "Open in Web"</div>
-          <button type="button" id="mt5-pick-btn" style="background:transparent;border:1px solid var(--text);color:var(--text);padding:10px 24px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;">Choose File</button>
+          <div style="font-family:'Fraunces',serif;font-size:18px;color:var(--text);margin-bottom:8px;" data-i18n="mt5.drop_label">Drop your MT5 report here</div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:20px;" data-i18n="mt5.drop_hint">.html exported from MT5 Terminal → History → Report → "Open in Web"</div>
+          <button type="button" id="mt5-pick-btn" data-i18n="mt5.choose_file" style="background:transparent;border:1px solid var(--text);color:var(--text);padding:10px 24px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;">Choose File</button>
           <input type="file" id="mt5-file-input" accept=".html,.htm,.csv" style="display:none;" />
         </div>
         <div id="mt5-pick-error" style="margin-top:16px;padding:12px 16px;background:var(--bad-bg2);border:1px solid var(--bad);color:var(--bad);font-family:'DM Mono',monospace;font-size:12px;display:none;"></div>
         <div style="margin-top:24px;font-size:12px;color:var(--text-dim);line-height:1.7;font-style:italic;font-family:'Fraunces',serif;">
-          <strong style="color:var(--text-mid);font-style:normal;">How to export from MT5:</strong> In MT5 desktop, open the <em>Toolbox</em> → <em>History</em> tab. Right-click the table → choose your timeframe (e.g. "Custom Period") → right-click again → <em>Report</em> → <em>Open in Web</em>. Save the resulting <code style="background:var(--bg-elev);padding:1px 6px;font-family:'DM Mono',monospace;font-style:normal;">.html</code> file and drop it here.
+          <strong style="color:var(--text-mid);font-style:normal;" data-i18n="mt5.how_to_export">How to export from MT5:</strong> <span data-i18n-html="mt5.how_to_export_body">In MT5 desktop, open the <em>Toolbox</em> → <em>History</em> tab. Right-click the table → choose your timeframe (e.g. "Custom Period") → right-click again → <em>Report</em> → <em>Open in Web</em>. Save the resulting <code style="background:var(--bg-elev);padding:1px 6px;font-family:'DM Mono',monospace;font-style:normal;">.html</code> file and drop it here.</span>
         </div>
       </div>
 
@@ -1573,10 +1578,10 @@
       <div id="mt5-step-preview" style="display:none;">
         <div id="mt5-preview-meta" style="margin-bottom:20px;padding:14px 18px;background:var(--bg-elev);border:1px solid var(--border-2);font-family:'DM Mono',monospace;font-size:12px;color:var(--text-mid);"></div>
         <div style="margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-          <span style="font-size:10px;color:var(--text-dim);letter-spacing:0.25em;text-transform:uppercase;">Filter by date</span>
+          <span style="font-size:10px;color:var(--text-dim);letter-spacing:0.25em;text-transform:uppercase;" data-i18n="mt5.filter_by_date">Filter by date</span>
           <select id="mt5-date-filter" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text);padding:7px 12px;font-family:'DM Mono',monospace;font-size:13px;outline:none;"></select>
-          <button type="button" id="mt5-quick-today" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Today</button>
-          <button type="button" id="mt5-quick-latest" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Most Recent</button>
+          <button type="button" id="mt5-quick-today" data-i18n="btn.today" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Today</button>
+          <button type="button" id="mt5-quick-latest" data-i18n="mt5.most_recent" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Most Recent</button>
           <span style="font-size:10px;color:var(--text-dim);letter-spacing:0.1em;font-style:italic;font-family:'Fraunces',serif;margin-left:auto;" id="mt5-preview-summary"></span>
         </div>
         <div id="mt5-preview-list" style="border:1px solid var(--border-2);max-height:380px;overflow-y:auto;"></div>
@@ -1841,6 +1846,35 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      "tip.pnl_series": "Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap. Shared with the Statistics tab.",
+      "tip.total_rp_series": "Net R and Net Pips across your current series of 10.",
+      "tip.potential_rp_series": "R and Pips left on the table across wins in your current series. Potential minus actual captured.",
+      "tip.account_balance": "Your current account balance: Starting Balance (set above) plus Net P&L.",
+      "tip.pnl_lifetime": "Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap.",
+      "tip.total_costs": "Total commissions and spread paid across all trades. Gross P&L minus Total Costs equals Net P&L.",
+      "tip.win_rate": "Wins \u00f7 (Wins + Losses) across every trade ever logged. BEs excluded.",
+      "tip.total_rp_lifetime": "Net R and Net Pips across every trade ever logged.",
+      "tip.potential_rp_lifetime": "R and Pips left on the table across all winning trades ever logged. Potential minus actual captured.",
+      "tip.expectancy": "Average R and average Pips per trade.",
+      "tip.profit_factor": "Total winning R \u00f7 total losing R across all trades. Above 1.5 = solid edge.",
+      "tip.wins_breakdown": "Total number of winning trades, total R captured, and average R per win. Higher avg R = bigger winners on average.",
+      "tip.losses_breakdown": "Total number of losing trades. Each loss counts as -1R by default. If your imported actual losses were bigger than 1R (slippage), they show as higher R in the average.",
+      "tip.bes_breakdown": "Trades that closed at or near entry, often with SL moved to BE. They contribute 0R to stats but may carry small \u00a3 costs (commission + spread).",
+      "tip.max_win_streak": "Longest unbroken run of winning trades. Critical for confidence \u2014 and for understanding what you can ride.",
+      "series.no_trades_yet": "No trades logged yet",
+      "btn.dismiss": "Dismiss",
+      "mt5.subtitle": "Upload your MT5 Trade History Report (HTML format). Trades auto-fill into the Review tab.",
+      "mt5.drop_label": "Drop your MT5 report here",
+      "mt5.drop_hint": ".html exported from MT5 Terminal \u2192 History \u2192 Report \u2192 \"Open in Web\"",
+      "mt5.choose_file": "Choose File",
+      "mt5.filter_by_date": "Filter by date",
+      "mt5.most_recent": "Most Recent",
+      "mt5_banner.label": "Finish logging your imports",
+      "mt5_banner.body": "Your imported trades still need <em>Pot R / Pips</em> and <em>Type</em>. Click the cells in each row to fill them in \u2014 the banner will disappear once everything's logged.",
+      "mt5.how_to_export": "How to export from MT5:",
+      "mt5.how_to_export_body": "In MT5 desktop, open the <em>Toolbox</em> \u2192 <em>History</em> tab. Right-click the table \u2192 choose your timeframe (e.g. \"Custom Period\") \u2192 right-click again \u2192 <em>Report</em> \u2192 <em>Open in Web</em>. Save the resulting <code style=\"background:var(--bg-elev);padding:1px 6px;font-family:'DM Mono',monospace;font-style:normal;\">.html</code> file and drop it here.",
+      "mt5.what_to_fill_label": "Still yours to fill in",
+      "mt5.what_to_fill_body": "Import handles result, R, side, times, costs and risk. You'll still need to add <em>Pot R / Pot Pips</em> (where price could've gone if you'd held), <em>Trade Type</em> (Reaction vs Continuation), and any <em>Concept Tags</em> per trade \u2014 the report doesn't know those things.",
       "review.this_afternoon_bias": "This Afternoon's Bias",
       "review.this_evening_bias": "This Evening's Bias",
       "review.todays_bias": "Today's Bias",
@@ -2403,6 +2437,35 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      "tip.pnl_series": "Net P&L = beneficio despu\u00e9s de costes. Gross P&L = beneficio antes de costes. Haz clic en el selector para cambiar. Compartido con la pesta\u00f1a Estad\u00edsticas.",
+      "tip.total_rp_series": "R Neto y Pips Netos en tu serie actual de 10.",
+      "tip.potential_rp_series": "R y Pips dejados sobre la mesa en las ganadoras de tu serie actual. Potencial menos lo capturado.",
+      "tip.account_balance": "Tu saldo actual: Saldo Inicial (configurado arriba) m\u00e1s Net P&L.",
+      "tip.pnl_lifetime": "Net P&L = beneficio despu\u00e9s de costes. Gross P&L = beneficio antes de costes. Haz clic en el selector para cambiar.",
+      "tip.total_costs": "Comisiones y spread totales pagados en todas las operaciones. Gross P&L menos Costes Totales equivale a Net P&L.",
+      "tip.win_rate": "Ganadoras \u00f7 (Ganadoras + P\u00e9rdidas) en todas las operaciones registradas. BEs excluidos.",
+      "tip.total_rp_lifetime": "R Neto y Pips Netos en todas las operaciones registradas.",
+      "tip.potential_rp_lifetime": "R y Pips dejados sobre la mesa en todas las ganadoras registradas. Potencial menos lo capturado.",
+      "tip.expectancy": "R promedio y Pips promedio por operaci\u00f3n.",
+      "tip.profit_factor": "R ganador total \u00f7 R perdedor total en todas las operaciones. Por encima de 1.5 = edge s\u00f3lido.",
+      "tip.wins_breakdown": "Total de operaciones ganadoras, R total capturado, y R promedio por ganadora. R promedio m\u00e1s alto = ganadoras m\u00e1s grandes en promedio.",
+      "tip.losses_breakdown": "Total de operaciones perdedoras. Cada p\u00e9rdida cuenta como -1R por defecto. Si tus p\u00e9rdidas reales importadas fueron mayores que 1R (slippage), se muestran como R m\u00e1s alto en el promedio.",
+      "tip.bes_breakdown": "Operaciones cerradas en o cerca de la entrada, a menudo con SL movido a BE. Contribuyen 0R a las estad\u00edsticas pero pueden tener peque\u00f1os costes (comisi\u00f3n + spread).",
+      "tip.max_win_streak": "Racha ininterrumpida m\u00e1s larga de ganadoras. Cr\u00edtica para la confianza \u2014 y para entender qu\u00e9 puedes aguantar.",
+      "series.no_trades_yet": "Sin operaciones registradas todav\u00eda",
+      "btn.dismiss": "Descartar",
+      "mt5.subtitle": "Sube tu Informe de Historial de Operaciones de MT5 (formato HTML). Las operaciones se rellenan en la pesta\u00f1a Revisi\u00f3n.",
+      "mt5.drop_label": "Arrastra tu informe MT5 aqu\u00ed",
+      "mt5.drop_hint": ".html exportado desde MT5 Terminal \u2192 Historial \u2192 Informe \u2192 \"Abrir en Web\"",
+      "mt5.choose_file": "Elegir Archivo",
+      "mt5.filter_by_date": "Filtrar por fecha",
+      "mt5.most_recent": "M\u00e1s Recientes",
+      "mt5_banner.label": "Termina de registrar tus importaciones",
+      "mt5_banner.body": "Tus operaciones importadas a\u00fan necesitan <em>R Pot / Pips</em> y <em>Tipo</em>. Haz clic en las celdas de cada fila para rellenarlos \u2014 el aviso desaparecer\u00e1 cuando est\u00e9 todo registrado.",
+      "mt5.how_to_export": "C\u00f3mo exportar desde MT5:",
+      "mt5.how_to_export_body": "En MT5 escritorio, abre la pesta\u00f1a <em>Caja de herramientas</em> \u2192 <em>Historial</em>. Clic derecho en la tabla \u2192 elige el per\u00edodo (ej. \"Per\u00edodo personalizado\") \u2192 clic derecho otra vez \u2192 <em>Informe</em> \u2192 <em>Abrir en Web</em>. Guarda el archivo <code style=\"background:var(--bg-elev);padding:1px 6px;font-family:'DM Mono',monospace;font-style:normal;\">.html</code> resultante y arr\u00e1stralo aqu\u00ed.",
+      "mt5.what_to_fill_label": "A\u00fan por rellenar",
+      "mt5.what_to_fill_body": "La importaci\u00f3n maneja resultado, R, lado, horas, costes y riesgo. A\u00fan tendr\u00e1s que a\u00f1adir <em>R Pot / Pips Pot</em> (hasta d\u00f3nde podr\u00eda haber llegado el precio), <em>Tipo de operaci\u00f3n</em> (Reacci\u00f3n vs Continuaci\u00f3n), y las <em>Etiquetas de concepto</em> por operaci\u00f3n \u2014 el informe no sabe esas cosas.",
       "review.this_afternoon_bias": "El Sesgo de Esta Tarde",
       "review.this_evening_bias": "El Sesgo de Esta Noche",
       "review.todays_bias": "El Sesgo de Hoy",
@@ -4385,6 +4448,7 @@
       row.querySelector('.trade-remove').addEventListener('click', () => { data.review.trades.splice(idx, 1); syncTradedFromTrades(); fullUpdate(); });
     });
     _applyCurrency();
+    refreshTradeCompletionBanner();
   }
 
   // Potential R + Pips popup — fires on R/pips blur for Win trades.
@@ -4440,6 +4504,24 @@
     if (e.key === 'Enter') { e.preventDefault(); savePotentialRModal(); }
     else if (e.key === 'Escape') closePotentialRModal();
   });
+  // Refresh the MT5 completion-reminder banner. Fires when any MT5-imported trade is
+  // missing manual fields (potR/potPips, type, concept tags). Disappears once everything's logged.
+  function refreshTradeCompletionBanner() {
+    const banner = document.getElementById('mt5-completion-banner');
+    if (!banner) return;
+    const trades = data.review.trades || [];
+    const importedTrades = trades.filter(t => t.importedFrom === 'mt5');
+    if (importedTrades.length === 0) { banner.style.display = 'none'; return; }
+    // A trade is "incomplete" if any of: type is empty, OR (Win result with potR not set).
+    // Concept Tags and Mindset are optional review-level fields — not flagged.
+    const anyIncomplete = importedTrades.some(t => {
+      if (!t.type) return true;
+      if (t.result === 'Win' && (t.potentialR == null || t.potentialR === '')) return true;
+      return false;
+    });
+    banner.style.display = anyIncomplete ? 'block' : 'none';
+  }
+
   // Sync data.review.traded based on whether there are any logged trades.
   // No trades → 'No' (observed only) + hide Execution. Any trade row exists → 'Yes' + show Execution.
   // This replaces the old explicit "Did you take a trade?" question.
@@ -4588,6 +4670,7 @@
     return lines.join('\n');
   }
   function renderReviewPreview() {
+    try { refreshTradeCompletionBanner(); } catch(e) {}
     const r = data.review;
     const out = document.getElementById('review-preview');
     const hasLinks = (r.tvLinks || []).some(l => l && l.url);
@@ -4917,7 +5000,7 @@
       }
       dotsWrap.appendChild(dot);
     }
-    if (cs.length === 0) document.getElementById('current-tally').textContent = 'No trades logged yet';
+    if (cs.length === 0) document.getElementById('current-tally').textContent = t('series.no_trades_yet');
     else {
       const s = calcSeriesStats(cs);
       document.getElementById('current-tally').textContent =
@@ -8502,13 +8585,13 @@
       "¿cuál es el trade de hoy que te daría vergüenza tomar?",
       "si un colega te viera la pantalla, ¿dónde levantaría la ceja?",
       "¿estás buscando setups, o esperando que aparezcan?",
-      "¿qué haría una versión más serena de ti esta mañana?",
+      "¿qué haría una versión más serena de ti ahora mismo?",
       "¿qué trade has estado haciendo mal últimamente — y qué hace que hoy sea distinto, sinceramente?",
-      "¿afilado esta mañana, o solo con cafeína?",
+      "¿afilado ahora mismo, o solo con cafeína?",
       "¿cuál es la regla que más doblas en secreto?",
       "si hoy se tuerce, ¿cuál será la primera señal?",
       "nombra el trade que jamás volverías a tomar. ¿Por qué sigue en tu watchlist?",
-      "¿qué sesgo trajiste a esta mañana? Da igual — solo nótalo.",
+      "¿qué sesgo trajiste a la sesión? Da igual — solo nótalo.",
       "¿cuál es la pregunta que llevas evitando sobre tu trading?",
       "¿dónde está la costura más débil de tu proceso ahora mismo?",
       "si solo pudieras hacer un trade hoy, ¿cómo sería el setup — exactamente?",
@@ -8518,7 +8601,7 @@
       "¿qué es lo peor que podría pasar hoy, y cómo reaccionarías?",
       "¿dónde sueles salir demasiado pronto? Planifica alrededor de eso.",
       "si operaras hoy con cuenta más pequeña, ¿tomarías los mismos trades?",
-      "¿qué le diría la versión de ti de la semana pasada a la de esta mañana?",
+      "¿qué le diría la versión de ti de la semana pasada a la versión que está aquí ahora?",
       "si tomaras un trade hoy y perdiera, ¿sobreviviría la cuenta?",
       "¿cuál es el trade aburrido que deberías tomar y no vas a tomar?",
       "¿qué condiciones suelen comerse tus stops? ¿Alguna presente hoy?",
@@ -8541,7 +8624,7 @@
       "vale, antes de abrir esto — ¿estás listo, o solo disponible?",
       "si tu cuenta se hubiera reducido a la mitad anoche, ¿operarías distinto hoy? Pues opera así hoy.",
       "¿qué setup chungo tienes la tentación de tomar hoy? Probablemente sáltalo.",
-      "¿lectura torcida esta mañana, o afilada? Respuesta honesta.",
+      "¿lectura torcida hoy, o afilada? Respuesta honesta.",
       "¿estás intentando montar un setup que no está ahí?",
     ],
     REVIEW_GREETINGS: {
@@ -9044,13 +9127,13 @@
     "what's the one trade today you'd be embarrassed to take?",
     "if a colleague was watching your screen, where would they raise an eyebrow?",
     "are you scanning for setups, or hoping one appears?",
-    "what would a calmer version of you do this morning?",
+    "what would a calmer version of you do right now?",
     "what trade have you been getting wrong recently — and what, honestly, makes today different?",
-    "sharp this morning, or just caffeinated?",
+    "sharp right now, or just caffeinated?",
     "what's the rule you secretly bend the most?",
     "if today goes sideways, what's the first sign you'll notice?",
     "name the trade you would never take again. Why is it still on your watchlist?",
-    "what bias did you bring into this morning? Doesn't matter — just notice it.",
+    "what bias did you bring into the session? Doesn't matter — just notice it.",
     "what's the question you keep avoiding about your trading?",
     "where in your process is the weakest seam right now?",
     "if you could only take one trade today, what would the setup look like — exactly?",
@@ -9060,14 +9143,14 @@
     "what's the worst thing that could happen today, and how would you react?",
     "where do you usually exit too early? Plan around it.",
     "if you traded a smaller account today, would you take the same trades?",
-    "what would last week's you advise this morning's you?",
+    "what would last week's you advise the version of you sitting here now?",
     "if you took one trade today and it lost, would the account survive it?",
     "what's the boring trade you should be taking and won't?",
     "what conditions historically eat your stops? Any present today?",
     "what would discipline look like in the first thirty minutes?",
     "what would you tell a mate trading your account right now?",
     "what's a habit you've fallen out of and want back?",
-    "how would your best week's version of you read this morning's chart?",
+    "how would your best week's version of you read this chart right now?",
     "what makes a setup A+ vs B+ for you? Can you say it in a sentence?",
     "name the indicator on your screen you trust most. Now: do you actually trust it?",
     "if you had to skip a trade today, what would the signal be?",
@@ -9083,50 +9166,56 @@
     "right, before opening this — are you ready, or just available?",
     "if your account was halved overnight, would you trade differently today? Then trade like that today.",
     "what dodgy setup are you tempted to take today? Probably skip it.",
-    "wonky read this morning, or sharp? Honest answer.",
+    "wonky read today, or sharp? Honest answer.",
     "are you trying to wangle a setup that isn't there?",
   ];
 
   // Performance-aware questions — each function takes a recent-stats snapshot
   // and returns either a question string or null (if its preconditions aren't met).
   // The picker only chooses from ones that returned a question.
+  // Friendly label for s.yesterday.daysAgo — 1 → 'yesterday', 2 → '2 days ago', etc.
+  function _lastSessionLabel(daysAgo) {
+    if (daysAgo === 1) return 'yesterday';
+    return daysAgo + ' days ago';
+  }
+
   const PERFORMANCE_QUESTIONS = [
     // === Previous trading day (high priority — morning anchor) ===
     // "Yesterday" here means the most recent trading day within the last 7 days, not literally yesterday.
     // Multiple winners, no losses
     s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0)
-      ? `${s.yesterday.w} winners yesterday, no losses. Are you opening today calmer, or hungrier?`
+      ? `${s.yesterday.w} winners ${_lastSessionLabel(s.yesterday.daysAgo)}, no losses. Are you opening today calmer, or hungrier?`
       : null,
     s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0 && s.yesterday.totalR >= 3)
-      ? `+${s.yesterday.totalR.toFixed(1)}R yesterday. The harder question — was it process, or did the market gift you one?`
+      ? `+${s.yesterday.totalR.toFixed(1)}R ${_lastSessionLabel(s.yesterday.daysAgo)}. The harder question — was it process, or did the market gift you one?`
       : null,
     s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0 && s.yesterday.onlySide)
-      ? `${s.yesterday.w} wins yesterday, all ${s.yesterday.onlySide}. Worth checking if you skipped valid ${s.yesterday.onlySide === 'Long' ? 'Shorts' : 'Longs'}.`
+      ? `${s.yesterday.w} wins ${_lastSessionLabel(s.yesterday.daysAgo)}, all ${s.yesterday.onlySide}. Worth checking if you skipped valid ${s.yesterday.onlySide === 'Long' ? 'Shorts' : 'Longs'}.`
       : null,
     // Single winner
     s => (s.yesterday && s.yesterday.w === 1 && s.yesterday.l === 0 && s.yesterday.be === 0)
-      ? `One winner yesterday, clean read. Repeatable?`
+      ? `One winner ${_lastSessionLabel(s.yesterday.daysAgo)}, clean read. Repeatable?`
       : null,
     // Losses only
     s => (s.yesterday && s.yesterday.l >= 1 && s.yesterday.w === 0)
-      ? `Yesterday was red, ${s.yesterday.l === 1 ? 'one loss' : s.yesterday.l + ' losses'}. Do you know which decision did the damage?`
+      ? `${s.yesterday.daysAgo === 1 ? 'Yesterday was red' : s.yesterday.daysAgo + ' days ago was red'}, ${s.yesterday.l === 1 ? 'one loss' : s.yesterday.l + ' losses'}. Do you know which decision did the damage?`
       : null,
     s => (s.yesterday && s.yesterday.l >= 2 && s.yesterday.w === 0)
-      ? `${s.yesterday.l} losses yesterday, no wins. Lower size today, or normal? Honest answer.`
+      ? `${s.yesterday.l} losses ${_lastSessionLabel(s.yesterday.daysAgo)}, no wins. Lower size today, or normal? Honest answer.`
       : null,
     s => (s.yesterday && s.yesterday.l >= 1 && s.yesterday.w === 0 && s.yesterday.totalR <= -2)
-      ? `${s.yesterday.totalR.toFixed(1)}R yesterday. Sit with this — was the loss in the setup, or the management?`
+      ? `${s.yesterday.totalR.toFixed(1)}R ${_lastSessionLabel(s.yesterday.daysAgo)}. Sit with this — was the loss in the setup, or the management?`
       : null,
     // Mixed day
     s => (s.yesterday && s.yesterday.w > 0 && s.yesterday.l > 0)
-      ? `Yesterday: ${s.yesterday.w}W / ${s.yesterday.l}L. Net ${s.yesterday.totalR >= 0 ? '+' : ''}${s.yesterday.totalR.toFixed(1)}R. Which trade would you keep, which would you bin?`
+      ? `${s.yesterday.daysAgo === 1 ? 'Yesterday' : s.yesterday.daysAgo + ' days ago'}: ${s.yesterday.w}W / ${s.yesterday.l}L. Net ${s.yesterday.totalR >= 0 ? '+' : ''}${s.yesterday.totalR.toFixed(1)}R. Which trade would you keep, which would you bin?`
       : null,
     // BE-heavy
     s => (s.yesterday && s.yesterday.be >= 2 && s.yesterday.w === 0 && s.yesterday.l === 0)
-      ? `${s.yesterday.be} BEs yesterday, no decisions either way. Discipline or hesitation?`
+      ? `${s.yesterday.be} BEs ${_lastSessionLabel(s.yesterday.daysAgo)}, no decisions either way. Discipline or hesitation?`
       : null,
     s => (s.yesterday && s.yesterday.be >= 1 && s.yesterday.w === 0 && s.yesterday.l === 0 && s.yesterday.count === 1)
-      ? `One BE yesterday. Sometimes that's the right read. Sometimes it's flinching. Which was it?`
+      ? `One BE ${_lastSessionLabel(s.yesterday.daysAgo)}. Sometimes that's the right read. Sometimes it's flinching. Which was it?`
       : null,
     // Yesterday wasn't actually yesterday — gap of a few days
     s => (s.yesterday && s.yesterday.daysAgo >= 3 && s.yesterday.daysAgo <= 7)
@@ -9134,7 +9223,7 @@
       : null,
     // Pure positive day, single trade
     s => (s.yesterday && s.yesterday.count === 1 && s.yesterday.w === 1)
-      ? `One trade yesterday, green. Patience or under-trading? Both are possible.`
+      ? `One trade ${_lastSessionLabel(s.yesterday.daysAgo)}, green. Patience or under-trading? Both are possible.`
       : null,
 
     // === Streak questions ===
@@ -9220,12 +9309,14 @@
       ? `${s.daysSinceLastTrade} days quiet. When did you last actually see your A+ setup?`
       : null,
     s => (s.daysSinceLastTrade != null && s.daysSinceLastTrade >= 14)
-      ? `${s.daysSinceLastTrade} days away — yonks. Genuinely — what brought you back this morning?`
+      ? `${s.daysSinceLastTrade} days away — yonks. Genuinely — what brought you back?`
       : null,
 
     // === Sample size milestones ===
     s => (s.totalTrades > 0 && s.totalTrades < 10)
-      ? `${s.totalTrades} trade${s.totalTrades === 1 ? '' : 's'} logged in total. Early days — what did yesterday teach you?`
+      ? (s.yesterday
+          ? `${s.totalTrades} trade${s.totalTrades === 1 ? '' : 's'} logged in total. Early days — what did the last session teach you?`
+          : `${s.totalTrades} trade${s.totalTrades === 1 ? '' : 's'} logged in total. Early days — what's the one thing you want to repeat?`)
       : null,
     s => (s.totalTrades >= 10 && s.totalTrades < 25)
       ? `${s.totalTrades} trades in your history. What pattern do you already see in your wins? Say it out loud.`
@@ -9495,43 +9586,49 @@
 
   // Spanish PERFORMANCE_QUESTIONS — same structure (stat-aware lambda functions),
   // adapted phrasing for Castilian register. Gender-neutral throughout.
+  // Etiqueta amistosa para s.yesterday.daysAgo — 1 → 'ayer', 2 → 'hace 2 días', etc.
+  function _lastSessionLabelEs(daysAgo) {
+    if (daysAgo === 1) return 'ayer';
+    return 'hace ' + daysAgo + ' días';
+  }
+
   const PERFORMANCE_QUESTIONS_ES = [
     // === Día anterior (alta prioridad — anclaje matinal) ===
     s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0)
-      ? `${s.yesterday.w} ganadoras ayer, sin pérdidas. ¿Abres hoy más tranquilo o más hambriento?`
+      ? `${s.yesterday.w} ganadoras ${_lastSessionLabelEs(s.yesterday.daysAgo)}, sin pérdidas. ¿Abres hoy más tranquilo o más hambriento?`
       : null,
     s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0 && s.yesterday.totalR >= 3)
-      ? `+${s.yesterday.totalR.toFixed(1)}R ayer. La pregunta difícil — ¿fue proceso, o regalo del mercado?`
+      ? `+${s.yesterday.totalR.toFixed(1)}R ${_lastSessionLabelEs(s.yesterday.daysAgo)}. La pregunta difícil — ¿fue proceso, o regalo del mercado?`
       : null,
     s => (s.yesterday && s.yesterday.w >= 2 && s.yesterday.l === 0 && s.yesterday.onlySide)
-      ? `${s.yesterday.w} ganadoras ayer, todas ${s.yesterday.onlySide === 'Long' ? 'Largas' : 'Cortas'}. Revisa si te saltaste alguna ${s.yesterday.onlySide === 'Long' ? 'Corta' : 'Larga'} válida.`
+      ? `${s.yesterday.w} ganadoras ${_lastSessionLabelEs(s.yesterday.daysAgo)}, todas ${s.yesterday.onlySide === 'Long' ? 'Largas' : 'Cortas'}. Revisa si te saltaste alguna ${s.yesterday.onlySide === 'Long' ? 'Corta' : 'Larga'} válida.`
       : null,
     s => (s.yesterday && s.yesterday.w === 1 && s.yesterday.l === 0 && s.yesterday.be === 0)
-      ? `Una ganadora ayer, lectura limpia. ¿Repetible?`
+      ? `Una ganadora ${_lastSessionLabelEs(s.yesterday.daysAgo)}, lectura limpia. ¿Repetible?`
       : null,
     s => (s.yesterday && s.yesterday.l >= 1 && s.yesterday.w === 0)
-      ? `Ayer fue rojo, ${s.yesterday.l === 1 ? 'una pérdida' : s.yesterday.l + ' pérdidas'}. ¿Sabes qué decisión hizo el daño?`
+      ? `${s.yesterday.daysAgo === 1 ? 'Ayer fue rojo' : 'Hace ' + s.yesterday.daysAgo + ' días fue rojo'}, ${s.yesterday.l === 1 ? 'una pérdida' : s.yesterday.l + ' pérdidas'}. ¿Sabes qué decisión hizo el daño?`
       : null,
     s => (s.yesterday && s.yesterday.l >= 2 && s.yesterday.w === 0)
-      ? `${s.yesterday.l} pérdidas ayer, sin ganadoras. ¿Tamaño menor hoy, o normal? Respuesta honesta.`
+      ? `${s.yesterday.l} pérdidas ${_lastSessionLabelEs(s.yesterday.daysAgo)}, sin ganadoras. ¿Tamaño menor hoy, o normal? Respuesta honesta.`
       : null,
     s => (s.yesterday && s.yesterday.l >= 1 && s.yesterday.w === 0 && s.yesterday.totalR <= -2)
-      ? `${s.yesterday.totalR.toFixed(1)}R ayer. Siéntate con esto — ¿el fallo estuvo en el setup o en la gestión?`
+      ? `${s.yesterday.totalR.toFixed(1)}R ${_lastSessionLabelEs(s.yesterday.daysAgo)}. Siéntate con esto — ¿el fallo estuvo en el setup o en la gestión?`
       : null,
     s => (s.yesterday && s.yesterday.w > 0 && s.yesterday.l > 0)
-      ? `Ayer: ${s.yesterday.w}G / ${s.yesterday.l}P. Neto ${s.yesterday.totalR >= 0 ? '+' : ''}${s.yesterday.totalR.toFixed(1)}R. ¿Cuál operación guardarías, cuál tirarías?`
+      ? `${s.yesterday.daysAgo === 1 ? 'Ayer' : 'Hace ' + s.yesterday.daysAgo + ' días'}: ${s.yesterday.w}G / ${s.yesterday.l}P. Neto ${s.yesterday.totalR >= 0 ? '+' : ''}${s.yesterday.totalR.toFixed(1)}R. ¿Cuál operación guardarías, cuál tirarías?`
       : null,
     s => (s.yesterday && s.yesterday.be >= 2 && s.yesterday.w === 0 && s.yesterday.l === 0)
-      ? `${s.yesterday.be} BEs ayer, sin decisiones claras. ¿Disciplina o duda?`
+      ? `${s.yesterday.be} BEs ${_lastSessionLabelEs(s.yesterday.daysAgo)}, sin decisiones claras. ¿Disciplina o duda?`
       : null,
     s => (s.yesterday && s.yesterday.be >= 1 && s.yesterday.w === 0 && s.yesterday.l === 0 && s.yesterday.count === 1)
-      ? `Un BE ayer. A veces es la lectura correcta. A veces es retirarse antes de tiempo. ¿Cuál fue?`
+      ? `Un BE ${_lastSessionLabelEs(s.yesterday.daysAgo)}. A veces es la lectura correcta. A veces es retirarse antes de tiempo. ¿Cuál fue?`
       : null,
     s => (s.yesterday && s.yesterday.daysAgo >= 3 && s.yesterday.daysAgo <= 7)
       ? `Último día operado hace ${s.yesterday.daysAgo} días. ¿La pausa te despejó la mente, u oxidó la lectura?`
       : null,
     s => (s.yesterday && s.yesterday.count === 1 && s.yesterday.w === 1)
-      ? `Una operación ayer, verde. ¿Paciencia o sub-operar? Las dos son posibles.`
+      ? `Una operación ${_lastSessionLabelEs(s.yesterday.daysAgo)}, verde. ¿Paciencia o sub-operar? Las dos son posibles.`
       : null,
 
     s => (s.curStreak >= 5 && s.streakKind === 'Win')
@@ -9610,10 +9707,12 @@
       ? `${s.daysSinceLastTrade} días tranquilos. ¿Cuándo viste tu setup A+ por última vez de verdad?`
       : null,
     s => (s.daysSinceLastTrade != null && s.daysSinceLastTrade >= 14)
-      ? `${s.daysSinceLastTrade} días fuera — un montón. En serio — ¿qué te trajo de vuelta esta mañana?`
+      ? `${s.daysSinceLastTrade} días fuera — un montón. En serio — ¿qué te trajo de vuelta?`
       : null,
     s => (s.totalTrades > 0 && s.totalTrades < 10)
-      ? `${s.totalTrades} operacion${s.totalTrades === 1 ? '' : 'es'} registrada${s.totalTrades === 1 ? '' : 's'} en total. Pronto en el camino — ¿qué te enseñó ayer?`
+      ? (s.yesterday
+          ? `${s.totalTrades} operacion${s.totalTrades === 1 ? '' : 'es'} registrada${s.totalTrades === 1 ? '' : 's'} en total. Pronto en el camino — ¿qué te enseñó la última sesión?`
+          : `${s.totalTrades} operacion${s.totalTrades === 1 ? '' : 'es'} registrada${s.totalTrades === 1 ? '' : 's'} en total. Pronto en el camino — ¿qué cosa quieres repetir?`)
       : null,
     s => (s.totalTrades >= 10 && s.totalTrades < 25)
       ? `${s.totalTrades} operaciones en tu historial. ¿Qué patrón ya ves en tus ganadoras? Dilo en voz alta.`
@@ -10433,7 +10532,10 @@
       const dayMidnight = new Date(day.date); dayMidnight.setHours(0, 0, 0, 0);
       const daysAgo = Math.round((today - dayMidnight) / (1000 * 60 * 60 * 24));
       if (daysAgo <= 0) continue;  // skip today
-      if (daysAgo > 7)  return null; // outside the window
+      // If the most recent trading day was more than 1 day ago, the RECAP_* pools — which
+      // hardcode the word "yesterday" — would be misleading. Bail out and let the
+      // dedicated daysAgo-aware lines (in PERFORMANCE_QUESTIONS) take over instead.
+      if (daysAgo > 1)  return null; // outside the window
       const wins = day.trades.filter(t => t.result === 'Win').length;
       const losses = day.trades.filter(t => t.result === 'Lose').length;
       const bes = day.trades.filter(t => t.result === 'BE').length;
@@ -10985,7 +11087,8 @@
         actualGross: t.profit,   // MT5's "profit" is gross from price action
         pips: t.pips,
         potentialR: null,
-        potentialPips: null
+        potentialPips: null,
+        importedFrom: 'mt5'  // flag so the completion banner can target only these
       });
     });
 
