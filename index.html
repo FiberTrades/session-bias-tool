@@ -4641,29 +4641,6 @@
         grid.appendChild(row);
       }
     });
-    // Rule for the week — pulled with the same Mon-Fri/Sat-Sun logic as the Discord builder.
-    try {
-      if (typeof getRuleForWeek === 'function' && typeof getCalendarWeekKey === 'function') {
-        const ruleRefDate = new Date();
-        const dow = ruleRefDate.getDay();
-        let rule = null;
-        if (dow >= 1 && dow <= 5) {
-          rule = getRuleForWeek(getCalendarWeekKey(ruleRefDate));
-        } else {
-          const lastKey = getCalendarWeekKey(new Date(ruleRefDate.getTime() - 7*24*3600*1000));
-          const lastRule = getRuleForWeek(lastKey);
-          if (lastRule && lastRule.followed === null) rule = lastRule;
-          else rule = getRuleForWeek(getCalendarWeekKey(new Date(ruleRefDate.getTime() + 7*24*3600*1000)));
-        }
-        if (rule && rule.rule) {
-          const row = document.createElement('div');
-          row.className = 'saved-bias-row';
-          row.style.gridColumn = '1 / -1';
-          row.innerHTML = `<span class="k">${t('rule.eyebrow')}</span><span class="v" style="font-style:italic;">${rule.rule.replace(/</g,'&lt;')}</span>`;
-          grid.appendChild(row);
-        }
-      }
-    } catch(e) {}
     const linkEl = document.getElementById('saved-bias-link');
     const links = (b.tvLinks || []).filter(l => l && l.url);
     if (links.length > 0) {
