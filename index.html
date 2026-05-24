@@ -262,6 +262,13 @@
   .saved-bias { margin-top: 40px; padding: 28px; border: 1px solid var(--border-2); background: var(--bg-elev); }
   /* Session-live coaching banner — shows on Review tab when current time is within the session window */
   .session-live-banner { position: relative; margin-top: 12px; padding: 18px 24px; background: var(--bg-elev); border: 1px solid var(--border-2); border-left: 3px solid var(--good); }
+  .rule-banner { margin-bottom: 28px; padding: 14px 20px; background: var(--bg-elev); border: 1px solid var(--border-2); border-left: 3px solid var(--info); display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .rule-banner.hidden { display: none; }
+  .rule-banner-eyebrow { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); flex-shrink: 0; }
+  .rule-banner-text { flex: 1 1 auto; font-family: 'Fraunces', serif; font-size: 15px; color: var(--text); line-height: 1.45; min-width: 200px; }
+  .rule-banner-meta { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
+  .rule-banner-graded.good { color: var(--good); }
+  .rule-banner-graded.bad  { color: var(--bad); }
   .session-live-banner.hidden { display: none; }
   .session-live-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .session-live-dot { width: 8px; height: 8px; background: var(--good); border-radius: 50%; display: inline-block; animation: session-live-pulse 1.8s ease-in-out infinite; }
@@ -921,6 +928,11 @@
         <button type="button" id="skip-nudge-dismiss" style="background:transparent;border:1px solid var(--border-2);color:var(--text-dim);cursor:pointer;padding:4px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;flex-shrink:0;">Dismiss</button>
       </div>
     </div>
+    <div class="rule-banner hidden" id="rule-banner-bias">
+      <span class="rule-banner-eyebrow" data-i18n="rule.eyebrow">Rule for the week</span>
+      <span class="rule-banner-text" id="rule-banner-text-bias"></span>
+      <span class="rule-banner-meta" id="rule-banner-meta-bias"></span>
+    </div>
     <div id="bias-greeting" class="bias-greeting"></div>
     <section>
       <div class="section-header"><span class="section-num">01</span><span class="section-title" data-i18n="bias.s1.title">Trading Mode</span></div>
@@ -981,6 +993,11 @@
   </div>
 
   <div class="page" id="page-review">
+    <div class="rule-banner hidden" id="rule-banner-review">
+      <span class="rule-banner-eyebrow" data-i18n="rule.eyebrow">Rule for the week</span>
+      <span class="rule-banner-text" id="rule-banner-text-review"></span>
+      <span class="rule-banner-meta" id="rule-banner-meta-review"></span>
+    </div>
     <div class="session-live-banner hidden" id="session-live-banner">
       <div class="session-live-head">
         <span class="session-live-dot"></span>
@@ -1574,37 +1591,37 @@
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
       <div>
-        <h2 id="backup-modal-title">Trades saved</h2>
-        <p id="backup-modal-subtitle" style="margin:6px 0 0;color:var(--text-mid);font-size:13px;">Want to back up your data?</p>
+        <h2 id="backup-modal-title" data-i18n="backup.title_trades_saved">Trades saved</h2>
+        <p id="backup-modal-subtitle" data-i18n="backup.sub_want_backup" style="margin:6px 0 0;color:var(--text-mid);font-size:13px;">Want to back up your data?</p>
       </div>
       <button class="modal-close" id="backup-modal-close">×</button>
     </div>
     <div style="padding:0 28px 24px;">
       <div style="background:var(--bg-elev);border:1px solid var(--border-2);padding:18px 20px;margin-top:8px;font-size:12px;color:var(--text-mid);line-height:1.6;">
-        Your trades are saved in this browser's local storage. If you clear your browser data, switch computers, or your hard drive fails, that data is gone. A backup is a JSON file you can save to Google Drive, Dropbox, or anywhere else for safekeeping. <strong style="color:var(--text);">You can re-import it later from the Import Data button at the bottom of the page.</strong>
+        <span data-i18n-html="backup.intro_html">Your trades are saved in this browser's local storage. If you clear your browser data, switch computers, or your hard drive fails, that data is gone. A backup is a JSON file you can save to Google Drive, Dropbox, or anywhere else for safekeeping. <strong style="color:var(--text);">You can re-import it later from the Import Data button at the bottom of the page.</strong></span>
       </div>
       <div style="background:rgba(245, 158, 11, 0.06);border:1px solid rgba(245, 158, 11, 0.3);padding:14px 18px;margin-top:14px;font-size:11px;color:var(--text-mid);line-height:1.6;">
-        <strong style="color:#f59e0b;">Before enabling Auto-backup:</strong> backups go to your browser's default Downloads folder unless you change it. Set that to a Google Drive / Dropbox synced folder first so your backups land somewhere safe. Chrome / Edge users will be asked to pick a specific file instead.
+        <span data-i18n-html="backup.warning_html"><strong style="color:#f59e0b;">Before enabling Auto-backup:</strong> backups go to your browser's default Downloads folder unless you change it. Set that to a Google Drive / Dropbox synced folder first so your backups land somewhere safe. Chrome / Edge users will be asked to pick a specific file instead.</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px;">
         <button class="btn" id="backup-download-once" style="text-align:left;padding:14px 18px;">
-          <span style="display:block;font-size:13px;letter-spacing:0.15em;">Download backup now</span>
-          <span style="display:block;font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:none;letter-spacing:0.05em;font-style:italic;font-family:'Fraunces',serif;">One-time download to your default Downloads folder.</span>
+          <span data-i18n="backup.download_now" style="display:block;font-size:13px;letter-spacing:0.15em;">Download backup now</span>
+          <span style="display:block;font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:none;letter-spacing:0.05em;font-style:italic;font-family:'Fraunces',serif;" data-i18n="backup.download_sub">One-time download to your default Downloads folder.</span>
         </button>
         <button class="btn" id="backup-enable-auto" style="text-align:left;padding:14px 18px;">
-          <span style="display:block;font-size:13px;letter-spacing:0.15em;">Auto-backup every save</span>
-          <span style="display:block;font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:none;letter-spacing:0.05em;font-style:italic;font-family:'Fraunces',serif;">Silent backup after every save. Recommended only after you've set your downloads folder above.</span>
+          <span data-i18n="backup.auto_btn" style="display:block;font-size:13px;letter-spacing:0.15em;">Auto-backup every save</span>
+          <span style="display:block;font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:none;letter-spacing:0.05em;font-style:italic;font-family:'Fraunces',serif;" data-i18n="backup.auto_sub">Silent backup after every save. Recommended only after you've set your downloads folder above.</span>
         </button>
         <button class="btn" id="backup-skip" style="text-align:left;padding:14px 18px;">
-          <span style="display:block;font-size:13px;letter-spacing:0.15em;color:var(--text-dim);">Skip for now</span>
-          <span style="display:block;font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:none;letter-spacing:0.05em;font-style:italic;font-family:'Fraunces',serif;">No backup this time. You can always change this in Backup Settings.</span>
+          <span data-i18n="backup.skip_btn" style="display:block;font-size:13px;letter-spacing:0.15em;color:var(--text-dim);">Skip for now</span>
+          <span style="display:block;font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:none;letter-spacing:0.05em;font-style:italic;font-family:'Fraunces',serif;" data-i18n="backup.skip_sub">No backup this time. You can always change this in Backup Settings.</span>
         </button>
       </div>
       <div id="backup-auto-banner" style="display:none;margin-top:20px;padding:14px 18px;background:var(--bg-elev);border:1px solid var(--info);font-size:11px;color:var(--text-mid);">
-        <strong style="color:var(--info);">Auto-backup is on.</strong> A new timestamped file downloads silently on every save. <a href="#" id="backup-disable-auto" style="color:var(--bad);text-decoration:underline;">Turn off</a>
+        <span data-i18n-html="backup.auto_on_timestamped_html"><strong style="color:var(--info);">Auto-backup is on.</strong> A new timestamped file downloads silently on every save. <a href="#" id="backup-disable-auto" style="color:var(--bad);text-decoration:underline;">Turn off</a></span>
       </div>
       <div id="backup-linked-banner" style="display:none;margin-top:20px;padding:14px 18px;background:var(--bg-elev);border:1px solid var(--good);font-size:11px;color:var(--text-mid);">
-        <strong style="color:var(--good);">Auto-backup is on.</strong> Linked to <span id="backup-linked-name" style="color:var(--text);font-family:'DM Mono',monospace;"></span> — silently overwritten on every save. <a href="#" id="backup-unlink" style="color:var(--bad);text-decoration:underline;">Turn off</a>
+        <span data-i18n-html="backup.auto_on_linked_html"><strong style="color:var(--good);">Auto-backup is on.</strong> Linked to <span id="backup-linked-name" style="color:var(--text);font-family:'DM Mono',monospace;"></span> — silently overwritten on every save. <a href="#" id="backup-unlink" style="color:var(--bad);text-decoration:underline;">Turn off</a></span>
       </div>
     </div>
   </div>
@@ -1820,6 +1837,34 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'backup.title_trades_saved': "Trades saved",
+      'backup.title_settings': "Backup settings",
+      'backup.sub_want_backup': "Want to back up your data?",
+      'backup.sub_settings': "Manage how your data is backed up.",
+      'backup.trade_singular': "trade",
+      'backup.trade_plural': "trades",
+      'backup.saved_word': "saved",
+      'backup.intro_html': "Your trades are saved in this browser's local storage. If you clear your browser data, switch computers, or your hard drive fails, that data is gone. A backup is a JSON file you can save to Google Drive, Dropbox, or anywhere else for safekeeping. <strong style=\"color:var(--text);\">You can re-import it later from the Import Data button at the bottom of the page.</strong>",
+      'backup.warning_html': "<strong style=\"color:#f59e0b;\">Before enabling Auto-backup:</strong> backups go to your browser's default Downloads folder unless you change it. Set that to a Google Drive / Dropbox synced folder first so your backups land somewhere safe. Chrome / Edge users will be asked to pick a specific file instead.",
+      'backup.download_now': "Download backup now",
+      'backup.download_sub': "One-time download to your default Downloads folder.",
+      'backup.auto_btn': "Auto-backup every save",
+      'backup.auto_sub': "Silent backup after every save. Recommended only after you've set your downloads folder above.",
+      'backup.skip_btn': "Skip for now",
+      'backup.skip_sub': "No backup this time. You can always change this in Backup Settings.",
+      'backup.auto_on_timestamped_html': "<strong style=\"color:var(--info);\">Auto-backup is on.</strong> A new timestamped file downloads silently on every save. <a href=\"#\" id=\"backup-disable-auto\" style=\"color:var(--bad);text-decoration:underline;\">Turn off</a>",
+      'backup.auto_on_linked_html': "<strong style=\"color:var(--good);\">Auto-backup is on.</strong> Linked to <span id=\"backup-linked-name\" style=\"color:var(--text);font-family:'DM Mono',monospace;\"></span> \u2014 silently overwritten on every save. <a href=\"#\" id=\"backup-unlink\" style=\"color:var(--bad);text-decoration:underline;\">Turn off</a>",
+      'rule.eyebrow': "Rule for the week",
+      'rule.grade_label': "This week\u2019s rule \u2014 did you follow it?",
+      'rule.followed_btn': "\u2713 Followed",
+      'rule.broken_btn': "\u2715 Broken",
+      'rule.graded_followed': "Followed \u2713",
+      'rule.graded_broken': "Broken \u2715",
+      'rule.next_week_label': "Rule for next week",
+      'rule.next_week_hint': "One small, testable behaviour \u2014 something specific you can answer yes/no to next Friday. e.g. \u2018No entries before 8:30 AM\u2019 or \u2018SL doesn\u2019t move until +1R is locked in\u2019.",
+      'rule.next_week_placeholder': "Pick one specific rule for next week\u2026",
+      'rule.friday_prompt': "Friday\u2019s done. Time to grade this week\u2019s rule.",
+      'rule.friday_prompt_action': "Grade now",
       'status.today': 'Today',
       'status.backfill': 'Back-fill',
       'status.future': 'Future',
@@ -2337,6 +2382,34 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'backup.title_trades_saved': "Operaciones guardadas",
+      'backup.title_settings': "Configuraci\u00f3n de copias",
+      'backup.sub_want_backup': "\u00bfQuieres hacer una copia de tus datos?",
+      'backup.sub_settings': "Gestiona c\u00f3mo se respaldan tus datos.",
+      'backup.trade_singular': "operaci\u00f3n",
+      'backup.trade_plural': "operaciones",
+      'backup.saved_word': "guardadas",
+      'backup.intro_html': "Tus operaciones se guardan en el almacenamiento local de este navegador. Si borras los datos del navegador, cambias de ordenador o falla tu disco duro, esos datos se pierden. Una copia de seguridad es un archivo JSON que puedes guardar en Google Drive, Dropbox o cualquier otro sitio. <strong style=\"color:var(--text);\">Puedes volver a importarlo m\u00e1s tarde desde el bot\u00f3n Importar Datos al final de la p\u00e1gina.</strong>",
+      'backup.warning_html': "<strong style=\"color:#f59e0b;\">Antes de activar la copia autom\u00e1tica:</strong> las copias van a la carpeta de Descargas por defecto del navegador a menos que la cambies. Config\u00farala primero a una carpeta sincronizada de Google Drive / Dropbox para que tus copias terminen en un sitio seguro. A los usuarios de Chrome / Edge se les pedir\u00e1 elegir un archivo concreto.",
+      'backup.download_now': "Descargar copia ahora",
+      'backup.download_sub': "Descarga \u00fanica a tu carpeta de Descargas por defecto.",
+      'backup.auto_btn': "Copia autom\u00e1tica en cada guardado",
+      'backup.auto_sub': "Copia silenciosa despu\u00e9s de cada guardado. Recomendado s\u00f3lo despu\u00e9s de configurar tu carpeta de descargas arriba.",
+      'backup.skip_btn': "Omitir por ahora",
+      'backup.skip_sub': "Sin copia esta vez. Siempre puedes cambiar esto en Configuraci\u00f3n de Copias.",
+      'backup.auto_on_timestamped_html': "<strong style=\"color:var(--info);\">La copia autom\u00e1tica est\u00e1 activada.</strong> Se descarga silenciosamente un nuevo archivo con marca de tiempo en cada guardado. <a href=\"#\" id=\"backup-disable-auto\" style=\"color:var(--bad);text-decoration:underline;\">Desactivar</a>",
+      'backup.auto_on_linked_html': "<strong style=\"color:var(--good);\">La copia autom\u00e1tica est\u00e1 activada.</strong> Vinculada a <span id=\"backup-linked-name\" style=\"color:var(--text);font-family:'DM Mono',monospace;\"></span> \u2014 sobrescrita silenciosamente en cada guardado. <a href=\"#\" id=\"backup-unlink\" style=\"color:var(--bad);text-decoration:underline;\">Desactivar</a>",
+      'rule.eyebrow': "Regla de la semana",
+      'rule.grade_label': "La regla de esta semana \u2014 \u00bfla cumpliste?",
+      'rule.followed_btn': "\u2713 Cumplida",
+      'rule.broken_btn': "\u2715 Rota",
+      'rule.graded_followed': "Cumplida \u2713",
+      'rule.graded_broken': "Rota \u2715",
+      'rule.next_week_label': "Regla para la pr\u00f3xima semana",
+      'rule.next_week_hint': "Una conducta peque\u00f1a y comprobable \u2014 algo concreto a lo que puedas responder s\u00ed/no el pr\u00f3ximo viernes. ej. \u2018Nada de entradas antes de las 8:30\u2019 o \u2018El SL no se mueve hasta asegurar +1R\u2019.",
+      'rule.next_week_placeholder': "Elige una regla concreta para la pr\u00f3xima semana\u2026",
+      'rule.friday_prompt': "Viernes cerrado. Hora de calificar la regla de la semana.",
+      'rule.friday_prompt_action': "Calificar",
       'status.today': 'Hoy',
       'status.backfill': 'Retroactivo',
       'status.future': 'Futuro',
@@ -2832,6 +2905,7 @@
     }
     // Refresh the session-date status label (Today/Back-fill/Future)
     if (typeof updateSessionDateStatus === 'function') try { updateSessionDateStatus(); } catch(e) {}
+    if (typeof refreshRuleBanners === 'function') try { refreshRuleBanners(); } catch(e) {}
     // Reset cached greeting/tail picks so the bias-tab greeting re-renders in the new language
     try { _cachedTail = null; _cachedOpener = null; } catch(e) { /* vars not declared yet */ }
     if (typeof renderBiasGreeting === 'function') try { renderBiasGreeting(); } catch(e) {}
@@ -3015,6 +3089,17 @@
       : `${t('footer.session_closed')}${personal}.`;
     showSessionToast(msg, kind);
     playChime(kind);
+    if (kind === 'end' && new Date().getDay() === 5) {
+      const cur = getRuleForWeek(getCurrentWeekKey());
+      if (cur && cur.followed === null && typeof showUndoToast === 'function') {
+        setTimeout(() => {
+          showUndoToast(t('rule.friday_prompt'), () => {
+            const { weekStart, weekEnd } = getCurrentWeekBounds(new Date());
+            if (typeof openWeeklyReviewModal === 'function') openWeeklyReviewModal(weekStart, weekEnd);
+          }, 12000, t('rule.friday_prompt_action'));
+        }, 2200);
+      }
+    }
   }
 
   let data = loadData();
@@ -3406,6 +3491,7 @@
     if (d.userName === undefined) d.userName = '';
     if (d._nameSkipped === undefined) d._nameSkipped = false;
     if (!Array.isArray(d.weeklyReviews)) d.weeklyReviews = [];
+    if (!d.weeklyRules || typeof d.weeklyRules !== 'object') d.weeklyRules = {};
     if (!Array.isArray(d.monthlyReviews)) d.monthlyReviews = [];
     if (d._lastWeeklyPrompt === undefined) d._lastWeeklyPrompt = '';
     if (d._lastSessionStartAlert === undefined) d._lastSessionStartAlert = '';
@@ -3601,6 +3687,7 @@
       // Rotate page caption with British-voice line for the new page.
       refreshPageCaption(target);
       if (target === 'review') renderSavedBias();
+      if (target === 'bias' || target === 'review') { try { refreshRuleBanners(); } catch(e) {} }
       if (target === 'stats')  renderStats();
       if (target === 'trades') renderTradesStats();
       if (target === 'tradeview') renderTradeView();
@@ -4659,12 +4746,12 @@
   // Snackbar-style undo toast. Stays up for `duration` ms (default 10s) and
   // shows an inline UNDO button. Clicking it calls undoFn and dismisses.
   let _undoToastTimer = null;
-  function showUndoToast(message, undoFn, duration = 10000) {
+  function showUndoToast(message, undoFn, duration = 10000, actionLabel) {
     const toast = document.getElementById('toast');
     if (!toast) return;
     if (_undoToastTimer) { clearTimeout(_undoToastTimer); _undoToastTimer = null; }
     toast.classList.remove('show', 'session-alert', 'start', 'end', 'with-action');
-    toast.innerHTML = `<span class="toast-msg">${message}</span><button type="button" class="toast-action-btn" id="toast-undo-btn">${t('toast.undo_label')}</button>`;
+    toast.innerHTML = `<span class="toast-msg">${message}</span><button type="button" class="toast-action-btn" id="toast-undo-btn">${actionLabel || t('toast.undo_label')}</button>`;
     toast.classList.add('with-action', 'show');
     const btn = document.getElementById('toast-undo-btn');
     btn.addEventListener('click', () => {
@@ -6293,11 +6380,12 @@
     const titleEl = document.getElementById('backup-modal-title');
     const subEl   = document.getElementById('backup-modal-subtitle');
     if (fromSave) {
-      titleEl.textContent = `${savedCount} trade${savedCount === 1 ? '' : 's'} saved`;
-      subEl.textContent = 'Want to back up your data?';
+      const tradesWord = savedCount === 1 ? t('backup.trade_singular') : t('backup.trade_plural');
+      titleEl.textContent = `${savedCount} ${tradesWord} ${t('backup.saved_word')}`;
+      subEl.textContent = t('backup.sub_want_backup');
     } else {
-      titleEl.textContent = 'Backup settings';
-      subEl.textContent = 'Manage how your data is backed up.';
+      titleEl.textContent = t('backup.title_settings');
+      subEl.textContent = t('backup.sub_settings');
     }
     const isAuto    = !!data.settings.autoBackup;
     const isLinked  = !!data.settings.linkedFileBackup;
@@ -6350,20 +6438,31 @@
     }
   });
   document.getElementById('backup-skip').addEventListener('click', closeBackupModal);
-  document.getElementById('backup-disable-auto').addEventListener('click', e => {
-    e.preventDefault();
-    data.settings.autoBackup = false;
-    saveData();
-    showToast('Auto-backup turned off');
-    updateBackupSettingsLabel();
-    closeBackupModal();
-  });
-  document.getElementById('backup-unlink').addEventListener('click', async e => {
-    e.preventDefault();
-    await unlinkBackupFile();
-    showToast('Auto-backup turned off');
-    updateBackupSettingsLabel();
-    closeBackupModal();
+  // Use event delegation for the "Turn off" links inside the auto-backup banners.
+  // Those banners use data-i18n-html, so their innerHTML (including these anchors)
+  // gets recreated on every language change — direct addEventListener bindings
+  // would be lost. Delegating on the modal container keeps them working.
+  document.getElementById('backup-modal-bg').addEventListener('click', e => {
+    const disableLink = e.target.closest('#backup-disable-auto');
+    if (disableLink) {
+      e.preventDefault();
+      data.settings.autoBackup = false;
+      saveData();
+      showToast('Auto-backup turned off');
+      updateBackupSettingsLabel();
+      closeBackupModal();
+      return;
+    }
+    const unlinkLink = e.target.closest('#backup-unlink');
+    if (unlinkLink) {
+      e.preventDefault();
+      (async () => {
+        await unlinkBackupFile();
+        showToast('Auto-backup turned off');
+        updateBackupSettingsLabel();
+        closeBackupModal();
+      })();
+    }
   });
   // Footer "Backup Settings" link — opens modal in management mode
   document.getElementById('data-backup-settings').addEventListener('click', e => {
@@ -6453,6 +6552,59 @@
   }
 
   function computeWeeklyStats(weekStart, weekEnd) { return computePeriodStats(weekStart, weekEnd); }
+
+  // --- Weekly Rule helpers ---------------------------------------------------
+  function getCurrentWeekKey() { return getCurrentWeekBounds(new Date()).weekKey; }
+  function getNextWeekKey() {
+    const next = new Date();
+    next.setDate(next.getDate() + 7);
+    return getCurrentWeekBounds(next).weekKey;
+  }
+  function getRuleForWeek(weekKey) {
+    if (!weekKey || !data.weeklyRules) return null;
+    const r = data.weeklyRules[weekKey];
+    return (r && r.rule) ? r : null;
+  }
+  function setRuleForWeek(weekKey, ruleText) {
+    if (!weekKey) return;
+    if (!data.weeklyRules) data.weeklyRules = {};
+    const trimmed = (ruleText || '').trim();
+    if (!trimmed) { delete data.weeklyRules[weekKey]; saveData(); refreshRuleBanners(); return; }
+    const existing = data.weeklyRules[weekKey] || {};
+    data.weeklyRules[weekKey] = { rule: trimmed, followed: existing.followed ?? null, gradedAt: existing.gradedAt ?? null };
+    saveData();
+    refreshRuleBanners();
+  }
+  function gradeRuleForWeek(weekKey, followed) {
+    if (!weekKey || !data.weeklyRules || !data.weeklyRules[weekKey]) return;
+    data.weeklyRules[weekKey].followed = !!followed;
+    data.weeklyRules[weekKey].gradedAt = new Date().toISOString();
+    saveData();
+    refreshRuleBanners();
+  }
+  function refreshRuleBanners() {
+    const cur = getRuleForWeek(getCurrentWeekKey());
+    ['bias', 'review'].forEach(tab => {
+      const banner = document.getElementById('rule-banner-' + tab);
+      const textEl = document.getElementById('rule-banner-text-' + tab);
+      const metaEl = document.getElementById('rule-banner-meta-' + tab);
+      if (!banner || !textEl || !metaEl) return;
+      if (!cur) { banner.classList.add('hidden'); return; }
+      banner.classList.remove('hidden');
+      textEl.textContent = cur.rule;
+      if (cur.followed === true) {
+        metaEl.textContent = t('rule.graded_followed');
+        metaEl.className = 'rule-banner-meta rule-banner-graded good';
+      } else if (cur.followed === false) {
+        metaEl.textContent = t('rule.graded_broken');
+        metaEl.className = 'rule-banner-meta rule-banner-graded bad';
+      } else {
+        metaEl.textContent = '';
+        metaEl.className = 'rule-banner-meta';
+      }
+    });
+  }
+
 
   // Generic period stats — works for any [start, end] range. Used by weekly + monthly reviews.
   function computePeriodStats(periodStart, periodEnd) {
@@ -7431,11 +7583,51 @@
           <textarea id="rfx-learned" class="reflect-q-textarea" placeholder="${t('modal.learned_placeholder')}">${esc(learned)}</textarea>
         </div>
 
+        <div id="rfx-rule-section" style="margin-top:24px;padding:18px;border:1px solid var(--border-2);background:var(--bg);"></div>
+
         <div style="display:flex;justify-content:flex-end;margin-top:18px;">
           <button type="button" id="rfx-discord-copy" style="background:transparent;color:var(--text);border:1px solid var(--text-mid);padding:8px 18px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;" data-i18n="btn.copy_to_discord">Copy to Discord</button>
         </div>
       </div>
     `;
+    (function renderRuleSection() {
+      const wrap = document.getElementById('rfx-rule-section');
+      if (!wrap) return;
+      const thisWeekKey = currentReview.key;
+      const nextKey = (function() {
+        const next = new Date(weekEnd);
+        next.setDate(next.getDate() + 3);
+        return getCurrentWeekBounds(next).weekKey;
+      })();
+      const thisRule = getRuleForWeek(thisWeekKey);
+      const nextRule = getRuleForWeek(nextKey);
+      const nextRuleText = nextRule ? nextRule.rule : '';
+      const gradeBlock = thisRule
+        ? `<div style="margin-bottom:20px;">
+            <div style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">${t('rule.grade_label')}</div>
+            <div style="font-family:'Fraunces',serif;font-size:15px;color:var(--text);margin-bottom:12px;line-height:1.45;">"${esc(thisRule.rule)}"</div>
+            <div style="display:flex;gap:10px;">
+              <button type="button" id="rfx-rule-followed" style="flex:1;padding:8px 14px;background:${thisRule.followed === true ? 'var(--good)' : 'transparent'};color:${thisRule.followed === true ? 'var(--bg)' : 'var(--text)'};border:1px solid ${thisRule.followed === true ? 'var(--good)' : 'var(--border-2)'};font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">${t('rule.followed_btn')}</button>
+              <button type="button" id="rfx-rule-broken" style="flex:1;padding:8px 14px;background:${thisRule.followed === false ? 'var(--bad)' : 'transparent'};color:${thisRule.followed === false ? 'var(--bg)' : 'var(--text)'};border:1px solid ${thisRule.followed === false ? 'var(--bad)' : 'var(--border-2)'};font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">${t('rule.broken_btn')}</button>
+            </div>
+          </div>`
+        : '';
+      const setterBlock = `<div>
+          <div style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">${t('rule.next_week_label')}</div>
+          <div style="font-size:11px;color:var(--text-dim);font-style:italic;margin-bottom:10px;line-height:1.5;font-family:'Fraunces',serif;">${t('rule.next_week_hint')}</div>
+          <input type="text" id="rfx-rule-next" maxlength="200" placeholder="${t('rule.next_week_placeholder')}" value="${esc(nextRuleText)}" style="width:100%;background:var(--bg-elev);border:1px solid var(--border-2);color:var(--text);padding:10px 12px;font-family:'DM Mono',monospace;font-size:12px;outline:none;" />
+        </div>`;
+      wrap.innerHTML = gradeBlock + setterBlock;
+      const followedBtn = document.getElementById('rfx-rule-followed');
+      const brokenBtn   = document.getElementById('rfx-rule-broken');
+      if (followedBtn) followedBtn.addEventListener('click', () => { gradeRuleForWeek(thisWeekKey, true);  renderRuleSection(); });
+      if (brokenBtn)   brokenBtn.addEventListener('click',   () => { gradeRuleForWeek(thisWeekKey, false); renderRuleSection(); });
+      const nextInput = document.getElementById('rfx-rule-next');
+      if (nextInput) {
+        nextInput.addEventListener('input', () => { setRuleForWeek(nextKey, nextInput.value); });
+        nextInput.addEventListener('blur',  () => { setRuleForWeek(nextKey, nextInput.value); });
+      }
+    })();
 
     // Wire auto-save on every input. Each keystroke persists.
     // Use a safe optional read because some fields are conditionally rendered (e.g. no Win this week → no
@@ -9695,6 +9887,7 @@
   // Initial load: restore saved language (or default to English) and apply translations
   // to all data-i18n elements on first paint.
   setLanguage(data.settings.lang || 'en');
+  if (typeof refreshRuleBanners === 'function') try { refreshRuleBanners(); } catch(e) {}
   // Apply currency symbol to static HTML labels (the dynamic renderers use curSym() directly)
   applyCurrencySymbol();
   // Click handlers on the flag icons
