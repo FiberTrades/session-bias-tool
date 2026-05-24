@@ -80,6 +80,9 @@
   .page.active { display: block; }
   section { margin-top: 56px; }
   section.hidden { display: none; }
+  /* Generic .hidden — any element with this class is removed from layout.
+     Several specific selectors exist below for back-compat / specificity reasons. */
+  .hidden { display: none !important; }
   .section-header { display: flex; align-items: baseline; gap: 24px; margin-bottom: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
   .section-num { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; font-size: 30px; color: var(--text-mid); letter-spacing: -0.02em; line-height: 1; min-width: 36px; }
   .section-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 22px; letter-spacing: -0.01em; }
@@ -4405,9 +4408,20 @@
   function renderSavedBias() {
     const b = data.bias;
     const card = document.getElementById('saved-bias-card');
-    if (!b.date) { card.classList.add('hidden'); return; }
+    const hideCard = () => {
+      // Clear inner state too, so if the .hidden CSS ever gets overridden the
+      // content doesn't leak through.
+      const grid = document.getElementById('saved-bias-grid');
+      const link = document.getElementById('saved-bias-link');
+      const notes = document.getElementById('saved-bias-notes');
+      if (grid)  grid.innerHTML = '';
+      if (link)  { link.innerHTML = '';  link.classList.add('hidden'); }
+      if (notes) { notes.textContent = ''; notes.classList.add('hidden'); }
+      card.classList.add('hidden');
+    };
+    if (!b.date) { hideCard(); return; }
     const sameDay = new Date(b.date).toDateString() === today.toDateString();
-    if (!sameDay) { card.classList.add('hidden'); return; }
+    if (!sameDay) { hideCard(); return; }
     card.classList.remove('hidden');
     const grid = document.getElementById('saved-bias-grid');
     grid.innerHTML = '';
