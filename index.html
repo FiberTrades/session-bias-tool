@@ -1011,7 +1011,6 @@
       <div style="margin-left:60px;margin-top:14px;margin-bottom:18px;padding:14px 20px;background:var(--bg-elev);border:1px solid var(--border-2);display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
         <span style="font-size:10px;color:var(--text-dim);letter-spacing:0.25em;text-transform:uppercase;" data-i18n="session_strip.logging_for">Logging trades for</span>
         <input type="date" id="session-date" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text);padding:8px 12px;font-family:'DM Mono',monospace;font-size:13px;outline:none;" />
-        <span id="session-date-status" style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;"></span>
         <button type="button" id="session-date-today" data-i18n="btn.today" style="background:transparent;border:1px solid var(--border-2);color:var(--text-mid);padding:6px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 200ms;">Today</button>
         <button type="button" id="mt5-import-btn" data-i18n="btn.import_mt5" style="background:transparent;border:1px solid var(--text-mid);color:var(--text);padding:6px 14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:all 200ms;margin-left:auto;">↓ Import from MT5</button>
       </div>
@@ -1821,6 +1820,9 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'status.today': 'Today',
+      'status.backfill': 'Back-fill',
+      'status.future': 'Future',
       'tag.add_custom': '+ Custom',
       'tag.name_placeholder': 'Tag name…',
       'modal.post_session': 'Post-session:',
@@ -2335,6 +2337,9 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'status.today': 'Hoy',
+      'status.backfill': 'Retroactivo',
+      'status.future': 'Futuro',
       'tag.add_custom': '+ Personalizada',
       'tag.name_placeholder': 'Nombre de la etiqueta…',
       'modal.post_session': 'Post-sesión:',
@@ -2819,6 +2824,14 @@
     if (typeof renderTrades === 'function') try { renderTrades(); } catch(e) {}
     if (typeof renderBiasPreview === 'function') try { renderBiasPreview(); } catch(e) {}
     if (typeof renderReviewPreview === 'function') try { renderReviewPreview(); } catch(e) {}
+    // Re-render the "+ Custom" buttons (and any user-added custom tags) in both
+    // tag groups — they were rendered before setLanguage ran on init.
+    if (typeof renderCustomTags === 'function') {
+      try { renderCustomTags('concept-tags', 'concepts'); } catch(e) {}
+      try { renderCustomTags('mindset-tags', 'mindset'); } catch(e) {}
+    }
+    // Refresh the session-date status label (Today/Back-fill/Future)
+    if (typeof updateSessionDateStatus === 'function') try { updateSessionDateStatus(); } catch(e) {}
     // Reset cached greeting/tail picks so the bias-tab greeting re-renders in the new language
     try { _cachedTail = null; _cachedOpener = null; } catch(e) { /* vars not declared yet */ }
     if (typeof renderBiasGreeting === 'function') try { renderBiasGreeting(); } catch(e) {}
@@ -4348,15 +4361,15 @@
     const picker = document.getElementById('session-date');
     const status = document.getElementById('session-date-status');
     if (!picker || !status) return;
-    const t = todayDateStr();
-    if (picker.value === t) {
-      status.textContent = 'Today';
+    const todayStr = todayDateStr();
+    if (picker.value === todayStr) {
+      status.textContent = t('status.today');
       status.style.color = 'var(--text-dim)';
-    } else if (picker.value < t) {
-      status.textContent = 'Back-fill';
+    } else if (picker.value < todayStr) {
+      status.textContent = t('status.backfill');
       status.style.color = 'var(--info)';
     } else {
-      status.textContent = 'Future';
+      status.textContent = t('status.future');
       status.style.color = 'var(--bad)';
     }
   }
