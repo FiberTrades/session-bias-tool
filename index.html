@@ -1019,24 +1019,15 @@
       <p class="session-live-body" data-i18n-html="banner.body_html">Stay on this tab — your <strong>morning bias sits above</strong>, keeping you anchored. And when you take a trade, <strong>log it the moment you take it</strong> — while the chart's still in front of you. Fresh observation beats yesterday's reconstruction, every time.</p>
     </div>
     <div class="saved-bias hidden" id="saved-bias-card">
-      <div class="saved-bias-label" data-i18n="review.this_morning_bias">This morning's bias</div>
+      <div class="saved-bias-label" id="saved-bias-label">This morning's bias</div>
       <div class="saved-bias-grid" id="saved-bias-grid"></div>
       <div class="saved-bias-link hidden" id="saved-bias-link"></div>
       <div class="saved-bias-notes hidden" id="saved-bias-notes"></div>
     </div>
 
-    <section>
-      <div class="section-header"><span class="section-num">01</span><span class="section-title" data-i18n="review.s1.title">Did you take a trade?</span></div>
-      <p class="section-hint" data-i18n="review.s1.hint">If no, the trade-specific sections are skipped.</p>
-      <div class="options two-col" data-review="traded">
-        <button class="option" data-value="Yes" data-i18n="opt.yes">Yes</button>
-        <button class="option" data-value="No" data-i18n="opt.no">No — Observed Only</button>
-      </div>
-    </section>
-
-    <section id="section-trades" class="hidden">
+    <section id="section-trades">
       <div class="section-header">
-        <span class="section-num">02</span>
+        <span class="section-num">01</span>
         <span class="section-title" data-i18n="review.s2.title">Trade Log</span>
         <span class="section-header-spacer"></span>
         <span class="bias-date-inline">
@@ -1068,7 +1059,7 @@
     </section>
 
     <section id="section-execution" class="hidden">
-      <div class="section-header"><span class="section-num">03</span><span class="section-title" data-i18n="review.s3.title">Execution Quality</span></div>
+      <div class="section-header"><span class="section-num">02</span><span class="section-title" data-i18n="review.s3.title">Execution Quality</span></div>
       <p class="section-hint" data-i18n="hint.honest_self_assessment_of_how_you_executed">Honest self-assessment of how you executed.</p>
       <div class="options two-col" data-review="execution">
         <button class="option" data-value="Flawless" data-i18n="opt.flawless">Flawless</button>
@@ -1077,7 +1068,7 @@
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">04</span><span class="section-title" data-i18n="review.s4.title">Focus Level</span></div>
+      <div class="section-header"><span class="section-num">03</span><span class="section-title" data-i18n="review.s4.title">Focus Level</span></div>
       <p class="section-hint" data-i18n="hint.how_present_were_you_during_the_session">How present were you during the session.</p>
       <div class="options three-col" data-review="focus">
         <button class="option" data-value="Low" data-i18n="opt.low">Low</button>
@@ -1087,7 +1078,7 @@
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">05</span><span class="section-title" data-i18n="review.s5.title">How Did the Session Close?</span></div>
+      <div class="section-header"><span class="section-num">04</span><span class="section-title" data-i18n="review.s5.title">How Did the Session Close?</span></div>
       <p class="section-hint" data-i18n="hint.net_directional_behaviour_during_the_2_hour_window">Net directional behaviour during the 2-hour window.</p>
       <div class="options three-col" data-review="close">
         <button class="option" data-value="Bullish" data-i18n="opt.bullish">Bullish ↑</button>
@@ -1097,9 +1088,9 @@
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">06</span><span class="section-title" data-i18n="review.s6.title">RICE Phase Observed</span></div>
+      <div class="section-header"><span class="section-num">05</span><span class="section-title" data-i18n="review.s6.title">RICE Phase Observed</span></div>
       <p class="section-hint" data-i18n="hint.range_initiation_correction_extension_the_dominant">Range, Initiation, Correction, Extension — the dominant phase you saw.</p>
-      <div class="options four-col" data-review="rice">
+      <div class="options four-col" data-review-multi="rice">
         <button class="option" data-value="Range" data-i18n="opt.range">Range</button>
         <button class="option" data-value="Initiation" data-i18n="opt.initiation">Initiation</button>
         <button class="option" data-value="Correction" data-i18n="opt.correction">Correction</button>
@@ -1108,20 +1099,16 @@
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">07</span><span class="section-title" data-i18n="review.s7.title">Post-Session Charts</span></div>
+      <div class="section-header"><span class="section-num">06</span><span class="section-title" data-i18n="review.s7.title">Post-Session Charts</span></div>
       <p class="section-hint" data-i18n="hint.tradingview_snapshots_of_the_session_markups_encou">TradingView snapshots of the session — markups encouraged. Add as many as you need.</p>
       <div id="review-tv-list" style="margin-left:60px;"></div>
       <button type="button" id="review-tv-add" data-i18n="btn.add_link" style="margin-left:60px;margin-top:8px;background:transparent;border:1px dashed var(--border-2);padding:10px 16px;color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;transition:all 200ms;">+ Add link</button>
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">08</span><span class="section-title" data-i18n="review.s8.title">Concept Tags</span></div>
+      <div class="section-header"><span class="section-num">07</span><span class="section-title" data-i18n="review.s8.title">Concept Tags</span></div>
       <p class="section-hint" data-i18n="hint.select_all_that_applied_to_your_reads_today">Select all that applied to your reads today.</p>
       <div class="tags" id="concept-tags">
-        <button class="tag" data-value="Range (R)" data-i18n="tag.range_r">Range (R)</button>
-        <button class="tag" data-value="Initiation (I)" data-i18n="tag.initiation_i">Initiation (I)</button>
-        <button class="tag" data-value="Correction (C)" data-i18n="tag.correction_c">Correction (C)</button>
-        <button class="tag" data-value="Extension (E)" data-i18n="tag.extension_e">Extension (E)</button>
         <button class="tag" data-value="Range Phase" data-i18n="tag.range_phase">Range Phase</button>
         <button class="tag" data-value="Trend Phase" data-i18n="tag.trend_phase">Trend Phase</button>
         <button class="tag" data-value="Initiation Phase" data-i18n="tag.initiation_phase">Initiation Phase</button>
@@ -1162,7 +1149,7 @@
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">09</span><span class="section-title" data-i18n="review.s9.title">Mindset</span></div>
+      <div class="section-header"><span class="section-num">08</span><span class="section-title" data-i18n="review.s9.title">Mindset</span></div>
       <p class="section-hint" data-i18n="hint.mental_state">Mental state — be honest, this is how you grow.</p>
       <div class="tags" id="mindset-tags">
         <button class="tag" data-value="Flawless Execution" data-i18n="tag.flawless_execution">Flawless Execution</button>
@@ -1199,7 +1186,7 @@
     </section>
 
     <section>
-      <div class="section-header"><span class="section-num">10</span><span class="section-title" data-i18n="review.s10.title">Reflection</span></div>
+      <div class="section-header"><span class="section-num">09</span><span class="section-title" data-i18n="review.s10.title">Reflection</span></div>
       <p class="section-hint" data-i18n="review.s10.hint">What went well. What needs improvement. Don't skip this.</p>
       <textarea class="textarea" id="review-reflection" data-i18n-placeholder="ph.reflection_long" placeholder="Today I noticed... I will improve... Tomorrow I commit to..."></textarea>
     </section>
@@ -1854,6 +1841,9 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      "review.this_afternoon_bias": "This Afternoon's Bias",
+      "review.this_evening_bias": "This Evening's Bias",
+      "review.todays_bias": "Today's Bias",
       'btn.done': "Done",
       'rule.cadence_hint': "How often to show a snackbar reminder of your rule during the session.",
       'settings.rule_reminder': "Rule Reminder",
@@ -2413,6 +2403,9 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      "review.this_afternoon_bias": "El Sesgo de Esta Tarde",
+      "review.this_evening_bias": "El Sesgo de Esta Noche",
+      "review.todays_bias": "El Sesgo de Hoy",
       'btn.done': "Hecho",
       'rule.cadence_hint': "Con qu\u00e9 frecuencia mostrar un aviso con tu regla durante la sesi\u00f3n.",
       'settings.rule_reminder': "Recordatorio de la Regla",
@@ -3464,7 +3457,7 @@
     return { mode: null, structure: null, location: null, direction: null, tvLinks: [], notes: '', date: null, sessionDate: null };
   }
   function newReviewBlank() {
-    return { traded: null, trades: [], execution: null, focus: null, close: null, rice: null, tvLinks: [], concepts: [], mindset: [], reflection: '' };
+    return { traded: 'No', trades: [], execution: null, focus: null, close: null, rice: [], tvLinks: [], concepts: [], mindset: [], reflection: '' };
   }
   function newTradeBlank() {
     return { result: '', r: '', type: '', side: '', entryTime: '', exitTime: '', risk: '', sl: '', costs: '' };
@@ -3541,6 +3534,18 @@
       d._sessionNameTimesBackfilled = true;
     }
     if (!d.review) d.review = newReviewBlank();
+    // Migrate single-select RICE (string|null) → multi-select (array). And clean R/I/C/E
+    // out of the concepts array since they now live on data.review.rice instead.
+    if (d.review) {
+      if (typeof d.review.rice === 'string') d.review.rice = d.review.rice ? [d.review.rice] : [];
+      if (!Array.isArray(d.review.rice)) d.review.rice = [];
+      if (Array.isArray(d.review.concepts)) {
+        const ricePhaseConcepts = ['Range (R)', 'Initiation (I)', 'Correction (C)', 'Extension (E)'];
+        d.review.concepts = d.review.concepts.filter(c => !ricePhaseConcepts.includes(c));
+      }
+    }
+    // Same cleanup on any biasSnap/reviewSnap inside trades — keep historical data consistent
+    // but DON'T mutate snapshot rice (those are historical records, leave them as captured).
     if (!d.bias) d.bias = newBiasBlank();
     if (d.bias && !d.bias.sessionDate) d.bias.sessionDate = null;
     if (!d.currentSeries) d.currentSeries = [];
@@ -4022,6 +4027,27 @@
     renderBiasPreview();
   });
 
+  // Wires multi-select option groups (data-review-multi) — toggles items in an array.
+  // Used for RICE phase observed (range/initiation/correction/extension can all coexist on one day).
+  function bindReviewMultiOptions() {
+    document.querySelectorAll('[data-review-multi]').forEach(group => {
+      const key = group.dataset.reviewMulti;
+      if (!Array.isArray(data.review[key])) data.review[key] = [];
+      group.querySelectorAll('.option').forEach(btn => {
+        // Sync initial selected state
+        if (data.review[key].includes(btn.dataset.value)) btn.classList.add('selected');
+        btn.addEventListener('click', () => {
+          const val = btn.dataset.value;
+          const arr = data.review[key];
+          const idx = arr.indexOf(val);
+          if (idx >= 0) { arr.splice(idx, 1); btn.classList.remove('selected'); }
+          else { arr.push(val); btn.classList.add('selected'); }
+          renderReviewPreview();
+        });
+      });
+    });
+  }
+
   function bindReviewOptions() {
     document.querySelectorAll('[data-review]').forEach(group => {
       const key = group.dataset.review;
@@ -4030,22 +4056,6 @@
           group.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
           btn.classList.add('selected');
           data.review[key] = btn.dataset.value;
-          if (key === 'traded') {
-            const ts = document.getElementById('section-trades');
-            const es = document.getElementById('section-execution');
-            if (btn.dataset.value === 'Yes') {
-              ts.classList.remove('hidden');
-              es.classList.remove('hidden');
-              if (data.review.trades.length === 0) addTradeRow();
-            } else {
-              ts.classList.add('hidden');
-              es.classList.add('hidden');
-              data.review.trades = [];
-              renderTrades();
-              data.review.execution = null;
-              es.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
-            }
-          }
           renderReviewPreview();
         });
         if (data.review[key] === btn.dataset.value) btn.classList.add('selected');
@@ -4372,7 +4382,7 @@
         }
         lightUpdate();
       });
-      row.querySelector('.trade-remove').addEventListener('click', () => { data.review.trades.splice(idx, 1); fullUpdate(); });
+      row.querySelector('.trade-remove').addEventListener('click', () => { data.review.trades.splice(idx, 1); syncTradedFromTrades(); fullUpdate(); });
     });
     _applyCurrency();
   }
@@ -4430,8 +4440,24 @@
     if (e.key === 'Enter') { e.preventDefault(); savePotentialRModal(); }
     else if (e.key === 'Escape') closePotentialRModal();
   });
+  // Sync data.review.traded based on whether there are any logged trades.
+  // No trades → 'No' (observed only) + hide Execution. Any trade row exists → 'Yes' + show Execution.
+  // This replaces the old explicit "Did you take a trade?" question.
+  function syncTradedFromTrades() {
+    const hasTrades = data.review.trades && data.review.trades.length > 0;
+    data.review.traded = hasTrades ? 'Yes' : 'No';
+    const es = document.getElementById('section-execution');
+    if (es) es.classList.toggle('hidden', !hasTrades);
+    // If we just dropped to zero trades, clear the execution selection so a stale value doesn't linger
+    if (!hasTrades) {
+      data.review.execution = null;
+      if (es) es.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+    }
+  }
+
   function addTradeRow() {
     data.review.trades.push(newTradeBlank());
+    syncTradedFromTrades();
     renderTrades(); renderReviewPreview(); saveData();
   }
   document.getElementById('add-trade').addEventListener('click', addTradeRow);
@@ -4547,7 +4573,7 @@
       const arrow = r.close === 'Bullish' ? '↑' : r.close === 'Bearish' ? '↓' : '↔';
       lines.push(`Close       ${arrow} ${r.close}`);
     }
-    if (r.rice) lines.push(`Phase       ${r.rice}`);
+    if (Array.isArray(r.rice) && r.rice.length > 0) lines.push(`Phase       ${r.rice.join(' · ')}`);
     const reviewLinks = (r.tvLinks || []).filter(l => l && l.url);
     if (reviewLinks.length > 0) {
       lines.push('');
@@ -4565,7 +4591,7 @@
     const r = data.review;
     const out = document.getElementById('review-preview');
     const hasLinks = (r.tvLinks || []).some(l => l && l.url);
-    const filled = r.traded || r.focus || r.close || r.rice || hasLinks || r.concepts.length || r.mindset.length || r.reflection || r.trades.some(t => t.result || t.r);
+    const filled = r.traded || r.focus || r.close || (Array.isArray(r.rice) && r.rice.length) || hasLinks || r.concepts.length || r.mindset.length || r.reflection || r.trades.some(t => t.result || t.r);
     if (!filled) { out.innerHTML = '<em>Fill in the form to preview your Discord post.</em>'; return; }
     const html = buildReviewMessage()
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -4573,9 +4599,23 @@
     out.innerHTML = html;
   }
 
+  // Pick the right label for the saved-bias card based on the session window start time.
+  // < 12:00 → morning, 12-18 → afternoon, 18-22 → evening, otherwise → today.
+  function getSavedBiasLabelKey() {
+    const ws = (data.settings && data.settings.windowStart) || '08:00';
+    const h = parseInt((ws.split(':')[0] || '8'), 10);
+    if (h < 12)  return 'review.this_morning_bias';
+    if (h < 18)  return 'review.this_afternoon_bias';
+    if (h < 22)  return 'review.this_evening_bias';
+    return 'review.todays_bias';
+  }
+
   function renderSavedBias() {
     const b = data.bias;
     const card = document.getElementById('saved-bias-card');
+    // Set the label dynamically — adapts to whichever session window the user trades.
+    const labelEl = document.getElementById('saved-bias-label');
+    if (labelEl) labelEl.textContent = t(getSavedBiasLabelKey());
     const hideCard = () => {
       // Clear inner state too, so if the .hidden CSS ever gets overridden the
       // content doesn't leak through.
@@ -4601,6 +4641,29 @@
         grid.appendChild(row);
       }
     });
+    // Rule for the week — pulled with the same Mon-Fri/Sat-Sun logic as the Discord builder.
+    try {
+      if (typeof getRuleForWeek === 'function' && typeof getCalendarWeekKey === 'function') {
+        const ruleRefDate = new Date();
+        const dow = ruleRefDate.getDay();
+        let rule = null;
+        if (dow >= 1 && dow <= 5) {
+          rule = getRuleForWeek(getCalendarWeekKey(ruleRefDate));
+        } else {
+          const lastKey = getCalendarWeekKey(new Date(ruleRefDate.getTime() - 7*24*3600*1000));
+          const lastRule = getRuleForWeek(lastKey);
+          if (lastRule && lastRule.followed === null) rule = lastRule;
+          else rule = getRuleForWeek(getCalendarWeekKey(new Date(ruleRefDate.getTime() + 7*24*3600*1000)));
+        }
+        if (rule && rule.rule) {
+          const row = document.createElement('div');
+          row.className = 'saved-bias-row';
+          row.style.gridColumn = '1 / -1';
+          row.innerHTML = `<span class="k">${t('rule.eyebrow')}</span><span class="v" style="font-style:italic;">${rule.rule.replace(/</g,'&lt;')}</span>`;
+          grid.appendChild(row);
+        }
+      }
+    } catch(e) {}
     const linkEl = document.getElementById('saved-bias-link');
     const links = (b.tvLinks || []).filter(l => l && l.url);
     if (links.length > 0) {
@@ -4625,10 +4688,8 @@
   function restoreReviewValues() {
     renderReviewTvLinks();
     document.getElementById('review-reflection').value = data.review.reflection || '';
-    if (data.review.traded === 'Yes') {
-      document.getElementById('section-trades').classList.remove('hidden');
-      document.getElementById('section-execution').classList.remove('hidden');
-    }
+    // Trade Log is always visible now; Execution depends on whether any trades exist.
+    syncTradedFromTrades();
     renderTrades();
     renderReviewPreview();
     renderSavedBias();
@@ -4691,7 +4752,7 @@
     const valid = data.review.trades.filter(t => t.result && t.r && !isNaN(parseFloat(t.r)));
     if (valid.length === 0) { showToast('No valid trades to save'); return; }
     const biasSnap = { ...data.bias, tvLinks: (data.bias.tvLinks || []).map(l => ({ url: l.url || '', notes: l.notes || '' })) };
-    const reviewSnap = { traded: data.review.traded, execution: data.review.execution, focus: data.review.focus, close: data.review.close, rice: data.review.rice, tvLinks: (data.review.tvLinks || []).map(l => ({ url: l.url || '', notes: l.notes || '' })), concepts: [...data.review.concepts], mindset: [...data.review.mindset], reflection: data.review.reflection };
+    const reviewSnap = { traded: data.review.traded, execution: data.review.execution, focus: data.review.focus, close: data.review.close, rice: Array.isArray(data.review.rice) ? [...data.review.rice] : [], tvLinks: (data.review.tvLinks || []).map(l => ({ url: l.url || '', notes: l.notes || '' })), concepts: [...data.review.concepts], mindset: [...data.review.mindset], reflection: data.review.reflection };
     // Use session date (defaults to today, can be back-filled)
     const sessionDateStr = data.review.sessionDate || todayDateStr();
     const sessionDate = new Date(sessionDateStr + 'T12:00:00');
@@ -4744,7 +4805,9 @@
     data.review = newReviewBlank();
     data.review.sessionDate = todayDateStr();
     saveData();
+    syncTradedFromTrades();
     document.querySelectorAll('[data-review] .option').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('[data-review-multi] .option').forEach(b => b.classList.remove('selected'));
     document.querySelectorAll('.tag').forEach(b => b.classList.remove('selected'));
     renderReviewTvLinks();
     document.getElementById('review-reflection').value = '';
@@ -6726,6 +6789,7 @@
 
   bindBiasOptions();
   bindReviewOptions();
+  bindReviewMultiOptions();
   setupTagGroup('concept-tags', 'concepts');
   setupTagGroup('mindset-tags', 'mindset');
   restoreBiasValues();
@@ -10950,15 +11014,7 @@
 
     saveData();
 
-    // Make sure the Trade Log section is visible (it's hidden until "Did you take a trade?" = Yes)
-    if (data.review.traded !== 'Yes') {
-      data.review.traded = 'Yes';
-      document.querySelectorAll('[data-review="traded"] .option').forEach(b => {
-        b.classList.toggle('selected', b.dataset.value === 'Yes');
-      });
-      document.getElementById('section-trades').classList.remove('hidden');
-      document.getElementById('section-execution').classList.remove('hidden');
-    }
+    syncTradedFromTrades();
 
     // Refresh the session date picker and trade rows
     const picker = document.getElementById('session-date');
