@@ -717,7 +717,7 @@
   .modal-stat .v.good { color: var(--good); }
   .modal-stat .v.bad  { color: var(--bad); }
   .modal-trades { margin-top: 16px; }
-  .modal-trade-row { display: grid; grid-template-columns: 28px 110px 60px 70px 90px 90px 100px 70px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 4px; font-size: 11px; width: fit-content; max-width: 100%; cursor: pointer; transition: background 150ms; }
+  .modal-trade-row { display: grid; grid-template-columns: 28px 110px 90px 100px 90px 90px 100px 70px; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 4px; font-size: 11px; width: fit-content; max-width: 100%; cursor: pointer; transition: background 150ms; }
   .modal-trade-row.headers { cursor: default; }
   .modal-trade-row:not(.headers):hover { background: var(--border-2); }
   .modal-trade-cell { background: var(--bg); padding: 10px 10px; }
@@ -1343,14 +1343,14 @@
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title"><span data-i18n="trades.s6.title">What if I held winners longer?</span><span class="info-tip"><span class="info-tip-icon">?</span><span class="info-tip-content">A recommendation based on how much of the available move you're capturing on average, followed by a per-trade table sorted by R left on the table (worst exits first). Click any row to open that day's review. Conviction strength scales with the number of tracked wins — sub-10 wins is too few to act on, 50+ is a strong pattern.</span></span></span></div>
       <div class="potr-period-row">
-        <span class="potr-period-label">Period</span>
+        <span class="potr-period-label" data-i18n="period.label">Period</span>
         <select id="potr-period-select">
-          <option value="all">All history</option>
-          <option value="custom">Custom…</option>
+          <option value="all" data-i18n="period.all">All history</option>
+          <option value="custom" data-i18n="period.custom">Custom…</option>
         </select>
         <span class="potr-period-custom" id="potr-period-custom" style="display:none">
           <input type="date" id="potr-period-from" />
-          <span class="potr-period-sep">to</span>
+          <span class="potr-period-sep" data-i18n="period.to">to</span>
           <input type="date" id="potr-period-to" />
         </span>
         <span class="potr-period-count" id="potr-period-count"></span>
@@ -1821,6 +1821,23 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'period.all': 'All history',
+      'period.to': 'to',
+      'modal.week_of': 'Week of',
+      'modal.month_of': 'Month of',
+      'modal.concept_tags': 'Concept tags',
+      'modal.mindset_tags': 'Mindset tags',
+      'modal.need_3_tag': 'Need ≥3 trades carrying the same tag to rank.',
+      'modal.worst_short': 'Worst',
+      'modal.best_worst_weekday': 'Best & worst weekday',
+      'modal.need_3_weekdays': 'Need ≥3 trades on at least two different weekdays.',
+      'modal.best_day': 'Best day',
+      'modal.worst_day': 'Worst day',
+      'modal.vs_prev_month': 'vs Previous month',
+      'modal.no_prev_month': 'No data from previous month to compare.',
+      'modal.monthly_notes': 'Monthly Notes',
+      'modal.monthly_notes_sub': 'Anything to carry into next month.',
+      'modal.monthly_notes_placeholder': 'Themes, patterns, intentions for next month…',
       'word.win': 'win',
       'word.wins': 'wins',
       'pot.tier_too_few': 'Not enough yet',
@@ -2317,6 +2334,23 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'period.all': 'Todo el historial',
+      'period.to': 'a',
+      'modal.week_of': 'Semana del',
+      'modal.month_of': 'Mes de',
+      'modal.concept_tags': 'Etiquetas de concepto',
+      'modal.mindset_tags': 'Etiquetas de mentalidad',
+      'modal.need_3_tag': 'Hacen falta ≥3 operaciones con la misma etiqueta para clasificar.',
+      'modal.worst_short': 'Peor',
+      'modal.best_worst_weekday': 'Mejor y peor día de la semana',
+      'modal.need_3_weekdays': 'Hacen falta ≥3 operaciones en al menos dos días distintos.',
+      'modal.best_day': 'Mejor día',
+      'modal.worst_day': 'Peor día',
+      'modal.vs_prev_month': 'vs Mes anterior',
+      'modal.no_prev_month': 'Sin datos del mes anterior para comparar.',
+      'modal.monthly_notes': 'Notas Mensuales',
+      'modal.monthly_notes_sub': 'Algo que llevarte al mes siguiente.',
+      'modal.monthly_notes_placeholder': 'Temas, patrones, intenciones para el próximo mes…',
       'word.win': 'ganadora',
       'word.wins': 'ganadoras',
       'pot.tier_too_few': 'Aún insuficiente',
@@ -3839,6 +3873,9 @@
   function renderTrades() {
     const wrap = document.getElementById('trade-rows');
     wrap.innerHTML = '';
+    // After we rebuild the rows, refresh currency placeholders so € or $ replaces the hardcoded £.
+    // (Inputs use data-currency-placeholder="{C}" but are recreated with placeholder="£" each render.)
+    const _applyCurrency = () => { if (typeof applyCurrencySymbol === 'function') applyCurrencySymbol(); };
     // Pre-compute translated strings — inside the forEach below, `t` is the trade
     // parameter, which shadows the global t() translation function.
     const _resWin  = t('res.win'),  _resLose = t('res.lose'), _resBE = t('res.be');
@@ -4034,6 +4071,7 @@
       });
       row.querySelector('.trade-remove').addEventListener('click', () => { data.review.trades.splice(idx, 1); fullUpdate(); });
     });
+    _applyCurrency();
   }
 
   // Potential R + Pips popup — fires on R/pips blur for Win trades.
@@ -4777,7 +4815,7 @@
     document.getElementById('stat-max-bes').textContent = mb || '0';
 
     const dows = [1,2,3,4,5];
-    const dowNames = { 1:'Monday', 2:'Tuesday', 3:'Wednesday', 4:'Thursday', 5:'Friday' };
+    const dowNames = { 1: t('dow.monday'), 2: t('dow.tuesday'), 3: t('dow.wednesday'), 4: t('dow.thursday'), 5: t('dow.friday') };
     const dowWrap = document.getElementById('dow-breakdown');
     const anyDow = all.some(t => t.dayOfWeek !== undefined && t.dayOfWeek !== null);
     // Cell formatters — R only.
@@ -5667,13 +5705,22 @@
         }
         // Append week summary cell — pinned to current row, column 8
         weekIdx++;
-        // Compute Mon-Fri bounds for this displayed week (anchor = first real date in this row)
+        // Compute Mon-Fri bounds for the WORKWEEK displayed in this row.
+        // The calendar layout is Sun-Sat: when the row's anchor is Sunday,
+        // the Mon-Fri visible in THIS row is anchor+1 to anchor+5 (next 5 days).
+        // For the first row of the month where the 1st falls mid-week, walk back
+        // to the most recent Monday (which may be in the previous month).
         const mondayDate = (function() {
           const anchor = currentWeek.anchorDate;
-          const adow = anchor.getDay(); // 0=Sun
+          const adow = anchor.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
           const m = new Date(anchor);
-          const daysSinceMonday = (adow + 6) % 7;
-          m.setDate(m.getDate() - daysSinceMonday);
+          if (adow === 0) {
+            // Anchor is Sunday: Monday of the row's workweek = anchor + 1
+            m.setDate(m.getDate() + 1);
+          } else {
+            // Anchor is mid-row: Monday = anchor - (adow - 1)
+            m.setDate(m.getDate() - (adow - 1));
+          }
           return m;
         })();
         const fridayDate = new Date(mondayDate); fridayDate.setDate(fridayDate.getDate() + 4);
@@ -5777,7 +5824,7 @@
     const dayTrades = grouped[dateKey] || [];
     if (dayTrades.length === 0) return;
     const d = new Date(dateKey);
-    const fullDate = d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    const fullDate = d.toLocaleDateString(tLocale(), { weekday:'long', day:'numeric', month:'long', year:'numeric' }).replace(/^./, c => c.toUpperCase());
     document.getElementById('modal-date').textContent = fullDate;
     const wins = dayTrades.filter(t => t.result === 'Win').length;
     const losses = dayTrades.filter(t => t.result === 'Lose').length;
@@ -6609,7 +6656,7 @@
       if (eligible.length === 0) {
         return `<div class="month-insight-block">
           <div class="month-insight-title">${title}</div>
-          <div class="month-insight-empty">Need ≥3 trades carrying the same tag to rank.</div>
+          <div class="month-insight-empty">${t('modal.need_3_tag')}</div>
         </div>`;
       }
       const sorted = eligible.slice().sort((a, b) => b.total - a.total);
@@ -6637,18 +6684,18 @@
             <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} ${best.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', best.trades)}</div>
           </div>
           <div class="month-insight-cell">
-            <div class="month-insight-label"><span class="icon bad">↓</span>Worst</div>
+            <div class="month-insight-label"><span class="icon bad">↓</span>${t('modal.worst_short')}</div>
             <div class="month-insight-value">${worst.tag}</div>
             <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} ${worst.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', worst.trades)}</div>
           </div>
         </div>
       </div>`;
     }
-    const conceptHtml = tagSectionHtml(tagAggregate('concepts'), 'Concept tags');
-    const mindsetHtml = tagSectionHtml(tagAggregate('mindset'), 'Mindset tags');
+    const conceptHtml = tagSectionHtml(tagAggregate('concepts'), t('modal.concept_tags'));
+    const mindsetHtml = tagSectionHtml(tagAggregate('mindset'), t('modal.mindset_tags'));
 
     // === 5. Best & worst weekday (Mon-Fri only) ===
-    const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const WEEKDAY_NAMES = [t('cal.dow.sun'), t('cal.dow.mon'), t('cal.dow.tue'), t('cal.dow.wed'), t('cal.dow.thu'), t('cal.dow.fri'), t('cal.dow.sat')];
     const dowBuckets = {};
     monthTrades.forEach(t => {
       const d = new Date(t.date);
@@ -6666,15 +6713,15 @@
       const best = sorted[0], worst = sorted[sorted.length - 1];
       const cls = v => v > 0 ? 'good' : v < 0 ? 'bad' : '';
       dowHtml = `<div class="month-insight-block">
-        <div class="month-insight-title">Best & worst weekday</div>
+        <div class="month-insight-title">${t('modal.best_worst_weekday')}</div>
         <div class="month-insight-row">
           <div class="month-insight-cell">
-            <div class="month-insight-label"><span class="icon good">↑</span>Best day</div>
+            <div class="month-insight-label"><span class="icon good">↑</span>${t('modal.best_day')}</div>
             <div class="month-insight-value">${best.name}</div>
             <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} ${best.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', best.trades)}</div>
           </div>
           <div class="month-insight-cell">
-            <div class="month-insight-label"><span class="icon bad">↓</span>Worst day</div>
+            <div class="month-insight-label"><span class="icon bad">↓</span>${t('modal.worst_day')}</div>
             <div class="month-insight-value">${worst.name}</div>
             <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} ${worst.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace('{N}', worst.trades)}</div>
           </div>
@@ -6682,7 +6729,7 @@
       </div>`;
     } else {
       dowHtml = `<div class="month-insight-block">
-        <div class="month-insight-title">Best & worst weekday</div>
+        <div class="month-insight-title">${t('modal.best_worst_weekday')}</div>
         <div class="month-insight-empty">Need ≥3 trades on at least two different weekdays.</div>
       </div>`;
     }
@@ -6695,8 +6742,8 @@
     let comparisonHtml = '';
     if (prevStats.totalTrades === 0) {
       comparisonHtml = `<div class="month-insight-block">
-        <div class="month-insight-title">vs Previous month</div>
-        <div class="month-insight-empty">No data from previous month to compare.</div>
+        <div class="month-insight-title">${t('modal.vs_prev_month')}</div>
+        <div class="month-insight-empty">${t('modal.no_prev_month')}</div>
       </div>`;
     } else {
       const thisVal = isPipsView ? thisStats.totalPips : thisStats.totalR;
@@ -7044,20 +7091,75 @@
     "{n}, did you respect the bell — entries and exits both?",
   ];
 
+  // Spanish translations of the weekly/monthly review greetings. Used when language is 'es'.
+  const PERIOD_GREET_ES = {
+    BIG_WIN: [
+      "{p} fuerte, {n}. No dejes que infle tu tamaño de posición.",
+      "Gran {p}, {n} — ¿el tamaño fue tan deliberado como las ganadoras?",
+      "{n}, {p} destacado. La lección aquí importa tanto como en una pérdida.",
+      "{n}, beneficio asegurado. Ahora — ¿proceso o generosidad del mercado?",
+      "Verde y ruidoso, {n}. ¿Fue la disciplina igual de ruidosa?",
+      "{n}, un {p} para recordar. No ancles el próximo {p} a este.",
+    ],
+    POSITIVE: [
+      "{p} verde, {n}. ¿Fue el proceso o el mercado?",
+      "Buen {p}, {n} — ¿qué operación casi te disuades de tomar?",
+      "{p} sólido, {n}. ¿Tu disciplina igualó el resultado?",
+      "{n}, en positivo. ¿Cuál fue la mejor decisión que tomaste?",
+      "Verde, {n}. ¿Hubo una operación que cogiste por la razón equivocada?",
+      "{n}, {p} ganador. ¿Repetirías exactamente el mismo plan?",
+    ],
+    FLAT: [
+      "{p} plano, {n}. A veces el mercado no te debe nada.",
+      "{n}, casi plano. ¿Fue paciencia o duda?",
+      "{p} en break-even, {n}. ¿Qué tipo de día fue — claro o ruidoso?",
+      "{n}, ni ganancias ni pérdidas. ¿Trabajo limpio o trabajo incompleto?",
+    ],
+    NEGATIVE: [
+      "{p} en rojo, {n}. ¿Setups o ejecución?",
+      "{n}, {p} difícil. ¿Las pérdidas fueron del tamaño correcto?",
+      "Rojo, {n}. ¿Una operación se llevó la mayor parte, o fue acumulado?",
+      "{n}, en negativo. ¿Tu peor operación rompió alguna regla escrita?",
+      "{p} negativo, {n}. ¿Hubo un punto donde deberías haber parado?",
+      "{n}, no fue tu {p}. ¿Algo del proceso que rescatar?",
+    ],
+    BIG_LOSS: [
+      "{p} duro, {n}. Cuídate primero. El análisis puede esperar al lunes.",
+      "{n}, {p} difícil. ¿Una explosión o erosión acumulada?",
+      "Sangrado, {n}. Antes de analizar — ¿estás bien?",
+      "{n}, {p} caro. ¿Qué te diría tu yo de hace seis meses?",
+      "{p} en rojo profundo, {n}. ¿Qué te alejarías de hacer la próxima semana?",
+    ],
+    EMPTY: [
+      "{p} sin operaciones, {n}. ¿Disciplina o evitación?",
+      "{n}, {p} vacío. ¿No hubo setups, o no los tomaste?",
+      "Cero operaciones este {p}, {n}. ¿El plan era observar, o algo te frenó?",
+      "{n}, {p} en cero. ¿Qué pasó esta semana? ¿Vida o mercado?",
+    ],
+    REFLECTIVE: [
+      "{n}, ¿qué operación te enseñará más este {p}?",
+      "Cuenta tu {p} en una frase, {n}.",
+      "{n}, si un junior leyera este {p}, ¿qué aprendería?",
+      "Un buen {p}, un mal {p} — ¿qué tienen en común?",
+      "{n}, ¿qué hábito te hizo este {p}?",
+      "{n}, ¿este {p} cambia algo sobre la próxima semana?",
+    ],
+  };
   function pickPeriodGreeting(stats, n, period, seedKey) {
+    const _G = (en, esKey) => (window.__lang === 'es' && Array.isArray(PERIOD_GREET_ES[esKey]) && PERIOD_GREET_ES[esKey].length) ? PERIOD_GREET_ES[esKey] : en;
     let pool;
     if (stats.totalTrades === 0) {
-      pool = PERIOD_GREET_EMPTY;
+      pool = _G(PERIOD_GREET_EMPTY, 'EMPTY');
     } else if (stats.totalR >= 5) {
-      pool = [...PERIOD_GREET_BIG_WIN, ...PERIOD_GREET_POSITIVE, ...PERIOD_GREET_REFLECTIVE];
+      pool = [..._G(PERIOD_GREET_BIG_WIN, 'BIG_WIN'), ..._G(PERIOD_GREET_POSITIVE, 'POSITIVE'), ..._G(PERIOD_GREET_REFLECTIVE, 'REFLECTIVE')];
     } else if (stats.totalR <= -3) {
-      pool = [...PERIOD_GREET_BIG_LOSS, ...PERIOD_GREET_NEGATIVE, ...PERIOD_GREET_REFLECTIVE];
+      pool = [..._G(PERIOD_GREET_BIG_LOSS, 'BIG_LOSS'), ..._G(PERIOD_GREET_NEGATIVE, 'NEGATIVE'), ..._G(PERIOD_GREET_REFLECTIVE, 'REFLECTIVE')];
     } else if (stats.totalR > 0) {
-      pool = [...PERIOD_GREET_POSITIVE, ...PERIOD_GREET_REFLECTIVE];
+      pool = [..._G(PERIOD_GREET_POSITIVE, 'POSITIVE'), ..._G(PERIOD_GREET_REFLECTIVE, 'REFLECTIVE')];
     } else if (stats.totalR < 0) {
-      pool = [...PERIOD_GREET_NEGATIVE, ...PERIOD_GREET_REFLECTIVE];
+      pool = [..._G(PERIOD_GREET_NEGATIVE, 'NEGATIVE'), ..._G(PERIOD_GREET_REFLECTIVE, 'REFLECTIVE')];
     } else {
-      pool = [...PERIOD_GREET_FLAT, ...PERIOD_GREET_REFLECTIVE];
+      pool = [..._G(PERIOD_GREET_FLAT, 'FLAT'), ..._G(PERIOD_GREET_REFLECTIVE, 'REFLECTIVE')];
     }
     const idx = hashStr((seedKey || '') + ':' + (stats.totalR || 0).toFixed(1)) % pool.length;
     return pool[idx].replace(/\{n\}/g, n || 'trader').replace(/\{p\}/g, period);
@@ -7115,8 +7217,8 @@
 
   function openWeeklyReviewModal(weekStart, weekEnd) {
     const { weekKey } = getCurrentWeekBounds(weekEnd);
-    const fmtDate = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    const titleText = `Week of ${fmtDate(weekStart)} – ${fmtDate(weekEnd)}`;
+    const fmtDate = d => d.toLocaleDateString(tLocale(), { day: 'numeric', month: 'short' });
+    const titleText = `${t('modal.week_of')} ${fmtDate(weekStart)} – ${fmtDate(weekEnd)}`;
     currentReview = { kind: 'weekly', start: weekStart, end: weekEnd, key: weekKey, titleText };
     const stats = computePeriodStats(weekStart, weekEnd);
     fillReviewModalBody(stats, titleText, 'week');
@@ -7130,8 +7232,8 @@
     const periodStart = new Date(year, month, 1, 0, 0, 0, 0);
     const periodEnd = new Date(year, month + 1, 0, 23, 59, 59, 999);
     const monthKey = `${year}-M${String(month + 1).padStart(2, '0')}`;
-    const monthName = periodStart.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-    const titleText = `Month of ${monthName}`;
+    const monthName = periodStart.toLocaleDateString(tLocale(), { month: 'long', year: 'numeric' }).replace(/^./, c => c.toUpperCase());
+    const titleText = `${t('modal.month_of')} ${monthName}`;
     currentReview = { kind: 'monthly', start: periodStart, end: periodEnd, key: monthKey, titleText };
     const stats = computePeriodStats(periodStart, periodEnd);
     fillReviewModalBody(stats, titleText, 'month', { start: periodStart, end: periodEnd });
@@ -7472,9 +7574,9 @@
     function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     document.getElementById('review-modal-reflection').innerHTML = `
       <div class="reflect-block">
-        <div class="reflect-header">Monthly Notes</div>
-        <div class="reflect-subhead">Anything to carry into next month.</div>
-        <textarea id="rfx-month-notes" class="reflect-q-textarea" style="min-height:120px;" placeholder="Themes, patterns, intentions for next month…">${esc(notes)}</textarea>
+        <div class="reflect-header">${t('modal.monthly_notes')}</div>
+        <div class="reflect-subhead">${t('modal.monthly_notes_sub')}</div>
+        <textarea id="rfx-month-notes" class="reflect-q-textarea" style="min-height:120px;" placeholder="${t('modal.monthly_notes_placeholder')}">${esc(notes)}</textarea>
       </div>
     `;
     document.getElementById('rfx-month-notes').addEventListener('input', e2 => {
