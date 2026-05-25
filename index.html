@@ -5001,15 +5001,16 @@
     const netR = calcNetR();
     if (netR !== null) lines.push(`            Net: ${netR >= 0 ? '+' : ''}${netR.toFixed(2)}R`);
 
-    // Pre-collect every chart URL across trades. Numbering restarts at [1] within each
-    // trade — the "— Trade N —" header is the anchor, and the bracketed number identifies
-    // which chart within that trade if it has multiple. Reader visually maps Discord's
-    // preview stack to the "— Trade N —" headers, not to global numbers.
+    // Pre-collect every chart URL across the session's trades, assigning continuous [N] numbers.
+    // Continuous numbering (Trade 1 → [1], Trade 2 → [2] [3], etc.) matches the Weekly Review
+    // behaviour and removes the duplicate-[1] confusion that arose with per-trade restart.
+    // The "— Trade N —" header still anchors which trade a chart belongs to; the bracket is
+    // now just a unique identifier for matching to Discord's preview pile.
     const chartIndex = []; // [{ tradeIdx, num, url, notes }]
     r.trades.forEach((t, i) => {
       const links = (t.tvLinks || []).filter(l => l && l.url);
-      links.forEach((l, localIdx) => {
-        chartIndex.push({ tradeIdx: i, num: localIdx + 1, url: l.url, notes: l.notes || '' });
+      links.forEach((l) => {
+        chartIndex.push({ tradeIdx: i, num: chartIndex.length + 1, url: l.url, notes: l.notes || '' });
       });
     });
 
@@ -8906,16 +8907,15 @@
       return `${dateStr} · ${t.side || '—'} · ${rStr}${pStr}`;
     }
 
-    // Pre-collect every chart URL across this week's sections, assign sequential [N] numbers.
-    // Each section then references its charts inline, and all URLs are emitted at the bottom
-    // — Discord stacks the previews there anyway, so [N] markers let the reader match each.
-    // Numbering restarts within each source section — Best/Missed each get their own
-    // local [1], [2], etc. The section header is the anchor; brackets only matter when a
-    // section has multiple charts.
+    // Pre-collect every chart URL across this week's sections, assigning continuous [N] numbers
+    // across the whole post. The Weekly Review uses continuous numbering (best=1, missed=2,3...)
+    // instead of per-section restart — different from Session Review by deliberate choice,
+    // because weekly charts come from genuinely different sources (best trade vs missed setups)
+    // and continuous numbering reads less ambiguously when Discord stacks the previews at the bottom.
     const chartIndex = []; // { num, url, source }
     const bestTradeChart = dBestWin && (typeof pickTradeChartUrl === 'function') ? pickTradeChartUrl(dBestWin) : null;
-    if (bestTradeChart) chartIndex.push({ num: 1, url: bestTradeChart, source: 'best' });
-    missedUrls.forEach((url, idx) => chartIndex.push({ num: idx + 1, url, source: 'missed' }));
+    if (bestTradeChart) chartIndex.push({ num: chartIndex.length + 1, url: bestTradeChart, source: 'best' });
+    missedUrls.forEach(url => chartIndex.push({ num: chartIndex.length + 1, url, source: 'missed' }));
 
     const refsBySource = src => chartIndex.filter(c => c.source === src).map(c => `[${c.num}]`).join(' ');
 
