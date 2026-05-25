@@ -215,6 +215,8 @@
   .tv-link-preview-wrap:empty { display: none; }
   .tv-link-preview { width: 100%; max-width: 540px; height: auto; border-radius: 2px; border: 1px solid var(--border-2); display: block; cursor: pointer; transition: opacity 200ms; }
   .tv-link-preview:hover { opacity: 0.85; }
+  /* Weekly "Winning trades I didn't take" charts use the same wider size as the day-modal bias charts (720px) */
+  #rfx-missed-list .tv-link-preview { max-width: 720px; }
   .tv-link-notes { display: block; width: 100%; margin-top: 10px; background: var(--bg-elev); border: 1px solid var(--border-2); padding: 10px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 300; line-height: 1.6; outline: none; resize: vertical; min-height: 50px; transition: border-color 200ms; }
   .tv-link-notes:focus { border-color: var(--text-mid); }
   .tv-link-notes::placeholder { color: var(--text-dim); }
@@ -7692,7 +7694,10 @@
   //   - Traded:    days at least one trade was logged
   // The gap between them is the interpretive value — disciplined waiting shows as
   // high showed-up + low traded, which is healthy for a selective trader.
-  function renderConsistencyBlock(periodStart, periodEnd, periodTrades) {
+  // opts.minimal=true hides percentages + interpretive note (used for weekly where the
+  // %s are noisy at small samples and the note doesn't add enough to earn its space).
+  function renderConsistencyBlock(periodStart, periodEnd, periodTrades, opts) {
+    const minimal = !!(opts && opts.minimal);
     // Count weekdays in the period (Mon–Fri only)
     let weekdaysInPeriod = 0;
     for (let d = new Date(periodStart); d <= periodEnd; d.setDate(d.getDate() + 1)) {
@@ -7723,13 +7728,18 @@
     tradedDaySet.forEach(k => showedUpSet.add(k));
     const showedUpDays = showedUpSet.size;
     const showedUpPct = weekdaysInPeriod > 0 ? Math.round(showedUpDays / weekdaysInPeriod * 100) : 0;
-    // Interpretive sub-line based on the gap between the two numbers.
+    // Interpretive sub-line — only included in full (non-minimal) mode.
     let consistencyNote = '';
-    if (showedUpPct >= 70 && tradedPct >= 50) consistencyNote = t('modal.consistency_note_active');
-    else if (showedUpPct >= 60 && tradedPct < showedUpPct - 25) consistencyNote = t('modal.consistency_note_selective');
-    else if (showedUpPct < 40) consistencyNote = t('modal.consistency_note_absent');
-    else if (showedUpPct >= 40 && tradedPct >= 40) consistencyNote = t('modal.consistency_note_balanced');
-    else if (showedUpDays > 0 || tradedDays > 0) consistencyNote = t('modal.consistency_note_neutral');
+    if (!minimal) {
+      if (showedUpPct >= 70 && tradedPct >= 50) consistencyNote = t('modal.consistency_note_active');
+      else if (showedUpPct >= 60 && tradedPct < showedUpPct - 25) consistencyNote = t('modal.consistency_note_selective');
+      else if (showedUpPct < 40) consistencyNote = t('modal.consistency_note_absent');
+      else if (showedUpPct >= 40 && tradedPct >= 40) consistencyNote = t('modal.consistency_note_balanced');
+      else if (showedUpDays > 0 || tradedDays > 0) consistencyNote = t('modal.consistency_note_neutral');
+    }
+    // Percentage spans are only emitted when not in minimal mode.
+    const showedUpPctHtml = minimal ? '' : `<span class="consistency-pct">${showedUpPct}%</span>`;
+    const tradedPctHtml   = minimal ? '' : `<span class="consistency-pct">${tradedPct}%</span>`;
     return `
       <div class="month-insight-block">
         <div class="month-insight-title">${t('modal.consistency')}</div>
@@ -7737,12 +7747,12 @@
           <div class="consistency-line">
             <span class="consistency-label">${t('modal.consistency_showed_up')}</span>
             <span class="consistency-vals"><span class="consistency-big">${showedUpDays}</span> <span class="consistency-of">/ ${weekdaysInPeriod}</span></span>
-            <span class="consistency-pct">${showedUpPct}%</span>
+            ${showedUpPctHtml}
           </div>
           <div class="consistency-line">
             <span class="consistency-label">${t('modal.consistency_traded')}</span>
             <span class="consistency-vals"><span class="consistency-big">${tradedDays}</span> <span class="consistency-of">/ ${weekdaysInPeriod}</span></span>
-            <span class="consistency-pct">${tradedPct}%</span>
+            ${tradedPctHtml}
           </div>
         </div>
         ${consistencyNote ? `<div class="consistency-note">${consistencyNote}</div>` : ''}
@@ -8386,7 +8396,7 @@
       // Wrap the block in a styled section so it slots in cleanly below the stats row.
       weeklyExtra = `<div class="month-insights" style="margin-top:0;">
         <div class="month-insights-header">${t('modal.consistency')}</div>
-        ${renderConsistencyBlock(currentReview.start, currentReview.end, weekTrades)}
+        ${renderConsistencyBlock(currentReview.start, currentReview.end, weekTrades, { minimal: true })}
       </div>`;
     }
     // Net P&L now lives in the corner pill; Trades count is implicit from W/L/BE row.
