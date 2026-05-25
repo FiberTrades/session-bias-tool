@@ -7705,6 +7705,48 @@
   // Monthly-only insights block. Rendered only inside the monthly review modal.
   // Five sections: best/worst week · trading-day consistency · concept-tag winners/losers ·
   // mindset-tag winners/losers · best/worst weekday · previous-month comparison.
+  // Render a small auto-trade summary card with date/side/R/£ + thumbnail.
+  // Global so it can be called from both renderWeeklyReflection (per-week best trade) and
+  // renderMonthlyInsights (Top 3 ranked cards). Uses only globally-available helpers.
+  function autoTradeCard(tr, label, iconCls, icon) {
+    if (!tr) return '';
+    const escFn = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    function rOf(t) {
+      if (t.result === 'Win')  return parseFloat(t.r) || 0;
+      if (t.result === 'Lose') return -1;
+      return 0;
+    }
+    const r = rOf(tr);
+    const rStr = (r >= 0 ? '+' : '') + r.toFixed(2) + 'R';
+    const rCls = r > 0 ? 'good' : r < 0 ? 'bad' : '';
+    const dt = new Date(tr.date);
+    const dateStr = dt.toLocaleDateString(tLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
+    const sideStr = tSide(tr.side) || '—';
+    const resultLabel = tr.result === 'Win' ? tResult('Win')
+                     : tr.result === 'Lose' ? tResult('Lose')
+                     : tr.result === 'BE' ? tResult('BE') : '';
+    const resultCls = tr.result === 'Win' ? 'good' : tr.result === 'Lose' ? 'bad' : 'be';
+    const resultChip = resultLabel
+      ? `<span class="auto-trade-result-chip ${resultCls}">${resultLabel}</span>`
+      : '';
+    const net = (typeof tradeNetPL === 'function') ? tradeNetPL(tr) : 0;
+    const netStr = (net >= 0 ? '+' : '-') + curSym() + Math.abs(net).toFixed(2);
+    const pipsHtml = (typeof tr.pips === 'number' && !isNaN(tr.pips))
+      ? ` · <span class="${rCls}">${tr.pips >= 0 ? '+' : ''}${tr.pips.toFixed(0)}p</span>`
+      : '';
+    const thumbHtml = (typeof pickTradeChartThumb === 'function') ? pickTradeChartThumb(tr) : '';
+    return `<div class="auto-trade-card">
+      <div class="auto-trade-label"><span class="icon ${iconCls}">${icon}</span>${escFn(label)}</div>
+      <div class="auto-trade-body">
+        ${thumbHtml}
+        <div class="auto-trade-meta">
+          <div><span class="auto-trade-date">${dateStr}</span> · ${sideStr}${resultChip ? ' · ' + resultChip : ''}</div>
+          <div><span class="${rCls}">${rStr}</span>${pipsHtml} · <span class="${rCls}">${netStr}</span></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
   // Reusable consistency block — used by both weekly and monthly review modals.
   // Two metrics, both computed against the same denominator (weekdays in the period):
   //   - Showed up: days a bias was completed (read from biasHistory) — trade days auto-count
@@ -8510,42 +8552,8 @@
     // Escape HTML in values that get injected back into the DOM
     function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    // Render a small auto-trade summary card with date/side/R/£ + thumbnail (if a chart is logged on the trade)
-    function autoTradeCard(t, label, iconCls, icon) {
-      if (!t) return '';
-      const r = tradeRLocal(t);
-      const rStr = (r >= 0 ? '+' : '') + r.toFixed(2) + 'R';
-      const rCls = r > 0 ? 'good' : r < 0 ? 'bad' : '';
-      const dt = new Date(t.date);
-      const dateStr = dt.toLocaleDateString(tLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
-      const sideStr = tSide(t.side) || '—';
-      // Result chip — small inline tag matching the calendar's W/L/BE styling
-      const resultLabel = t.result === 'Win' ? tResult('Win')
-                       : t.result === 'Lose' ? tResult('Lose')
-                       : t.result === 'BE' ? tResult('BE') : '';
-      const resultCls = t.result === 'Win' ? 'good' : t.result === 'Lose' ? 'bad' : 'be';
-      const resultChip = resultLabel
-        ? `<span class="auto-trade-result-chip ${resultCls}">${resultLabel}</span>`
-        : '';
-      const net = (typeof tradeNetPL === 'function') ? tradeNetPL(t) : 0;
-      const netStr = (net >= 0 ? '+' : '-') + curSym() + Math.abs(net).toFixed(2);
-      // Show pips alongside R when logged — same visual weight, both peers.
-      const pipsHtml = (typeof t.pips === 'number' && !isNaN(t.pips))
-        ? ` · <span class="${rCls}">${t.pips >= 0 ? '+' : ''}${t.pips.toFixed(0)}p</span>`
-        : '';
-      const thumbHtml = (typeof pickTradeChartThumb === 'function') ? pickTradeChartThumb(t) : '';
-      // Two-line meta: date+side+result chip on top, R+pips+£ underneath. Reads cleanly even in narrow half-width columns.
-      return `<div class="auto-trade-card">
-        <div class="auto-trade-label"><span class="icon ${iconCls}">${icon}</span>${label}</div>
-        <div class="auto-trade-body">
-          ${thumbHtml}
-          <div class="auto-trade-meta">
-            <div><span class="auto-trade-date">${dateStr}</span> · ${sideStr}${resultChip ? ' · ' + resultChip : ''}</div>
-            <div><span class="${rCls}">${rStr}</span>${pipsHtml} · <span class="${rCls}">${netStr}</span></div>
-          </div>
-        </div>
-      </div>`;
-    }
+    // Render a small auto-trade summary card — uses the global autoTradeCard helper defined below.
+
 
     // Parse one URL per line. Trims whitespace and drops empty lines.
     // Returns just the URLs that look like TradingView snapshot links.
