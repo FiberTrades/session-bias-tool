@@ -9484,11 +9484,22 @@
       && sorted[sorted.length - 3].result === 'Lose'
       && sorted[sorted.length - 4].result === 'Lose');
 
-    // Days since last trade
+    // Days since last trade — count *trading days* (Mon-Fri) missed, not calendar days.
+    // Markets are closed Sat/Sun, so a Monday after a Friday session should read as 1 day, not 3.
     const lastDate = sorted[sorted.length - 1].date ? new Date(sorted[sorted.length - 1].date) : null;
-    const daysSinceLastTrade = lastDate
-      ? Math.floor((now - lastDate) / (1000 * 60 * 60 * 24))
-      : null;
+    let daysSinceLastTrade = null;
+    if (lastDate) {
+      // Walk forward day-by-day from the day after last trade, counting weekdays we missed.
+      const start = new Date(lastDate); start.setHours(0, 0, 0, 0);
+      const today = new Date(now); today.setHours(0, 0, 0, 0);
+      const msPerDay = 1000 * 60 * 60 * 24;
+      let weekdayGap = 0;
+      for (let t = start.getTime() + msPerDay; t <= today.getTime(); t += msPerDay) {
+        const d = new Date(t).getDay(); // 0=Sun, 6=Sat
+        if (d !== 0 && d !== 6) weekdayGap += 1;
+      }
+      daysSinceLastTrade = weekdayGap;
+    }
 
     // Capture rate (R only — across tracked wins lifetime)
     const trackedRWinsList = sorted.filter(t => t.result === 'Win'
@@ -10612,7 +10623,20 @@
       const outcome = getRecentDayOutcome();
       _cachedTail = pickTail(outcome);
     }
-    el.innerHTML = `${_cachedOpener}, ${nameSpan}. ${_cachedTail.charAt(0).toUpperCase()}${_cachedTail.slice(1)}`;
+    // If the opener already addresses the reader (contains "mate", "trader", "night owl",
+    // "búho", etc.), appending ", Nestor" makes it a double vocative — awkward.
+    // In that case, name them inside the tail instead, or drop the comma-name structure entirely.
+    const vocativePattern = /\b(mate|trader|night owl|owl|caffeinated|búho|amigo|tío|colega)\b/i;
+    const hasBuiltInVocative = vocativePattern.test(_cachedOpener);
+    let composed;
+    if (hasBuiltInVocative) {
+      // Format: "Opener. <name>, tail" — name moves to the start of the tail, no double vocative.
+      composed = `${_cachedOpener}. ${nameSpan}, ${_cachedTail}`;
+    } else {
+      // Standard format: "Opener, <name>. Tail"
+      composed = `${_cachedOpener}, ${nameSpan}. ${_cachedTail.charAt(0).toUpperCase()}${_cachedTail.slice(1)}`;
+    }
+    el.innerHTML = composed;
     const nameEl = document.getElementById('greet-name');
     if (nameEl) nameEl.addEventListener('click', openInlineNameEdit);
   }
