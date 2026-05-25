@@ -1,2 +1,2 @@
-# session-tool
-Session tool for in depth understanding of your trading Session window
+# session-tool-app
+Session tool app for in depth understanding of your trading session window
