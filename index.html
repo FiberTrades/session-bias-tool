@@ -1886,6 +1886,8 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Completed series of 10 — your trajectory over time.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'modal.went_well_label': "What did I do well this week?",
+      'modal.went_well_placeholder': "Execution wins, discipline moments, things you held to. Even on a red week — what kept you intact?",
       'modal.this_weeks_trades': "This week's trades",
       "lbl.execution": "Execution",
       "lbl.focus": "Focus",
@@ -2487,6 +2489,8 @@
       // ----- Page captions / section hints -----
       'stats.hint.series_history': 'Series de 10 completadas — tu trayectoria a lo largo del tiempo.',
       // ----- Dynamic JS strings, result values, placeholders -----
+      'modal.went_well_label': "¿Qué hice bien esta semana?",
+      'modal.went_well_placeholder': "Aciertos de ejecución, momentos de disciplina, cosas a las que te aferraste. Incluso en una semana en rojo — ¿qué te mantuvo entero?",
       'modal.this_weeks_trades': "Mis operaciones esta semana",
       "lbl.execution": "Ejecuci\u00f3n",
       "lbl.focus": "Foco",
@@ -8183,22 +8187,20 @@
   // Auto-saves on every keystroke to data.weeklyReviews. Period stats (incl. Potential R left)
   // are shown in the shared KPI block above and recomputed live from raw trades.
   function renderWeeklyReflection(weekStart, weekEnd, existing) {
-    // Read existing answers; legacy reviews may have only `notes` — fold that into the "what worked" field
+    // Read existing answers; legacy reviews may have only `notes` — fold that into the "what learned" field
     const e = existing || {};
     const bestTradeNotes  = (e.bestTrade  && e.bestTrade.notes)  || '';
     const worstTradeNotes = (e.worstTrade && e.worstTrade.notes) || '';
     const missedUrl   = (e.missedTrade && e.missedTrade.url) || '';
-    const missedWins  = e.reflectionMissedWins  || '';
     const focusNext   = e.reflectionFocusNext   || '';
-    // Q "what worked + what learned" merges the old wentWell + learned. If a legacy review
-    // had both fields filled, concatenate them so no text is lost. Otherwise fall back through.
-    let learned;
-    const hadLearned  = e.reflectionLearned  && e.reflectionLearned.trim().length;
-    const hadWentWell = e.reflectionWentWell && e.reflectionWentWell.trim().length;
-    if (hadLearned && hadWentWell)      learned = e.reflectionWentWell + '\n\n' + e.reflectionLearned;
-    else if (hadLearned)                learned = e.reflectionLearned;
-    else if (hadWentWell)               learned = e.reflectionWentWell;
-    else                                learned = e.notes || '';
+    // Two reflection fields:
+    //   - wentWell — "What did I do well this week?" (returns as a dedicated section after popular request)
+    //   - learned  — "What did I learn about myself or the markets this week?"
+    // Legacy reviews may have used `notes` (very old) or merged content from a previous merge step.
+    // For legacy data: read wentWell directly if it exists, fall back to blank. Read learned directly,
+    // fall back to legacy notes only if learned is also empty.
+    const wentWell = e.reflectionWentWell || '';
+    const learned  = e.reflectionLearned || (wentWell ? '' : (e.notes || ''));
 
     // Auto-pick best Win + worst Lose for the week from raw trades.
     const allTrades = (typeof getAllLifetimeTrades === 'function') ? getAllLifetimeTrades() : [];
@@ -8352,12 +8354,16 @@
           <div class="reflect-q-label">${t('modal.missed_wins_label')}</div>
           <div id="rfx-missed-list" class="reflect-q-tv-list">${renderTvLinksList(missedTradeLinks)}</div>
           <button type="button" id="rfx-missed-add" class="reflect-q-tv-add">${esc(t('btn.add_link') || '+ Add link')}</button>
-          <textarea id="rfx-missed-wins" class="reflect-q-textarea reflect-q-textarea-spaced" placeholder="${t('modal.missed_wins_placeholder')}">${esc(missedWins)}</textarea>
         </div>
 
         <div class="reflect-question">
           <div class="reflect-q-label">${t('modal.focus_next_label')}</div>
           <textarea id="rfx-focus-next" class="reflect-q-textarea" placeholder="${t('modal.focus_next_placeholder')}">${esc(focusNext)}</textarea>
+        </div>
+
+        <div class="reflect-question">
+          <div class="reflect-q-label">${t('modal.went_well_label')}</div>
+          <textarea id="rfx-went-well" class="reflect-q-textarea" placeholder="${t('modal.went_well_placeholder')}">${esc(wentWell)}</textarea>
         </div>
 
         <div class="reflect-question">
@@ -8459,8 +8465,8 @@
         bestTrade:   { notes: valOf('rfx-best-trade-notes') },
         worstTrade:  { notes: valOf('rfx-worst-trade-notes') },
         missedTrade: { tvLinks: cleanLinks(missedState) },
-        reflectionMissedWins: valOf('rfx-missed-wins'),
         reflectionFocusNext:  valOf('rfx-focus-next'),
+        reflectionWentWell:   valOf('rfx-went-well'),
         reflectionLearned:    valOf('rfx-learned'),
         savedAt: new Date().toISOString()
       };
@@ -8556,7 +8562,7 @@
     wireTvLinksList('rfx-missed-list',     'rfx-missed-add',     missedState);
 
     // Best/worst trade notes only exist when wins/losses occurred — attach if present.
-    ['rfx-missed-wins', 'rfx-best-trade-notes', 'rfx-worst-trade-notes', 'rfx-focus-next', 'rfx-learned'].forEach(id => {
+    ['rfx-best-trade-notes', 'rfx-worst-trade-notes', 'rfx-focus-next', 'rfx-went-well', 'rfx-learned'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('input', persist);
     });
@@ -8629,8 +8635,10 @@
     const missedUrls    = missedLinksOut.map(l => l.url);
     const bestTradeTxt  = valTrim('rfx-best-trade-notes');
     const worstTradeTxt = valTrim('rfx-worst-trade-notes');
-    const missedWins    = valTrim('rfx-missed-wins');
+    // Legacy: read the missed-wins notes from the persisted review (textarea was removed; per-card notes serve that purpose now). Old reviews may still have a value here, so we keep emitting it for back-compat.
+    const missedWins    = (persistedEntry && persistedEntry.reflectionMissedWins) || '';
     const focusNext     = valTrim('rfx-focus-next');
+    const wentWell      = valTrim('rfx-went-well');
     const learned       = valTrim('rfx-learned');
 
     // Recompute the week's best Win + worst Lose for the Discord post — same data the UI shows.
@@ -8691,6 +8699,11 @@
       lines.push('');
       lines.push('**Focus for next week**');
       lines.push(focusNext);
+    }
+    if (wentWell) {
+      lines.push('');
+      lines.push('**What I did well**');
+      lines.push(wentWell);
     }
     if (learned) {
       lines.push('');
