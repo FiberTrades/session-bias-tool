@@ -215,6 +215,10 @@
   .tv-link-preview-wrap:empty { display: none; }
   .tv-link-preview { width: 100%; max-width: 540px; height: auto; border-radius: 2px; border: 1px solid var(--border-2); display: block; cursor: pointer; transition: opacity 200ms; }
   .tv-link-preview:hover { opacity: 0.85; }
+  /* Session Bias + Session Review: chart preview is exactly half the width of the textarea below it
+     (the textarea is width:100% of the card, so width:50% on the image = 50% of the textarea). */
+  #bias-tv-list .tv-link-preview,
+  #review-tv-list .tv-link-preview { width: 50%; max-width: 50%; }
   /* Weekly "Winning trades I didn't take" — match the Best trade card thumbnail size for visual consistency.
      Both width AND height align by using the same aspect-ratio + object-fit:cover as .trade-thumb img. */
   #rfx-missed-list .tv-link-preview { max-width: 260px; aspect-ratio: 16 / 9; height: auto; object-fit: cover; }
@@ -273,7 +277,7 @@
   .trade-remove:hover { color: var(--text); }
   .add-trade { margin-top: 4px; background: transparent; border: 1px dashed var(--border-2); padding: 16px; width: 100%; color: var(--text-dim); cursor: pointer; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; transition: all 200ms; }
   .add-trade:hover { border-color: var(--text-mid); color: var(--text); }
-  .saved-bias { margin-top: 40px; padding: 28px; border: 1px solid var(--border-2); background: var(--bg-elev); }
+  .saved-bias { margin-top: 40px; padding: 28px 28px 20px; border: 1px solid var(--border-2); background: var(--bg-elev); }
   /* Session-live coaching banner — shows on Review tab when current time is within the session window */
   /* Persistent "Session live" pill — sits above every tab's content during the session window. */
   .session-live-pill { margin: 0 0 24px; padding: 0; background: transparent; border: none; display: flex; align-items: center; gap: 12px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-mid); }
@@ -317,6 +321,9 @@
   .saved-bias-row .v { color: var(--text); font-size: 15px; }
   /* Chart fills the full card width */
   .saved-bias-link { width: 100%; font-size: 12px; color: var(--text-mid); word-break: break-all; }
+  /* Each chart wrapper has margin-bottom for the gap between charts when there are multiple.
+     Strip it on the last one so the card doesn't trail extra empty space below the chart/caption. */
+  .saved-bias-link > div:last-child { margin-bottom: 0 !important; }
   .bias-chart-img { width: 100%; max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border-2); display: block; cursor: pointer; transition: opacity 200ms; }
   .bias-chart-img:hover { opacity: 0.85; }
   /* Notes — full width below. DM Mono to match the stats row above (Mode, Structure, etc.),
@@ -5163,7 +5170,9 @@
       }).join('');
     } else linkEl.classList.add('hidden');
     const notesEl = document.getElementById('saved-bias-notes');
-    if (b.notes) { notesEl.classList.remove('hidden'); notesEl.textContent = '"' + b.notes + '"'; }
+    // Trim trailing whitespace/newlines from the saved notes — the textarea preserves any
+    // empty lines the user typed at the end, which render as visible blank rows below the text.
+    if (b.notes && b.notes.trim()) { notesEl.classList.remove('hidden'); notesEl.textContent = '"' + b.notes.trim() + '"'; }
     else notesEl.classList.add('hidden');
   }
   function restoreReviewValues() {
