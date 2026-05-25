@@ -6598,33 +6598,10 @@
     wrap.querySelectorAll('.year-month').forEach(el => {
       el.addEventListener('click', () => {
         const m = parseInt(el.dataset.month);
-        console.log('[DEBUG month click] m=', m, 'year=', yearGlanceYear);
-        try {
-          openMonthlyReviewModal(yearGlanceYear, m);
-          console.log('[DEBUG] openMonthlyReviewModal returned normally');
-        } catch (err) {
-          console.error('[DEBUG] openMonthlyReviewModal threw:', err);
-        }
+        openMonthlyReviewModal(yearGlanceYear, m);
       });
     });
-    // Diagnostic: log any click inside year-glance to see what element actually receives it
-    wrap.addEventListener('click', (e) => {
-      console.log('[DEBUG year-glance click]', 'target=', e.target.tagName, e.target.className, 'closest .year-month=', e.target.closest('.year-month')?.dataset.month);
-    }, true);
   }
-  // ============ TEMPORARY DEBUG: capture every click anywhere on the page ============
-  document.addEventListener('click', (e) => {
-    const t = e.target;
-    const closestMonth = t.closest && t.closest('.year-month');
-    console.log('[DEBUG page click]',
-      'tag=', t.tagName,
-      'class=', t.className,
-      'id=', t.id || '(none)',
-      'closest .year-month=', closestMonth ? closestMonth.dataset.month : '(none)',
-      'closest [id]=', (t.closest('[id]') || {}).id || '(none)'
-    );
-  }, true);
-  // ============ END TEMPORARY DEBUG ============
 
   function renderCalendar() {
     const calTitleDate = new Date(calendarYear, calendarMonth, 1);
