@@ -8861,14 +8861,14 @@
     const tradesInPeriodHavePips = stats.totalPips !== 0 || (stats.mfe && stats.mfe.trackedPips > 0);
 
     const lines = [header, ''];
-    // Numbers block — fixed-width labels for clean alignment in Discord's monospace blocks
+    // Numbers block — fixed-width labels for clean alignment in Discord's monospace blocks.
+    // No £ amounts emitted on purpose — money figures stay private; R + pips communicate edge fine.
     lines.push('```');
     lines.push(`Trades         ${stats.totalTrades}`);
     lines.push(`Wins           ${stats.wins}`);
     lines.push(`Losses         ${stats.losses}`);
     lines.push(`Break-even     ${stats.bes}`);
     lines.push(`Total R        ${totalRStr}`);
-    lines.push(`Net P&L        ${netStr}`);
     lines.push(`Potential R    ${potRStr}${potLeftR == null ? '   (no Potential R logged)' : '   (left on table)'}`);
     lines.push('```');
 
@@ -8917,9 +8917,10 @@
       const dateStr = dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
       const r = tRD(t);
       const rStr = (r >= 0 ? '+' : '') + r.toFixed(2) + 'R';
-      const net = (typeof tradeNetPL === 'function') ? tradeNetPL(t) : 0;
-      const netStr = (net >= 0 ? '+£' : '-£') + Math.abs(net).toFixed(2);
-      return `${dateStr} · ${t.side || '—'} · ${rStr} · ${netStr}`;
+      // Include pips when logged — they're market measurements, not money. £ deliberately omitted.
+      const p = (typeof t.pips === 'number' && !isNaN(t.pips)) ? t.pips : null;
+      const pStr = p !== null ? ` · ${p >= 0 ? '+' : ''}${p.toFixed(0)}p` : '';
+      return `${dateStr} · ${t.side || '—'} · ${rStr}${pStr}`;
     }
 
     // Pre-collect every chart URL across this week's sections, assign sequential [N] numbers.
