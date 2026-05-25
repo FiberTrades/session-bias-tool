@@ -8052,9 +8052,10 @@
         </div>
       </div>`;
     } else {
-      // No wins this month — explicit empty state.
+      // No wins this month — explicit empty state. Use the singular title since "Best 3 trades"
+      // would be misleading when there are no trades at all.
       tradeOfMonthHtml = `<div class="month-insight-block">
-        <div class="month-insight-title">${t('modal.top_trades_month').replace('{N}', 3)}</div>
+        <div class="month-insight-title">${t('modal.trade_of_month_title')}</div>
         <div class="month-insight-empty">${t('modal.no_wins_month')}</div>
       </div>`;
     }
