@@ -306,19 +306,21 @@
   .session-live-dismiss:hover { color: var(--text); }
   .session-live-body { font-family: 'Fraunces', serif; font-size: 14px; line-height: 1.7; color: var(--text-mid); margin: 0; }
   .session-live-body strong { color: var(--text); font-weight: normal; }
-  .saved-bias-label { font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 14px; text-align: center; }
-  /* The K/V grid is constrained + centered inside the full-width card. Without the cap, rows
-     would stretch edge-to-edge of the card, leaving big gaps between K and V. Centering as
-     a fixed-width block keeps it readable and visually balanced under the label. */
-  .saved-bias-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 48px; max-width: 640px; margin: 0 auto; }
-  .saved-bias-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; font-size: 13px; }
+  .saved-bias-label { font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 20px; }
+  /* Two-column layout inside the card: stats on the left (stacked vertically), chart on the right.
+     Fills the box visually even though everything is pegged to its column. */
+  .saved-bias-main { display: flex; gap: 32px; align-items: flex-start; }
+  /* Left column — stats stack vertically, one per row */
+  .saved-bias-grid { display: flex; flex-direction: column; gap: 12px; flex: 0 0 auto; min-width: 220px; }
+  .saved-bias-row { display: flex; align-items: baseline; gap: 16px; font-size: 14px; }
   .saved-bias-row .k { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; font-size: 10px; min-width: 88px; }
-  .saved-bias-row .v { color: var(--text); text-align: right; }
-  .saved-bias-link { margin: 14px auto 0; max-width: 640px; font-size: 12px; color: var(--text-mid); word-break: break-all; text-align: center; }
-  /* Chart sits centered under the grid, same max-width band as everything else. */
-  .bias-chart-img { margin: 14px auto 0; width: 100%; max-width: 640px; height: auto; border-radius: 4px; border: 1px solid var(--border-2); display: block; cursor: pointer; transition: opacity 200ms; }
+  .saved-bias-row .v { color: var(--text); }
+  /* Right column — chart fills remaining space */
+  .saved-bias-link { flex: 1 1 auto; font-size: 12px; color: var(--text-mid); word-break: break-all; min-width: 0; }
+  .bias-chart-img { width: 100%; max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border-2); display: block; cursor: pointer; transition: opacity 200ms; }
   .bias-chart-img:hover { opacity: 0.85; }
-  .saved-bias-notes { margin: 10px auto 0; max-width: 640px; font-size: 15px; color: var(--text-mid); font-style: italic; line-height: 1.7; border-top: 1px solid var(--border); padding-top: 12px; }
+  /* Notes — full width below both columns */
+  .saved-bias-notes { margin-top: 20px; font-size: 15px; color: var(--text-mid); font-style: italic; line-height: 1.7; border-top: 1px solid var(--border); padding-top: 14px; }
   .settings-panel { margin-top: 32px; padding: 18px 24px; background: var(--bg-elev); border: 1px solid var(--border-2); display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
   .settings-panel .label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); }
   .settings-field { display: flex; align-items: center; gap: 8px; }
@@ -930,7 +932,8 @@
     .input, .textarea { width: 100%; }
     .trade-row, .trade-row-headers { grid-template-columns: 28px 70px 50px 1fr 60px 60px 22px; }
     .trade-row .trade-cell:nth-child(7), .trade-row .trade-cell:nth-child(8), .trade-row .trade-cell:nth-child(9), .trade-row .trade-cell:nth-child(10), .trade-row .trade-cell:nth-child(11), .trade-row-headers .trade-header-cell:nth-child(7), .trade-row-headers .trade-header-cell:nth-child(8), .trade-row-headers .trade-header-cell:nth-child(9), .trade-row-headers .trade-header-cell:nth-child(10), .trade-row-headers .trade-header-cell:nth-child(11) { display: none; }
-    .saved-bias-grid { grid-template-columns: 1fr; }
+    .saved-bias-main { flex-direction: column; gap: 20px; }
+    .saved-bias-grid { width: 100%; }
     .history-row { grid-template-columns: 50px 1fr 1fr 1fr 1fr; }
     #type-breakdown .history-row, #side-breakdown .history-row, #dow-breakdown .history-row { grid-template-columns: 100px 60px 80px 100px 1fr; }
     #type-breakdown .history-cell.label, #side-breakdown .history-cell.label, #dow-breakdown .history-cell.label { font-size: 13px; }
@@ -1086,8 +1089,10 @@
     </div>
     <div class="saved-bias hidden" id="saved-bias-card">
       <div class="saved-bias-label" id="saved-bias-label">This morning's bias</div>
-      <div class="saved-bias-grid" id="saved-bias-grid"></div>
-      <div class="saved-bias-link hidden" id="saved-bias-link"></div>
+      <div class="saved-bias-main">
+        <div class="saved-bias-grid" id="saved-bias-grid"></div>
+        <div class="saved-bias-link hidden" id="saved-bias-link"></div>
+      </div>
       <div class="saved-bias-notes hidden" id="saved-bias-notes"></div>
     </div>
 
