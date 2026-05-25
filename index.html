@@ -1122,9 +1122,11 @@
         <button class="tag" data-value="1st Tennis Serve" data-i18n="tag.1st_tennis_serve">1st Tennis Serve</button>
         <button class="tag" data-value="2nd Tennis Serve" data-i18n="tag.2nd_tennis_serve">2nd Tennis Serve</button>
         <button class="tag" data-value="Add-On Tennis Serve" data-i18n="tag.add_on_tennis_serve">Add-On Tennis Serve</button>
-        <button class="tag" data-value="Premium" data-i18n="tag.premium">Premium</button>
-        <button class="tag" data-value="Discount" data-i18n="tag.discount">Discount</button>
+        <button class="tag" data-value="Premium Edge" data-i18n="tag.premium_edge">Premium Edge</button>
+        <button class="tag" data-value="Premium Middle" data-i18n="tag.premium_middle">Premium Middle</button>
         <button class="tag" data-value="50% / Equilibrium" data-i18n="tag.50_equilibrium">50% / Equilibrium</button>
+        <button class="tag" data-value="Discount Middle" data-i18n="tag.discount_middle">Discount Middle</button>
+        <button class="tag" data-value="Discount Edge" data-i18n="tag.discount_edge">Discount Edge</button>
         <button class="tag" data-value="High Sweep" data-i18n="tag.high_sweep">High Sweep</button>
         <button class="tag" data-value="Low Sweep" data-i18n="tag.low_sweep">Low Sweep</button>
         <button class="tag" data-value="Prev D/W/M Sweep" data-i18n="tag.prev_d_w_m_sweep">Prev D/W/M Sweep</button>
@@ -2227,9 +2229,11 @@
       'tag.1st_tennis_serve': '1st Tennis Serve',
       'tag.2nd_tennis_serve': '2nd Tennis Serve',
       'tag.add_on_tennis_serve': 'Add-On Tennis Serve',
-      'tag.premium': 'Premium',
-      'tag.discount': 'Discount',
       'tag.50_equilibrium': '50% / Equilibrium',
+      'tag.premium_edge': "Premium Edge",
+      'tag.premium_middle': "Premium Middle",
+      'tag.discount_edge': "Discount Edge",
+      'tag.discount_middle': "Discount Middle",
       'tag.high_sweep': 'High Sweep',
       'tag.low_sweep': 'Low Sweep',
       'tag.prev_d_w_m_sweep': 'Prev D/W/M Sweep',
@@ -2818,9 +2822,11 @@
       'tag.1st_tennis_serve': '1er Saque',
       'tag.2nd_tennis_serve': '2º Saque',
       'tag.add_on_tennis_serve': 'Saque Adicional',
-      'tag.premium': 'Premium',
-      'tag.discount': 'Discount',
       'tag.50_equilibrium': '50% / Equilibrio',
+      'tag.premium_edge': "Premium (Extremo)",
+      'tag.premium_middle': "Premium (Medio)",
+      'tag.discount_edge': "Discount (Extremo)",
+      'tag.discount_middle': "Discount (Medio)",
       'tag.high_sweep': 'Barrido de Máximo',
       'tag.low_sweep': 'Barrido de Mínimo',
       'tag.prev_d_w_m_sweep': 'Barrido D/S/M Anterior',
@@ -3605,8 +3611,29 @@
       if (Array.isArray(d.review.concepts)) {
         const ricePhaseConcepts = ['Range (R)', 'Initiation (I)', 'Correction (C)', 'Extension (E)'];
         d.review.concepts = d.review.concepts.filter(c => !ricePhaseConcepts.includes(c));
+        // Migrate old short tag names to new edge-vs-middle distinction:
+        // 'Premium' → 'Premium Edge', 'Discount' → 'Discount Edge' (best-guess; user can re-tag).
+        d.review.concepts = d.review.concepts.map(c =>
+          c === 'Premium' ? 'Premium Edge' :
+          c === 'Discount' ? 'Discount Edge' : c
+        );
       }
     }
+    // Migrate concepts inside historical trade snapshots too — keeps stats/analytics consistent.
+    const _migrateConcepts = arr => Array.isArray(arr) ? arr.map(c =>
+      c === 'Premium' ? 'Premium Edge' :
+      c === 'Discount' ? 'Discount Edge' : c
+    ) : arr;
+    function _migrateTradeArr(trades) {
+      if (!Array.isArray(trades)) return;
+      trades.forEach(t => {
+        if (t && t.reviewSnap && Array.isArray(t.reviewSnap.concepts)) {
+          t.reviewSnap.concepts = _migrateConcepts(t.reviewSnap.concepts);
+        }
+      });
+    }
+    if (Array.isArray(d.currentSeries)) _migrateTradeArr(d.currentSeries);
+    if (Array.isArray(d.history)) d.history.forEach(s => _migrateTradeArr(s.trades));
     // Same cleanup on any biasSnap/reviewSnap inside trades — keep historical data consistent
     // but DON'T mutate snapshot rice (those are historical records, leave them as captured).
     if (!d.bias) d.bias = newBiasBlank();
