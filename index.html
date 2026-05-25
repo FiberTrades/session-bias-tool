@@ -307,22 +307,22 @@
   .session-live-body { font-family: 'Fraunces', serif; font-size: 14px; line-height: 1.7; color: var(--text-mid); margin: 0; }
   .session-live-body strong { color: var(--text); font-weight: normal; }
   .saved-bias-label { font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 20px; }
-  /* Two-column layout inside the card: stats on the left (stacked vertically), chart on the right.
-     Fills the box visually even though everything is pegged to its column.
-     align-items: stretch makes the stats column match the chart's height, and
-     justify-content: space-between on the grid spreads the 4 rows evenly top-to-bottom. */
-  .saved-bias-main { display: flex; gap: 32px; align-items: stretch; }
-  /* Left column — stats stack vertically and spread across the full chart height */
-  .saved-bias-grid { display: flex; flex-direction: column; justify-content: space-between; gap: 12px; flex: 0 0 auto; min-width: 220px; }
-  .saved-bias-row { display: flex; align-items: baseline; gap: 16px; font-size: 14px; }
-  .saved-bias-row .k { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; font-size: 10px; min-width: 88px; }
-  .saved-bias-row .v { color: var(--text); }
-  /* Right column — chart fills remaining space */
-  .saved-bias-link { flex: 1 1 auto; font-size: 12px; color: var(--text-mid); word-break: break-all; min-width: 0; }
+  /* Stats sit in a horizontal strip across the top, chart below — fills the card's width
+     cleanly with stats reading left-to-right above the chart they describe. */
+  .saved-bias-main { display: flex; flex-direction: column; gap: 18px; }
+  /* Horizontal stats strip — 4 K/V pairs spread evenly across the chart's width */
+  .saved-bias-grid { display: flex; justify-content: space-between; gap: 24px; width: 100%; }
+  .saved-bias-row { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 14px; flex: 1 1 0; min-width: 0; }
+  .saved-bias-row .k { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; font-size: 10px; }
+  .saved-bias-row .v { color: var(--text); font-size: 15px; }
+  /* Chart fills the full card width */
+  .saved-bias-link { width: 100%; font-size: 12px; color: var(--text-mid); word-break: break-all; }
   .bias-chart-img { width: 100%; max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border-2); display: block; cursor: pointer; transition: opacity 200ms; }
   .bias-chart-img:hover { opacity: 0.85; }
-  /* Notes — full width below both columns */
-  .saved-bias-notes { margin-top: 20px; font-size: 15px; color: var(--text-mid); font-style: italic; line-height: 1.7; border-top: 1px solid var(--border); padding-top: 14px; }
+  /* Notes — full width below. Roman (not italic), full text colour, slight size bump so
+     it reads cleanly mid-session without leaning in. Quote marks added by JS provide the
+     "your own words" cue without needing italic to do the work. */
+  .saved-bias-notes { margin-top: 20px; font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 14px; }
   .settings-panel { margin-top: 32px; padding: 18px 24px; background: var(--bg-elev); border: 1px solid var(--border-2); display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
   .settings-panel .label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); }
   .settings-field { display: flex; align-items: center; gap: 8px; }
@@ -934,8 +934,10 @@
     .input, .textarea { width: 100%; }
     .trade-row, .trade-row-headers { grid-template-columns: 28px 70px 50px 1fr 60px 60px 22px; }
     .trade-row .trade-cell:nth-child(7), .trade-row .trade-cell:nth-child(8), .trade-row .trade-cell:nth-child(9), .trade-row .trade-cell:nth-child(10), .trade-row .trade-cell:nth-child(11), .trade-row-headers .trade-header-cell:nth-child(7), .trade-row-headers .trade-header-cell:nth-child(8), .trade-row-headers .trade-header-cell:nth-child(9), .trade-row-headers .trade-header-cell:nth-child(10), .trade-row-headers .trade-header-cell:nth-child(11) { display: none; }
-    .saved-bias-main { flex-direction: column; gap: 20px; }
-    .saved-bias-grid { width: 100%; }
+    .saved-bias-main { gap: 16px; }
+    .saved-bias-grid { flex-direction: column; gap: 12px; }
+    .saved-bias-row { flex-direction: row; align-items: baseline; gap: 16px; }
+    .saved-bias-row .k { min-width: 88px; }
     .history-row { grid-template-columns: 50px 1fr 1fr 1fr 1fr; }
     #type-breakdown .history-row, #side-breakdown .history-row, #dow-breakdown .history-row { grid-template-columns: 100px 60px 80px 100px 1fr; }
     #type-breakdown .history-cell.label, #side-breakdown .history-cell.label, #dow-breakdown .history-cell.label { font-size: 13px; }
