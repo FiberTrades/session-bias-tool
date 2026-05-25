@@ -215,8 +215,9 @@
   .tv-link-preview-wrap:empty { display: none; }
   .tv-link-preview { width: 100%; max-width: 540px; height: auto; border-radius: 2px; border: 1px solid var(--border-2); display: block; cursor: pointer; transition: opacity 200ms; }
   .tv-link-preview:hover { opacity: 0.85; }
-  /* Weekly "Winning trades I didn't take" — match the Best trade card thumbnail size for visual consistency */
-  #rfx-missed-list .tv-link-preview { max-width: 260px; }
+  /* Weekly "Winning trades I didn't take" — match the Best trade card thumbnail size for visual consistency.
+     Both width AND height align by using the same aspect-ratio + object-fit:cover as .trade-thumb img. */
+  #rfx-missed-list .tv-link-preview { max-width: 260px; aspect-ratio: 16 / 9; height: auto; object-fit: cover; }
   .tv-link-notes { display: block; width: 100%; margin-top: 10px; background: var(--bg-elev); border: 1px solid var(--border-2); padding: 10px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 300; line-height: 1.6; outline: none; resize: vertical; min-height: 50px; transition: border-color 200ms; }
   .tv-link-notes:focus { border-color: var(--text-mid); }
   .tv-link-notes::placeholder { color: var(--text-dim); }
@@ -7909,8 +7910,11 @@
     // identical and the logic stays in one place.
     const consistencyHtml = renderConsistencyBlock(periodStart, periodEnd, monthTrades);
 
-    // === 3 & 4. Tag winners & losers (concepts + mindset) ===
-    // For each tag: sum the active unit's metric across trades carrying that tag. Min 3 trades required.
+    // === Tag winners & losers — REMOVED. Sample sizes at monthly scale are too small to be
+    // honest about best/worst tags. The patterns block below still surfaces actionable lean-in
+    // and avoid signals from tag data using stricter thresholds.
+
+    // Tag aggregator kept for the patterns block (it uses these buckets to find lean/avoid signals).
     function tagAggregate(tagKey) {
       const buckets = {};
       monthTrades.forEach(t => {
@@ -7924,47 +7928,6 @@
       });
       return Object.values(buckets).filter(b => b.trades >= 3);
     }
-    function tagSectionHtml(eligible, title) {
-      if (eligible.length === 0) {
-        return `<div class="month-insight-block">
-          <div class="month-insight-title">${title}</div>
-          <div class="month-insight-empty">${t('modal.need_3_tag')}</div>
-        </div>`;
-      }
-      const sorted = eligible.slice().sort((a, b) => b.total - a.total);
-      const best = sorted[0], worst = sorted[sorted.length - 1];
-      const cls = v => v > 0 ? 'good' : v < 0 ? 'bad' : '';
-      // If best === worst (only one eligible tag), show only the one
-      if (best.tag === worst.tag) {
-        return `<div class="month-insight-block">
-          <div class="month-insight-title">${title}</div>
-          <div class="month-insight-row">
-            <div class="month-insight-cell">
-              <div class="month-insight-label"><span class="icon info">◆</span>${t('modal.only_ranked_tag')}</div>
-              <div class="month-insight-value">${best.tag}</div>
-              <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} ${best.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace(/\{N\}/g, best.trades)}</div>
-            </div>
-          </div>
-        </div>`;
-      }
-      return `<div class="month-insight-block">
-        <div class="month-insight-title">${title}</div>
-        <div class="month-insight-row">
-          <div class="month-insight-cell">
-            <div class="month-insight-label"><span class="icon good">↑</span>${t('modal.best_short')}</div>
-            <div class="month-insight-value">${best.tag}</div>
-            <div class="month-insight-sub ${cls(best.total)}">${fmtMetric(best.total)} ${best.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace(/\{N\}/g, best.trades)}</div>
-          </div>
-          <div class="month-insight-cell">
-            <div class="month-insight-label"><span class="icon bad">↓</span>${t('modal.worst_short')}</div>
-            <div class="month-insight-value">${worst.tag}</div>
-            <div class="month-insight-sub ${cls(worst.total)}">${fmtMetric(worst.total)} ${worst.trades === 1 ? t('modal.across_one_trade') : t('modal.across_n_trades').replace(/\{N\}/g, worst.trades)}</div>
-          </div>
-        </div>
-      </div>`;
-    }
-    const conceptHtml = tagSectionHtml(tagAggregate('concepts'), t('modal.concept_tags'));
-    const mindsetHtml = tagSectionHtml(tagAggregate('mindset'), t('modal.mindset_tags'));
 
     // === 5. Best & worst weekday (Mon-Fri only) ===
     const WEEKDAY_NAMES = [t('cal.dow.sun'), t('cal.dow.mon'), t('cal.dow.tue'), t('cal.dow.wed'), t('cal.dow.thu'), t('cal.dow.fri'), t('cal.dow.sat')];
@@ -8249,8 +8212,6 @@
       ${tradeOfMonthHtml}
       ${weekSectionHtml}
       ${consistencyHtml}
-      ${conceptHtml}
-      ${mindsetHtml}
       ${dowHtml}
       ${comparisonHtml}
     </div>`;
