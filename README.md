@@ -1,2 +1,2 @@
-# session-bias-tool
-Session bias prep tool for Pre London Session
+# session-tool
+Session tool for in depth understanding of your trading Session window
