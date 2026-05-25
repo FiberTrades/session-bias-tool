@@ -589,9 +589,11 @@
   .mfe-value-sub.bad { color: var(--bad); opacity: 0.75; }
   /* Monthly insights — extra blocks shown only in monthly review modal */
   .month-insights { margin-top: 22px; padding-top: 22px; border-top: 1px dashed var(--border-2); }
-  .month-insights-header { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-mid); margin-bottom: 14px; }
+  .month-insights-header { font-family: 'Fraunces', serif; font-size: 18px; color: var(--text); margin-bottom: 14px; }
   .month-insight-block { padding: 12px 16px; background: var(--bg-elev); border: 1px solid var(--border-2); margin-bottom: 10px; }
-  .month-insight-title { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+  .month-insight-title { font-family: 'Fraunces', serif; font-size: 15px; color: var(--text); margin-bottom: 10px; }
+  /* Hero variant kept for backward compatibility — slightly larger */
+  .month-insight-title-hero { font-size: 17px; }
   .month-insight-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   /* When the row has only one child (e.g. only Best trade exists, no Loss yet), let it span the row
      instead of leaving an awkward empty half on the right. */
@@ -710,12 +712,15 @@
   @media (max-width: 640px) {
     .reflect-bw-grid { grid-template-columns: 1fr; }
   }
-  /* Weekly Reflection structured form — separate question blocks for the weekend ritual */
+  /* Weekly Reflection structured form — headers use Fraunces serif to match the daily
+     modal's editorial style. Same family as .modal-section-title for visual consistency. */
   .reflect-block { margin-top: 28px; padding-top: 22px; border-top: 1px dashed var(--border-2); }
-  .reflect-header { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-mid); margin-bottom: 6px; }
-  .reflect-subhead { font-size: 11px; color: var(--text-dim); font-style: italic; margin-bottom: 18px; line-height: 1.5; }
+  .reflect-header { font-family: 'Fraunces', serif; font-size: 18px; color: var(--text); margin-bottom: 6px; }
+  .reflect-subhead { font-family: 'Fraunces', serif; font-size: 13px; color: var(--text-dim); font-style: italic; margin-bottom: 18px; line-height: 1.5; }
   .reflect-question { margin-bottom: 22px; }
-  .reflect-q-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+  .reflect-q-label { font-family: 'Fraunces', serif; font-size: 15px; color: var(--text); margin-bottom: 10px; }
+  /* Hero variant kept for backward compatibility — slightly larger to still pop */
+  .reflect-q-label-hero { font-size: 17px; }
   .reflect-q-textarea { width: 100%; background: var(--bg-elev); border: 1px solid var(--border-2); color: var(--text); padding: 10px 12px; font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.6; outline: none; resize: vertical; min-height: 64px; box-sizing: border-box; }
   .reflect-q-textarea:focus { border-color: var(--text-mid); }
   .reflect-q-textarea::placeholder { color: var(--text-dim); font-style: italic; }
@@ -2059,7 +2064,10 @@
       'status.future': 'Future',
       'tag.add_custom': '+ Custom',
       'tag.name_placeholder': 'Tag name…',
-      'modal.post_session': 'Post-session:',
+      'modal.post_session': 'Post-session charts:',
+      'modal.post_session_chart': 'Post-session chart:',
+      'modal.morning_bias_chart': 'Morning bias chart:',
+      'modal.morning_bias_charts': 'Morning bias charts:',
       'lbl.w': 'W',
       'lbl.l': 'L',
       'lbl.be': 'BE',
@@ -2676,7 +2684,10 @@
       'status.future': 'Futuro',
       'tag.add_custom': '+ Personalizada',
       'tag.name_placeholder': 'Nombre de la etiqueta…',
-      'modal.post_session': 'Post-sesión:',
+      'modal.post_session': 'Gráficos post-sesión:',
+      'modal.post_session_chart': 'Gráfico post-sesión:',
+      'modal.morning_bias_chart': 'Gráfico del sesgo matutino:',
+      'modal.morning_bias_charts': 'Gráficos del sesgo matutino:',
       'lbl.w': 'G',
       'lbl.l': 'P',
       'lbl.be': 'BE',
@@ -6978,12 +6989,16 @@
         if (b.direction) html += `<strong style="color:var(--text);">${dir} ${tOpt(b.direction)}</strong>`;
         if (b.structure) html += (b.direction ? ' &middot; ' : '') + `${tOpt(b.structure)}`;
         if (b.location)  html += ((b.direction || b.structure) ? ' &middot; ' : '') + `${tOpt(b.location)}`;
+        if (biasLinks.length > 0) {
+          const biasChartLabel = biasLinks.length === 1 ? (t('modal.morning_bias_chart') || 'Morning bias chart:') : (t('modal.morning_bias_charts') || 'Morning bias charts:');
+          html += `<div style="margin-top:14px;font-size:11px;color:var(--text-mid);letter-spacing:0.15em;text-transform:uppercase;">${biasChartLabel}</div>`;
+        }
         biasLinks.forEach(linkObj => {
           const link = linkObj.url;
           const note = linkObj.notes || '';
           const img = tradingViewImageUrl(link);
           const noteEl = note ? `<div style="font-size:11px;color:var(--text-dim);font-style:italic;margin-top:4px;font-family:'Fraunces',serif;">"${note.replace(/</g,'&lt;')}"</div>` : '';
-          if (img) html += `<br><a href="${link}" target="_blank" rel="noopener"><img src="${img}" alt="Bias chart" class="bias-chart-img" onerror="this.style.display='none'"></a>${noteEl}`;
+          if (img) html += `<a href="${link}" target="_blank" rel="noopener" style="display:block;margin-top:6px;"><img src="${img}" alt="Bias chart" class="bias-chart-img" onerror="this.style.display='none'"></a>${noteEl}`;
           else html += `<br><a href="${link}" target="_blank" rel="noopener" style="color:var(--text-mid);word-break:break-all;">${link}</a>${noteEl}`;
         });
         if (b.notes) html += `<br><em style="color:var(--text-dim);">"${b.notes}"</em>`;
@@ -7014,7 +7029,8 @@
         if (r.reflection && r.reflection.trim()) html += `<div style="margin-top:10px;font-style:italic;font-family:'Fraunces',serif;font-size:14px;color:var(--text);line-height:1.5;border-left:2px solid var(--text-mid);padding-left:12px;">${escTxt(r.reflection.trim())}</div>`;
         const tradeLinks = (r.tvLinks || []).filter(l => l && l.url && !biasUrls.includes(l.url));
         if (tradeLinks.length > 0) {
-          html += `<div style="margin-top:10px;font-size:11px;color:var(--text-mid);">${t('modal.post_session') || 'Post-session charts:'}</div>`;
+          const reviewChartLabel = tradeLinks.length === 1 ? (t('modal.post_session_chart') || 'Post-session chart:') : (t('modal.post_session') || 'Post-session charts:');
+          html += `<div style="margin-top:14px;font-size:11px;color:var(--text-mid);letter-spacing:0.15em;text-transform:uppercase;">${reviewChartLabel}</div>`;
           tradeLinks.forEach(linkObj => {
             const link = linkObj.url;
             const note = linkObj.notes || '';
@@ -8091,7 +8107,7 @@
                     : topN.length === 2 ? 'reflect-week-grid grid-2'
                     : 'reflect-week-grid';
       tradeOfMonthHtml = `<div class="month-insight-block">
-        <div class="month-insight-title">${title}</div>
+        <div class="month-insight-title month-insight-title-hero">${title}</div>
         <div class="${gridCls}">
           ${cells}
         </div>
@@ -8632,7 +8648,7 @@
         <div class="reflect-subhead">${t('modal.weekend_sit_with')}</div>
 
         ${bestWinTrade ? `<div class="reflect-question">
-          <div class="reflect-q-label">${t('modal.best_trade_title')}</div>
+          <div class="reflect-q-label reflect-q-label-hero">${t('modal.best_trade_title')}</div>
           <div class="reflect-bw-grid">
             <div class="reflect-bw-col">
               ${autoTradeCard(bestWinTrade, '', 'good', '')}
