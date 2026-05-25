@@ -672,9 +672,22 @@
      Collapses to single column on narrow screens. */
   .reflect-bw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .reflect-bw-grid > :only-child { grid-column: 1 / -1; }
-  /* This week's trades — auto-populated grid. Tighter than best/worst (more cards). */
+  /* This week's trades — auto-populated grid. Tighter than best/worst (more cards).
+     Variants adapt to count:
+       .grid-1 → single hero card, mirrors weekly "Best trade of the week" big-card styling
+       .grid-2 → two side-by-side, each takes half the row
+       default → 3-col tight layout */
   .reflect-week-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .reflect-week-grid .auto-trade-card { margin-bottom: 0; }
+  .reflect-week-grid.grid-1 { grid-template-columns: 1fr; gap: 0; }
+  .reflect-week-grid.grid-2 { grid-template-columns: 1fr 1fr; gap: 12px; }
+  /* 1-up: hero-style matching weekly Best trade card */
+  .reflect-week-grid.grid-1 .auto-trade-card { padding: 16px 18px; }
+  .reflect-week-grid.grid-1 .auto-trade-body { gap: 18px; align-items: center; }
+  .reflect-week-grid.grid-1 .trade-thumb { flex: 0 0 260px; max-width: 260px; }
+  .reflect-week-grid.grid-1 .auto-trade-meta { font-size: 16px; line-height: 1.75; text-align: center; }
+  .reflect-week-grid.grid-1 .auto-trade-meta .auto-trade-date { font-size: 19px; }
+  .reflect-week-grid.grid-1 .auto-trade-meta .auto-trade-result-chip { font-size: 10px; padding: 2px 8px; }
   /* Spacing for the textarea below the missed-trades cards so it doesn't crowd the + Add link button. */
   .reflect-q-textarea-spaced { margin-top: 16px; }
   @media (max-width: 700px) {
@@ -686,11 +699,12 @@
   .reflect-bw-col { display: flex; flex-direction: column; gap: 8px; }
   .reflect-bw-col .auto-trade-card { margin-bottom: 0; }
   /* When the Best-trade card stands alone (no Worst sibling), give the stats real visual weight
-     so the meta column balances the thumbnail. Larger text + tighter line-height feels deliberate. */
+     so the meta column balances the thumbnail. Larger text + tighter line-height feels deliberate.
+     Meta text is centered horizontally so the space between thumb→stats matches stats→right edge. */
   .reflect-bw-grid > :only-child .auto-trade-card { padding: 16px 18px; }
   .reflect-bw-grid > :only-child .auto-trade-body { gap: 18px; align-items: center; }
   .reflect-bw-grid > :only-child .trade-thumb { flex: 0 0 260px; max-width: 260px; }
-  .reflect-bw-grid > :only-child .auto-trade-meta { font-size: 16px; line-height: 1.75; }
+  .reflect-bw-grid > :only-child .auto-trade-meta { font-size: 16px; line-height: 1.75; text-align: center; }
   .reflect-bw-grid > :only-child .auto-trade-meta .auto-trade-date { font-size: 19px; }
   .reflect-bw-grid > :only-child .auto-trade-meta .auto-trade-result-chip { font-size: 10px; padding: 2px 8px; }
   @media (max-width: 640px) {
@@ -8059,18 +8073,26 @@
     if (winsThisMonth.length > 0) {
       // Sort by R descending, take top 3
       const topN = winsThisMonth.slice().sort((a, b) => tradeR(b) - tradeR(a)).slice(0, 3);
-      // Wrap each autoTradeCard in a clickable shell — the existing .trade-of-month-cell
-      // click handler reads data-trade-date and opens that day's modal.
+      // When there's only 1 winning trade, render it like the weekly Best trade — big card,
+      // centered meta, no in-card #1 label (the section header already says "Best trade of the month").
+      // For 2+, keep the #N rank label inside the card so the reader sees the ranking.
+      const showRankLabel = topN.length > 1;
       const cells = topN.map((tr, i) => {
         const dateIso = new Date(tr.date).toISOString();
+        const label = showRankLabel ? `#${i + 1}` : '';
+        const icon  = showRankLabel ? '★' : '';
         return `<div class="trade-of-month-cell" data-trade-date="${dateIso}" title="Click to open this day's review" style="padding:0;border:none;background:transparent;">
-          ${autoTradeCard(tr, `#${i + 1}`, 'good', '★')}
+          ${autoTradeCard(tr, label, 'good', icon)}
         </div>`;
       }).join('');
       const title = topN.length === 1 ? t('modal.trade_of_month_title') : t('modal.top_trades_month').replace('{N}', topN.length);
+      // Grid layout adapts to count: 1 → single hero card, 2 → side-by-side, 3 → tight 3-col.
+      const gridCls = topN.length === 1 ? 'reflect-week-grid grid-1'
+                    : topN.length === 2 ? 'reflect-week-grid grid-2'
+                    : 'reflect-week-grid';
       tradeOfMonthHtml = `<div class="month-insight-block">
         <div class="month-insight-title">${title}</div>
-        <div class="reflect-week-grid">
+        <div class="${gridCls}">
           ${cells}
         </div>
       </div>`;
