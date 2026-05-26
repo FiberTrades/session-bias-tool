@@ -9789,7 +9789,7 @@
         "¿qué parte de tu prep matutina dio frutos?",
         "¿qué no hiciste esta semana que deberías haber hecho?",
         "si un mentor revisara esta semana, ¿qué señalaría primero?",
-        "¿qué te sorprendió de la cinta esta semana?",
+        "¿qué te sorprendió del mercado esta semana?",
         "¿cuál es el cambio más pequeño que podrías hacer la próxima semana que componga?",
         "¿qué trade más quieres olvidar? ¿Cuál más quieres repetir?",
         "¿cuál es la idea de trade que trajiste al lunes y nunca usaste?",
@@ -10275,7 +10275,7 @@
       ? `${s.recent10WR}% over 10. Lovely. Statistically it won\'t last. Just maths, mind.`
       : null,
     s => (s.recent10WR != null && s.recent10WR <= 30 && s.recent10Decided >= 6)
-      ? `${s.recent10WR}% over 10. Either conditions changed, or your filter loosened. Probably the second.`
+      ? `${s.recent10WR}% over 10. Either the setups stopped working, or you stopped filtering. Probably the second.`
       : null,
     s => (s.recent10WR != null && s.recent10WR <= 20 && s.recent10Decided >= 6)
       ? `${s.recent10WR}% over 10. That\'s not a slump, mate. That\'s a flag.`
@@ -10679,7 +10679,7 @@
       ? `${s.curStreak} pérdidas seguidas. Desconecta. En serio.`
       : null,
     s => (s.curStreak >= 3 && s.streakKind === 'BE')
-      ? `${s.curStreak} BEs seguidos. O la cinta está en lateral, o gestionas demasiado pronto. Probablemente las dos cosas.`
+      ? `${s.curStreak} BEs seguidos. O el mercado está lateral, o gestionas demasiado pronto. Probablemente las dos cosas.`
       : null,
     s => (s.recent10WR != null && s.recent10WR >= 70 && s.recent10Decided >= 6)
       ? `${s.recent10WR}% en las últimas 10. ¿Edge real, o racha caliente? Deberías saber cuál.`
@@ -10688,7 +10688,7 @@
       ? `${s.recent10WR}% en 10. Precioso. Estadísticamente no durará. Solo matemáticas.`
       : null,
     s => (s.recent10WR != null && s.recent10WR <= 30 && s.recent10Decided >= 6)
-      ? `${s.recent10WR}% en 10. O la cinta cambió, o tu filtro se aflojó. Probablemente lo segundo.`
+      ? `${s.recent10WR}% en 10. O los setups dejaron de funcionar, o dejaste de filtrar. Probablemente lo segundo.`
       : null,
     s => (s.recent10WR != null && s.recent10WR <= 20 && s.recent10Decided >= 6)
       ? `${s.recent10WR}% en 10. Eso no es un bache. Es una bandera.`
@@ -11373,7 +11373,7 @@
       if (s.wins >= 5 && s.losses === 0)
         candidates.push(`${s.wins} wins, zero losses. Fair play. A pattern, or about to find out it isn't?`);
       if (s.losses >= 5 && s.wins <= 1)
-        candidates.push(`${s.losses} losses, barely a win. Have conditions changed, or has your filter quietly loosened?`);
+        candidates.push(`${s.losses} losses, barely a win. Have the setups stopped working, or has your filter quietly loosened?`);
       if (s.totalR >= 8)
         candidates.push(`+${s.totalR.toFixed(1)}R on the week. Cracking. What conditions made it easy — and are they likely to repeat?`);
       if (s.totalR <= -5)
@@ -11476,7 +11476,7 @@
       if (s.wins >= 5 && s.losses === 0)
         candidates.push(`${s.wins} ganadoras, cero pérdidas. Bien hecho. ¿Un patrón, o a punto de descubrir que no lo es?`);
       if (s.losses >= 5 && s.wins <= 1)
-        candidates.push(`${s.losses} pérdidas, apenas una ganadora. ¿Ha cambiado la cinta, o se ha aflojado tu filtro en silencio?`);
+        candidates.push(`${s.losses} pérdidas, apenas una ganadora. ¿Han dejado de funcionar los setups, o se ha aflojado tu filtro en silencio?`);
       if (s.totalR >= 8)
         candidates.push(`+${s.totalR.toFixed(1)}R en la semana. Cojonudo. ¿Qué condiciones lo hicieron fácil — y es probable que se repitan?`);
       if (s.totalR <= -5)
