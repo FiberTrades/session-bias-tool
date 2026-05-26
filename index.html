@@ -6849,7 +6849,8 @@
           openMonthlyReviewModal(yearGlanceYear, m);
         } catch (err) {
           console.error('[DIAG] Monthly click failed:', err);
-          alert('Monthly click failed: ' + (err && err.message ? err.message : err));
+          const stack = (err && err.stack) ? String(err.stack).split('\n').slice(0, 4).join('\n') : '(no stack)';
+          alert('Monthly click failed: ' + (err && err.message ? err.message : err) + '\n\nStack:\n' + stack);
         }
       });
     }
@@ -6992,7 +6993,8 @@
           if (typeof openWeeklyReviewModal === 'function') openWeeklyReviewModal(monday, friday);
         } catch (err) {
           console.error('[DIAG] Weekly click failed:', err);
-          alert('Weekly click failed: ' + (err && err.message ? err.message : err));
+          const stack = (err && err.stack) ? String(err.stack).split('\n').slice(0, 4).join('\n') : '(no stack)';
+          alert('Weekly click failed: ' + (err && err.message ? err.message : err) + '\n\nStack:\n' + stack);
         }
       });
     });
