@@ -1024,7 +1024,7 @@
 
     <div class="meta">
       <div class="meta-cell"><span class="meta-label" data-i18n="meta.pair">Pair</span><span class="meta-value" id="meta-pair">EUR/USD</span></div>
-      <div class="meta-cell"><span class="meta-label" data-i18n="meta.session">Session</span><span class="meta-value meta-editable" id="meta-session" data-field="sessionName" title="Click to edit. Type e.g. 'London 8-10AM' to set the trading window inline.">London</span></div>
+      <div class="meta-cell"><span class="meta-label" data-i18n="meta.session">Session</span><span class="meta-value meta-editable" id="meta-session" data-field="sessionName" data-i18n-title="tip.session_name">London</span></div>
       <div class="meta-cell"><span class="meta-label" data-i18n="meta.date">Date</span><span class="meta-value" id="today">—</span></div>
       <div class="meta-cell"><span class="meta-label" data-i18n="meta.time">Time</span><span class="meta-value" id="meta-time">—</span></div>
     </div>
@@ -1117,7 +1117,7 @@
       <div class="session-live-head">
         <span class="session-live-dot"></span>
         <span class="session-live-label" data-i18n="banner.session_live">Session live</span>
-        <button type="button" class="session-live-dismiss" id="session-live-dismiss" data-i18n-aria-label="banner.dismiss_aria" aria-label="Dismiss until tomorrow" title="Dismiss until tomorrow">×</button>
+        <button type="button" class="session-live-dismiss" id="session-live-dismiss" data-i18n-aria-label="banner.dismiss_aria" aria-label="Dismiss until tomorrow" data-i18n-title="tip.dismiss_today">×</button>
       </div>
       <p class="session-live-body" data-i18n-html="banner.body_html">Stay on this tab — your <strong>morning bias sits above</strong>, keeping you anchored. And when you take a trade, <strong>log it the moment you take it</strong> — while the chart's still in front of you. Fresh observation beats yesterday's reconstruction, every time.</p>
     </div>
@@ -1543,7 +1543,7 @@
     <div class="data-actions">
       <a id="data-import" data-i18n="btn.import_data">Import Data</a>
       <a id="data-backup-settings" data-i18n="btn.backup_settings">Backup Settings</a>
-      <select id="currency-select" class="currency-select" title="Currency">
+      <select id="currency-select" class="currency-select" data-i18n-title="tip.currency">
         <option value="GBP">£ GBP</option>
         <option value="EUR">€ EUR</option>
         <option value="USD">$ USD</option>
@@ -1553,8 +1553,8 @@
         <option value="AUD">A$ AUD</option>
       </select>
       <span class="lang-toggle" id="lang-toggle">
-        <span class="lang-flag active" id="lang-flag-en" data-lang="en" title="English" aria-label="English">🇬🇧</span>
-        <span class="lang-flag" id="lang-flag-es" data-lang="es" title="Castellano" aria-label="Castellano">🇪🇸</span>
+        <span class="lang-flag active" id="lang-flag-en" data-lang="en" data-i18n-title="tip.lang_en" aria-label="English">🇬🇧</span>
+        <span class="lang-flag" id="lang-flag-es" data-lang="es" data-i18n-title="tip.lang_es" aria-label="Castellano">🇪🇸</span>
       </span>
       <input type="file" id="data-import-input" accept=".json" style="display:none" />
     </div>
@@ -2044,6 +2044,42 @@
       'backup.trade_plural': "trades",
       'backup.saved_word': "saved",
       'backup.observed_only_saved': 'Session saved (observed only)',
+      'tip.session_name': "Click to edit. Type e.g. 'London 8-10AM' to set the trading window inline.",
+      'tip.dismiss_today': 'Dismiss until tomorrow',
+      'tip.currency': 'Currency',
+      'tip.lang_en': 'English',
+      'tip.lang_es': 'Castellano',
+      'tip.remove_link': 'Remove link',
+      'tip.remove_tag': 'Remove this tag',
+      'tip.review_trade': 'Click to review this trade',
+      'tip.r_captured': 'R-multiple captured',
+      'tip.pips_captured': 'Pips captured',
+      'tip.pot_r': 'Potential R — how far the move went',
+      'tip.pot_pips': 'Potential pips — how far the move went',
+      'tip.risk_amount': 'Risk amount',
+      'tip.sl_pips': 'Stop loss distance in pips',
+      'tip.remove': 'Remove',
+      'tip.open_day_review': "Click to open this day's review",
+      'tip.weekly_review_view': 'Click to view weekly review',
+      'tip.weekly_review_add': 'Click to add weekly review',
+      'tip.pot_rp_header': 'Potential R / Potential pips — how far the move went',
+      'tip.edit_trade': 'Click to edit',
+      'tip.open_chart': 'Open chart in new tab',
+      'tip.change_name': 'Click to change your name',
+      'tip.r_setup': "R — the setup's risk/reward ratio (e.g. 5 = 1:5)",
+      'tip.r_setup_short': "R — the setup's risk/reward ratio",
+      'tip.pips_setup': 'Pips — the pip target of the setup',
+      'tip.trade_dot_hover': 'Trade #{N}: {RESULT} {R}{PIPS} · {DATE} · Click to edit/delete',
+      'tip.today_btn': 'Jump to today',
+      'tip.today_btn_empty': 'No trades for today yet',
+      'tip.latest_btn': 'Jump to your most recent trade',
+      'tip.latest_btn_none': 'No trades logged yet',
+      'tip.expand_section': 'Click to expand',
+      'tip.collapse_section': 'Click to collapse',
+      'tip.mt5_today_show': "Show today's trades ({D})",
+      'tip.mt5_today_empty': 'No trades from today ({D}) in this file',
+      'tip.mt5_latest_show': 'Show the most recent date ({D})',
+      'tip.mt5_latest_empty': 'No trades to show',
       'backup.intro_html': "Your trades are saved in this browser's local storage. If you clear your browser data, switch computers, or your hard drive fails, that data is gone. A backup is a JSON file you can save to Google Drive, Dropbox, or anywhere else for safekeeping. <strong style=\"color:var(--text);\">You can re-import it later from the Import Data button at the bottom of the page.</strong>",
       'backup.warning_html': "<strong style=\"color:#f59e0b;\">Before enabling Auto-backup:</strong> backups go to your browser's default Downloads folder unless you change it. Set that to a Google Drive / Dropbox synced folder first so your backups land somewhere safe. Chrome / Edge users will be asked to pick a specific file instead.",
       'backup.download_now': "Download backup now",
@@ -2665,6 +2701,42 @@
       'backup.trade_plural': "operaciones",
       'backup.saved_word': "guardadas",
       'backup.observed_only_saved': 'Sesión guardada (solo observada)',
+      'tip.session_name': "Haz clic para editar. Escribe p.ej. 'Londres 8-10AM' para fijar la ventana de trading.",
+      'tip.dismiss_today': 'Ocultar hasta mañana',
+      'tip.currency': 'Moneda',
+      'tip.lang_en': 'English',
+      'tip.lang_es': 'Castellano',
+      'tip.remove_link': 'Quitar enlace',
+      'tip.remove_tag': 'Quitar esta etiqueta',
+      'tip.review_trade': 'Haz clic para revisar esta operación',
+      'tip.r_captured': 'R-múltiplo capturado',
+      'tip.pips_captured': 'Pips capturados',
+      'tip.pot_r': 'R potencial — hasta dónde llegó el movimiento',
+      'tip.pot_pips': 'Pips potenciales — hasta dónde llegó el movimiento',
+      'tip.risk_amount': 'Importe del riesgo',
+      'tip.sl_pips': 'Distancia del stop loss en pips',
+      'tip.remove': 'Quitar',
+      'tip.open_day_review': 'Haz clic para abrir la revisión de este día',
+      'tip.weekly_review_view': 'Haz clic para ver la revisión semanal',
+      'tip.weekly_review_add': 'Haz clic para añadir revisión semanal',
+      'tip.pot_rp_header': 'R potencial / Pips potenciales — hasta dónde llegó el movimiento',
+      'tip.edit_trade': 'Haz clic para editar',
+      'tip.open_chart': 'Abrir gráfico en pestaña nueva',
+      'tip.change_name': 'Haz clic para cambiar tu nombre',
+      'tip.r_setup': 'R — el ratio riesgo/recompensa de la configuración (p.ej. 5 = 1:5)',
+      'tip.r_setup_short': 'R — el ratio riesgo/recompensa de la configuración',
+      'tip.pips_setup': 'Pips — el objetivo en pips de la configuración',
+      'tip.trade_dot_hover': 'Operación #{N}: {RESULT} {R}{PIPS} · {DATE} · Haz clic para editar/eliminar',
+      'tip.today_btn': 'Ir al día de hoy',
+      'tip.today_btn_empty': 'Aún no hay operaciones para hoy',
+      'tip.latest_btn': 'Ir a tu operación más reciente',
+      'tip.latest_btn_none': 'Aún no hay operaciones registradas',
+      'tip.expand_section': 'Haz clic para expandir',
+      'tip.collapse_section': 'Haz clic para contraer',
+      'tip.mt5_today_show': 'Mostrar operaciones de hoy ({D})',
+      'tip.mt5_today_empty': 'No hay operaciones de hoy ({D}) en este archivo',
+      'tip.mt5_latest_show': 'Mostrar la fecha más reciente ({D})',
+      'tip.mt5_latest_empty': 'No hay operaciones para mostrar',
       'backup.intro_html': "Tus operaciones se guardan en el almacenamiento local de este navegador. Si borras los datos del navegador, cambias de ordenador o falla tu disco duro, esos datos se pierden. Una copia de seguridad es un archivo JSON que puedes guardar en Google Drive, Dropbox o cualquier otro sitio. <strong style=\"color:var(--text);\">Puedes volver a importarlo m\u00e1s tarde desde el bot\u00f3n Importar Datos al final de la p\u00e1gina.</strong>",
       'backup.warning_html': "<strong style=\"color:#f59e0b;\">Antes de activar la copia autom\u00e1tica:</strong> las copias van a la carpeta de Descargas por defecto del navegador a menos que la cambies. Config\u00farala primero a una carpeta sincronizada de Google Drive / Dropbox para que tus copias terminen en un sitio seguro. A los usuarios de Chrome / Edge se les pedir\u00e1 elegir un archivo concreto.",
       'backup.download_now': "Descargar copia ahora",
@@ -4304,7 +4376,7 @@
       card.innerHTML = `
         <div class="tv-link-row">
           <input type="url" class="tv-link-url" placeholder="https://www.tradingview.com/x/..." />
-          <button type="button" class="tv-link-remove" title="Remove link">×</button>
+          <button type="button" class="tv-link-remove" title="${t('tip.remove_link')}">×</button>
         </div>
         <div class="tv-link-preview-wrap"></div>
         <textarea class="tv-link-notes" data-i18n-placeholder="ph.chart_notes" placeholder="${t('ph.chart_notes')}" rows="2"></textarea>
@@ -4573,7 +4645,7 @@
       btn.type = 'button';
       btn.className = 'tag custom';
       btn.dataset.value = label;
-      btn.innerHTML = `${safeLabel}<span class="tag-remove" title="Remove this tag">×</span>`;
+      btn.innerHTML = `${safeLabel}<span class="tag-remove" title="${t('tip.remove_tag')}">×</span>`;
       container.appendChild(btn);
     });
     const addBtn = document.createElement('button');
@@ -4647,19 +4719,19 @@
       const row = document.createElement('div');
       row.className = 'trade-row';
       row.innerHTML = `
-        <div class="trade-cell trade-num" data-idx="${idx}" title="Click to review this trade">${idx + 1}</div>
+        <div class="trade-cell trade-num" data-idx="${idx}" title="${t('tip.review_trade')}">${idx + 1}</div>
         <div class="trade-cell"><select class="trade-select result-select">
           <option value="">—</option><option value="Win">${_resWin}</option><option value="Lose">${_resLose}</option><option value="BE">${_resBE}</option>
         </select></div>
         <div class="trade-cell trade-cell-dual">
-          <input class="trade-input trade-input-tiny r-input" type="text" inputmode="decimal" placeholder="R" title="R-multiple captured" />
+          <input class="trade-input trade-input-tiny r-input" type="text" inputmode="decimal" placeholder="R" title="${t('tip.r_captured')}" />
           <span class="trade-sep">·</span>
-          <input class="trade-input trade-input-tiny pips-input" type="text" inputmode="decimal" placeholder="P" title="Pips captured" />
+          <input class="trade-input trade-input-tiny pips-input" type="text" inputmode="decimal" placeholder="P" title="${t('tip.pips_captured')}" />
         </div>
         <div class="trade-cell trade-cell-dual">
-          <input class="trade-input trade-input-tiny potr-input" type="text" inputmode="decimal" placeholder="R" title="Potential R — how far the move went" />
+          <input class="trade-input trade-input-tiny potr-input" type="text" inputmode="decimal" placeholder="R" title="${t('tip.pot_r')}" />
           <span class="trade-sep">·</span>
-          <input class="trade-input trade-input-tiny potpips-input" type="text" inputmode="decimal" placeholder="P" title="Potential pips — how far the move went" />
+          <input class="trade-input trade-input-tiny potpips-input" type="text" inputmode="decimal" placeholder="P" title="${t('tip.pot_pips')}" />
         </div>
         <div class="trade-cell"><select class="trade-select type-select">
           <option value="">—</option><option value="Reaction">${_typeR}</option><option value="Continuation">${_typeC}</option>
@@ -4670,14 +4742,14 @@
         <div class="trade-cell"><input class="trade-input entry-input" type="time" /></div>
         <div class="trade-cell"><input class="trade-input exit-input" type="time" /></div>
         <div class="trade-cell trade-cell-dual">
-          <input class="trade-input trade-input-tiny risk-input" type="number" step="any" data-currency-placeholder="{C}" placeholder="£" title="Risk in £" />
+          <input class="trade-input trade-input-tiny risk-input" type="number" step="any" data-currency-placeholder="{C}" placeholder="£" title="${t('tip.risk_amount')}" />
           <span class="trade-sep">·</span>
-          <input class="trade-input trade-input-tiny sl-input" type="number" step="any" placeholder="SL" title="Stop loss distance in pips" />
+          <input class="trade-input trade-input-tiny sl-input" type="number" step="any" placeholder="SL" title="${t('tip.sl_pips')}" />
         </div>
         <div class="trade-cell"><input class="trade-input costs-input" type="number" step="any" data-currency-placeholder="{C}" placeholder="£" /></div>
         <div class="trade-cell"><input class="trade-input gross-input" type="number" step="any" placeholder="auto" style="font-family:'DM Mono',monospace;font-size:13px;" /></div>
         <div class="trade-cell"><input class="trade-input net-input" type="number" step="any" placeholder="auto" style="font-family:'DM Mono',monospace;font-size:13px;" /></div>
-        <div class="trade-cell"><button class="trade-remove" title="Remove">×</button></div>
+        <div class="trade-cell"><button class="trade-remove" title="${t('tip.remove')}">×</button></div>
       `;
       wrap.appendChild(row);
       row.querySelector('.result-select').value = t.result || '';
@@ -4699,9 +4771,9 @@
           el.style.opacity = '';
         });
         rInput.placeholder = 'R';
-        rInput.title = 'R — the setup\'s risk/reward ratio (e.g. 5 = 1:5)';
+        rInput.title = t('tip.r_setup');
         pipsInput.placeholder = 'P';
-        pipsInput.title = 'Pips — the pip target of the setup';
+        pipsInput.title = t('tip.pips_setup');
       };
       syncRPipsEnabled();
       // Pot R / Pot pips only meaningful on Wins — dim/disable visually for other results
@@ -4958,7 +5030,7 @@
       card.innerHTML = `
         <div class="tv-link-row">
           <input type="url" class="tv-link-url" placeholder="https://www.tradingview.com/x/..." />
-          <button type="button" class="tv-link-remove" title="Remove link">×</button>
+          <button type="button" class="tv-link-remove" title="${t('tip.remove_link')}">×</button>
         </div>
         <div class="tv-link-preview-wrap"></div>
         <textarea class="tv-link-notes" data-i18n-placeholder="ph.chart_notes" placeholder="${t('ph.chart_notes')}" rows="2"></textarea>
@@ -5577,7 +5649,7 @@
         const dateStr = t.date ? new Date(t.date).toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : '';
         const rTxt = typeof t.r === 'number' ? t.r.toFixed(2) + 'R' : (t.r || '');
         const pipsTxt = (typeof t.pips === 'number' && !isNaN(t.pips)) ? ` · ${t.pips.toFixed(0)}p` : '';
-        dot.title = `Trade #${i + 1}: ${t.result} ${rTxt}${pipsTxt} · ${dateStr} · Click to edit/delete`;
+        dot.title = t('tip.trade_dot_hover').replace('{N}', i + 1).replace('{RESULT}', t.result).replace('{R}', rTxt).replace('{PIPS}', pipsTxt).replace('{DATE}', dateStr);
         dot.addEventListener('click', () => openEditTradeModal(t.id));
       }
       dotsWrap.appendChild(dot);
@@ -6437,7 +6509,7 @@
       const avgPct = pctVals.length > 0 ? pctVals.reduce((s, v) => s + v, 0) / pctVals.length : null;
       const pctStr = avgPct !== null ? avgPct.toFixed(0) + '%' : '—';
       const pctCls = avgPct === null ? '' : avgPct >= 80 ? 'good' : avgPct < 50 ? 'bad' : '';
-      return `<div class="potr-trade-row" data-date-key="${dateKey}" title="Click to open this day's review">
+      return `<div class="potr-trade-row" data-date-key="${dateKey}" title="${t('tip.open_day_review')}">
         <div class="potr-trade-cell">${dateStr}</div>
         <div class="potr-trade-cell">${side}</div>
         <div class="potr-trade-cell">${capRStr} <span class="potr-trade-sub">· ${capPStr}</span></div>
@@ -6879,7 +6951,7 @@
         const weekNum = Math.ceil((dayOfYear + yearStart.getDay() + 1) / 7);
         const weekKey = `${fridayDate.getFullYear()}-W${String(weekNum).padStart(2, '0')}`;
         const hasReview = (data.weeklyReviews || []).some(r => r.weekKey === weekKey);
-        html += `<div class="cal-week-summary clickable" data-monday="${mondayDate.toISOString()}" data-friday="${fridayDate.toISOString()}" data-week-key="${weekKey}" title="Click to ${hasReview ? 'view' : 'add'} weekly review" style="grid-row:${currentRow};grid-column:8;${SZ}">
+        html += `<div class="cal-week-summary clickable" data-monday="${mondayDate.toISOString()}" data-friday="${fridayDate.toISOString()}" data-week-key="${weekKey}" title="${hasReview ? t('tip.weekly_review_view') : t('tip.weekly_review_add')}" style="grid-row:${currentRow};grid-column:8;${SZ}">
           <div class="pl ${wCls}">${wLabel}</div>
           <div class="label">${t('cal.week_short_n').replace(/\{N\}/g, weekIdx)}</div>
           ${wSub ? `<div class="sub">${wSub}</div>` : ''}
@@ -7033,7 +7105,7 @@
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.side')}</div>
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.result')}</div>
       <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.rp')}</div>
-      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;" title="Potential R / Potential pips — how far the move went">${t('mtbl.pot_rp')}</div>
+      <div class="modal-trade-cell center" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;" title="${t('tip.pot_rp_header')}">${t('mtbl.pot_rp')}</div>
       <div class="modal-trade-cell right" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.net')}</div>
       <div class="modal-trade-cell right" style="color:var(--text-dim);font-size:9px;letter-spacing:0.15em;">${t('mtbl.hold')}</div>
     </div>`;
@@ -7053,7 +7125,7 @@
       const potRStr = potRHas ? t.potentialR.toFixed(2) : '—';
       const potPStr = potPHas ? t.potentialPips.toFixed(0) + 'p' : '— p';
       const potRowCls = isWin ? '' : 'be';
-      tHtml += `<div class="modal-trade-row" data-id="${t.id}" title="Click to edit">
+      tHtml += `<div class="modal-trade-row" data-id="${t.id}" title="${t('tip.edit_trade')}">
         <div class="modal-trade-cell center">${i + 1}</div>
         <div class="modal-trade-cell">${time}</div>
         <div class="modal-trade-cell center">${tSide(t.side) || '—'}</div>
@@ -7289,9 +7361,9 @@
       el.style.opacity = '';
     });
     rEl.placeholder = 'R';
-    rEl.title = 'R — the setup\'s risk/reward ratio';
+    rEl.title = t('tip.r_setup_short');
     pEl.placeholder = 'P';
-    pEl.title = 'Pips — the pip target of the setup';
+    pEl.title = t('tip.pips_setup');
   }
 
   document.querySelectorAll('.edit-result-toggle button').forEach(btn => {
@@ -7864,7 +7936,7 @@
     // Single-thumb wrapper. Click goes through but the parent cell click also fires — stop propagation
     // so opening the chart in a new tab doesn't also close the modal and open the day view.
     return `<div class="trade-thumb">
-      <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="Open chart in new tab">
+      <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="${t('tip.open_chart')}">
         <img src="${imgUrl}" alt="Chart" onerror="this.parentElement.parentElement.style.display='none';" />
       </a>
     </div>`;
@@ -8211,7 +8283,7 @@
         const dateIso = new Date(tr.date).toISOString();
         const label = showRankLabel ? `#${i + 1}` : '';
         const icon  = showRankLabel ? '★' : '';
-        return `<div class="trade-of-month-cell" data-trade-date="${dateIso}" title="Click to open this day's review" style="padding:0;border:none;background:transparent;">
+        return `<div class="trade-of-month-cell" data-trade-date="${dateIso}" title="${t('tip.open_day_review')}" style="padding:0;border:none;background:transparent;">
           ${autoTradeCard(tr, label, 'good', icon)}
         </div>`;
       }).join('');
@@ -8716,7 +8788,7 @@
         if (!m) return '';
         const imgUrl = `https://www.tradingview.com/x/${m[1]}/`;
         const safeUrl = url.replace(/"/g, '&quot;');
-        return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" title="Open chart in new tab"><img src="${imgUrl}" alt="Chart preview" onerror="this.parentElement.style.display='none';" /></a>`;
+        return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" title="${t('tip.open_chart')}"><img src="${imgUrl}" alt="Chart preview" onerror="this.parentElement.style.display='none';" /></a>`;
       }).filter(Boolean).join('');
       return cards;
     }
@@ -8736,7 +8808,7 @@
         return `<div class="tv-link-card" data-idx="${i}">
           <div class="tv-link-row">
             <input type="url" class="tv-link-url" placeholder="https://www.tradingview.com/x/..." value="${safeUrl}" />
-            <button type="button" class="tv-link-remove" title="Remove link">×</button>
+            <button type="button" class="tv-link-remove" title="${t('tip.remove_link')}">×</button>
           </div>
           <div class="tv-link-preview-wrap">${imgHtml}</div>
           <textarea class="tv-link-notes" placeholder="${esc(t('ph.chart_notes'))}" rows="2">${safeNotes}</textarea>
@@ -8946,7 +9018,7 @@
               return `<div class="tv-link-card" data-idx="${j}">
                 <div class="tv-link-row">
                   <input type="url" class="tv-link-url" placeholder="https://www.tradingview.com/x/..." value="${safeUrl}" />
-                  <button type="button" class="tv-link-remove" title="Remove link">×</button>
+                  <button type="button" class="tv-link-remove" title="${t('tip.remove_link')}">×</button>
                 </div>
                 <div class="tv-link-preview-wrap">${imgHtml}</div>
                 <textarea class="tv-link-notes" placeholder="${(t('ph.chart_notes')||'').replace(/"/g,'&quot;')}" rows="2">${safeNotes}</textarea>
@@ -8966,7 +9038,7 @@
         const html = `<div class="tv-link-card" data-idx="${idx}">
           <div class="tv-link-row">
             <input type="url" class="tv-link-url" placeholder="https://www.tradingview.com/x/..." />
-            <button type="button" class="tv-link-remove" title="Remove link">×</button>
+            <button type="button" class="tv-link-remove" title="${t('tip.remove_link')}">×</button>
           </div>
           <div class="tv-link-preview-wrap"></div>
           <textarea class="tv-link-notes" placeholder="${(t('ph.chart_notes')||'').replace(/"/g,'&quot;')}" rows="2"></textarea>
@@ -11538,7 +11610,7 @@
     if (!el) return;
     const name = (data.userName && data.userName.trim()) || 'friend';
     const safeName = name.replace(/</g, '&lt;');
-    const nameSpan = `<span class="greet-name" id="greet-name" title="Click to change your name">${safeName}</span>`;
+    const nameSpan = `<span class="greet-name" id="greet-name" title="${t('tip.change_name')}">${safeName}</span>`;
     if (!_cachedOpener) _cachedOpener = timeOfDayOpener();
     if (!_cachedTail) {
       const outcome = getRecentDayOutcome();
@@ -11852,13 +11924,13 @@
     todayBtn.classList.toggle('empty', !hasToday);
     todayBtn.disabled = !hasToday;
     todayBtn.title = hasToday
-      ? `Show today's trades (${todayStr})`
-      : `No trades from today (${todayStr}) in this file`;
+      ? t('tip.mt5_today_show').replace('{D}', todayStr)
+      : t('tip.mt5_today_empty').replace('{D}', todayStr);
     latestBtn.classList.toggle('empty', dates.length === 0);
     latestBtn.disabled = dates.length === 0;
     latestBtn.title = dates.length > 0
-      ? `Show the most recent date (${dates[0]})`
-      : 'No trades to show';
+      ? t('tip.mt5_latest_show').replace('{D}', dates[0])
+      : t('tip.mt5_latest_empty');
     todayBtn.onclick = () => {
       if (!hasToday) return;
       sel.value = todayStr;
@@ -12107,15 +12179,15 @@
       if (data.settings.collapsedSections[key]) {
         section.classList.add('collapsed');
         num.textContent = '+';
-        num.title = 'Click to expand';
+        num.title = t('tip.expand_section');
       } else {
-        num.title = 'Click to collapse';
+        num.title = t('tip.collapse_section');
       }
 
       const toggle = () => {
         const nowCollapsed = section.classList.toggle('collapsed');
         num.textContent = nowCollapsed ? '+' : '—';
-        num.title = nowCollapsed ? 'Click to expand' : 'Click to collapse';
+        num.title = nowCollapsed ? t('tip.expand_section') : t('tip.collapse_section');
         if (nowCollapsed) {
           data.settings.collapsedSections[key] = true;
         } else {
