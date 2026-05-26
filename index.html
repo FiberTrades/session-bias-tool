@@ -10264,7 +10264,7 @@
       ? `${s.curStreak} losses in a row. Mate, log off. Genuinely.`
       : null,
     s => (s.curStreak >= 3 && s.streakKind === 'BE')
-      ? `${s.curStreak} BEs in a row. Either the market is choppy, or you\'re managing too tight. Probably both, if I\'m honest.`
+      ? `${s.curStreak} BEs in a row. Either the market is choppy, or you\'re moving SL to BE too soon. Probably both, if I\'m honest.`
       : null,
 
     // === Recent 10 win-rate ===
@@ -10679,7 +10679,7 @@
       ? `${s.curStreak} pérdidas seguidas. Desconecta. En serio.`
       : null,
     s => (s.curStreak >= 3 && s.streakKind === 'BE')
-      ? `${s.curStreak} BEs seguidos. O el mercado está lateral, o gestionas demasiado pronto. Probablemente las dos cosas.`
+      ? `${s.curStreak} BEs seguidos. O el mercado está lateral, o mueves tu SL a BE demasiado pronto. Probablemente las dos cosas.`
       : null,
     s => (s.recent10WR != null && s.recent10WR >= 70 && s.recent10Decided >= 6)
       ? `${s.recent10WR}% en las últimas 10. ¿Edge real, o racha caliente? Deberías saber cuál.`
