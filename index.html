@@ -266,10 +266,11 @@
      stronger border. */
   .trade-review-tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 0 0 0 60px; padding: 0; background: transparent; border: none; }
   /* Lower-weight header for the "Select to Review" section — reads as a meta control rather than
-     a primary section title. Smaller text, no number prefix, dim eyebrow + dim sub-line. */
-  .trade-select-header { margin: 0 0 14px 60px; }
-  .trade-select-eyebrow { display: block; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text); margin-bottom: 6px; }
-  .trade-select-sub { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+     a primary section title. Smaller text, no number prefix, single-line inline layout: label
+     in white, sub-text in grey, both DM Mono uppercase. */
+  .trade-select-header { margin: 0 0 14px 60px; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+  .trade-select-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text); }
+  .trade-select-sub { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
   .trade-review-tab { background: transparent; border: 1px solid var(--border-2); color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.05em; padding: 7px 14px; cursor: pointer; transition: all 150ms; display: inline-flex; align-items: center; gap: 6px; }
   .trade-review-tab:hover { border-color: var(--text-mid); color: var(--text); }
   .trade-review-tab.active { border-color: var(--text); color: var(--text); font-weight: 600; background: var(--bg-elev); }
@@ -1231,7 +1232,7 @@
          per-trade review sections and visually disables them until the user picks a trade. -->
     <section id="section-trade-select" class="hidden">
       <div class="trade-select-header">
-        <span class="trade-select-eyebrow" data-i18n="review.select_to_review">Select to Review</span>
+        <span class="trade-select-eyebrow" data-i18n="review.select_to_review">Select to Review:</span>
         <span class="trade-select-sub" data-i18n="review.select_to_review_hint">Pick which trade you want to review — each has its own fields below.</span>
       </div>
       <div class="trade-review-tabs" id="trade-review-tabs"></div>
@@ -2103,7 +2104,7 @@
       "lbl.mindset": "Mindset",
       'review.reviewing_trade': "Reviewing Trade #{N}",
       'review.reviewing': 'Select to review',
-      'review.select_to_review': 'Select to Review',
+      'review.select_to_review': 'Select to Review:',
       'review.select_to_review_hint': 'Pick which trade you want to review — each has its own fields below.',
       'review.trade_short': 'Trade',
       "tip.pnl_series": "Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap. Shared with the Statistics tab.",
@@ -2768,7 +2769,7 @@
       "lbl.mindset": "Mentalidad",
       'review.reviewing_trade': "Revisando Operación #{N}",
       'review.reviewing': 'Selecciona para revisar',
-      'review.select_to_review': 'Selecciona para Revisar',
+      'review.select_to_review': 'Selecciona para Revisar:',
       'review.select_to_review_hint': 'Elige qué operación quieres revisar — cada una tiene sus propios campos abajo.',
       'review.trade_short': 'Operación',
       "tip.pnl_series": "Net P&L = beneficio despu\u00e9s de costes. Gross P&L = beneficio antes de costes. Haz clic en el selector para cambiar. Compartido con la pesta\u00f1a Estad\u00edsticas.",
