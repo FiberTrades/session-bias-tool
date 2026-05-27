@@ -269,7 +269,7 @@
      a primary section title. Smaller text, no number prefix, dim eyebrow + dim sub-line. */
   .trade-select-header { margin: 0 0 14px 60px; }
   .trade-select-eyebrow { display: block; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text); margin-bottom: 6px; }
-  .trade-select-sub { display: block; font-family: 'Fraunces', serif; font-style: italic; font-size: 13px; color: var(--text-mid); line-height: 1.5; max-width: 540px; }
+  .trade-select-sub { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .trade-review-tab { background: transparent; border: 1px solid var(--border-2); color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.05em; padding: 7px 14px; cursor: pointer; transition: all 150ms; display: inline-flex; align-items: center; gap: 6px; }
   .trade-review-tab:hover { border-color: var(--text-mid); color: var(--text); }
   .trade-review-tab.active { border-color: var(--text); color: var(--text); font-weight: 600; background: var(--bg-elev); }
@@ -1232,7 +1232,7 @@
     <section id="section-trade-select" class="hidden">
       <div class="trade-select-header">
         <span class="trade-select-eyebrow" data-i18n="review.select_to_review">Select to Review</span>
-        <span class="trade-select-sub" data-i18n="review.select_to_review_hint">You've logged multiple trades. Pick which one's review you want to fill in — each trade has its own set of fields below.</span>
+        <span class="trade-select-sub" data-i18n="review.select_to_review_hint">Pick which trade you want to review — each has its own fields below.</span>
       </div>
       <div class="trade-review-tabs" id="trade-review-tabs"></div>
     </section>
@@ -2104,7 +2104,7 @@
       'review.reviewing_trade': "Reviewing Trade #{N}",
       'review.reviewing': 'Select to review',
       'review.select_to_review': 'Select to Review',
-      'review.select_to_review_hint': "You've logged multiple trades. Pick which one's review you want to fill in — each trade has its own set of fields below.",
+      'review.select_to_review_hint': 'Pick which trade you want to review — each has its own fields below.',
       'review.trade_short': 'Trade',
       "tip.pnl_series": "Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap. Shared with the Statistics tab.",
       "tip.total_rp_series": "Net R and Net Pips across your current series of 10.",
@@ -2769,7 +2769,7 @@
       'review.reviewing_trade': "Revisando Operación #{N}",
       'review.reviewing': 'Selecciona para revisar',
       'review.select_to_review': 'Selecciona para Revisar',
-      'review.select_to_review_hint': 'Has registrado varias operaciones. Elige cuál quieres revisar — cada operación tiene su propio conjunto de campos abajo.',
+      'review.select_to_review_hint': 'Elige qué operación quieres revisar — cada una tiene sus propios campos abajo.',
       'review.trade_short': 'Operación',
       "tip.pnl_series": "Net P&L = beneficio despu\u00e9s de costes. Gross P&L = beneficio antes de costes. Haz clic en el selector para cambiar. Compartido con la pesta\u00f1a Estad\u00edsticas.",
       "tip.total_rp_series": "R Neto y Pips Netos en tu serie actual de 10.",
