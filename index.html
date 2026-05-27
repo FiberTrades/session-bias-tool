@@ -306,6 +306,18 @@
   .bias-date-inline input[type="date"]:hover, .bias-date-inline input[type="date"]:focus { border-color: var(--text-mid); color: var(--text); }
   .bias-date-inline button { background: transparent; border: 1px solid var(--border-2); color: var(--text-dim); padding: 5px 10px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: all 200ms; }
   .bias-date-inline button:hover { border-color: var(--text-mid); color: var(--text); }
+  /* Variant for the MT5-import + Calculator buttons sitting next to the date picker.
+     Slightly larger (12px), no uppercase tracking — these read as primary action labels
+     rather than tiny meta-controls. Hover lightens border and text the same way the
+     date input does, keeping the strip visually unified. */
+  .bias-date-inline-btn { background: var(--bg); border: 1px solid var(--border-2); color: var(--text-mid); padding: 5px 10px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.05em; text-transform: none; cursor: pointer; transition: all 200ms; margin-left: 6px; }
+  .bias-date-inline-btn:hover { border-color: var(--text-mid); color: var(--text); background: var(--bg-elev); }
+  /* Generic safety-net hover for any <button> with a `style` attribute but no explicit
+     :hover rule. Inline styles can't define :hover, so otherwise some buttons across the
+     app would feel "dead" on hover. We apply a subtle filter brightness that works with
+     any background color the inline style set. Filter only kicks in on hover. */
+  button[style]:not([disabled]):hover { filter: brightness(1.15); }
+  button[style]:not([disabled]):active { filter: brightness(0.95); }
   .rule-banner-meta { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
   .rule-banner-graded.good { color: var(--good); }
   .rule-banner-graded.bad  { color: var(--bad); }
@@ -1162,8 +1174,8 @@
         <span class="bias-date-inline">
           <span class="bias-date-inline-eyebrow" data-i18n="session_strip.logging_for">Logging trades for</span>
           <input type="date" id="session-date" />
-          <button type="button" id="mt5-import-btn" data-i18n="btn.import_mt5" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text-mid);padding:5px 10px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.05em;text-transform:none;cursor:pointer;transition:all 200ms;">↓ Import from MT5</button>
-          <button type="button" id="calculator-btn" data-i18n="btn.calculator" style="background:var(--bg);border:1px solid var(--border-2);color:var(--text-mid);padding:5px 10px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.05em;text-transform:none;cursor:pointer;transition:all 200ms;margin-left:8px;">＝ Calculator</button>
+          <button type="button" id="mt5-import-btn" class="bias-date-inline-btn" data-i18n="btn.import_mt5">↓ Import from MT5</button>
+          <button type="button" id="calculator-btn" class="bias-date-inline-btn" data-i18n="btn.calculator">＝ Calculator</button>
         </span>
       </div>
 
