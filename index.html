@@ -255,14 +255,18 @@
   .trade-header-cell { background: var(--bg-elev); padding: 8px 8px; font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); text-align: center; }
   .trade-cell { background: var(--bg); padding: 8px 8px; display: flex; align-items: center; }
   /* Trade-row "#" cell — clickable to make that trade the active one for per-trade review
-     fields (Execution / Focus / Close / Charts / Concepts / Mindset / Reflection). Always
-     looks button-like with a subtle border + hover lift so multi-trade users discover it. */
-  .trade-num { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text-mid); justify-content: center; cursor: pointer; transition: all 150ms; letter-spacing: 0.02em; border: 1px solid var(--border-2); border-radius: 3px; margin: 4px; position: relative; }
-  .trade-num:hover { background: var(--bg-elev); color: var(--text); border-color: var(--text-mid); }
-  .trade-num.active-review { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
-  .trade-num.active-review:hover { background: var(--text); color: var(--bg); }
-  /* Hint shown above the trade rows when ≥2 trades are logged. */
-  .trade-multi-hint { display: none; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 8px 0; padding: 8px 12px; background: var(--bg-elev); border: 1px dashed var(--border-2); }
+     fields (Execution / Focus / Close / Charts / Concepts / Mindset / Reflection). */
+  .trade-num { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text-mid); justify-content: center; cursor: pointer; transition: background 150ms, color 150ms; letter-spacing: 0.02em; }
+  .trade-num:hover { background: var(--bg-elev); color: var(--text); }
+  /* Active-review state: a pulsating ring drawn via outline (doesn't take layout space, so the
+     grid column widths stay aligned). 1.4s ease loop draws attention without being aggressive. */
+  .trade-num.active-review { color: var(--text); background: var(--bg-elev); animation: tradeNumPulse 1.4s ease-in-out infinite; outline: 2px solid var(--text); outline-offset: -2px; }
+  @keyframes tradeNumPulse {
+    0%, 100% { outline-color: var(--text); }
+    50%      { outline-color: var(--text-mid); }
+  }
+  /* Hint above the trade table — plain prose, no box. Only visible when ≥2 trades. */
+  .trade-multi-hint { display: none; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.04em; margin: 0 0 10px 60px; line-height: 1.5; }
   .trade-multi-hint.show { display: block; }
   .trade-multi-hint strong { color: var(--text); font-weight: 600; }
   .review-active-trade-label { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-mid); margin: 0 0 18px 60px; padding: 6px 0; border-bottom: 1px solid var(--border-2); }
@@ -1188,6 +1192,8 @@
       </div>
 
       <div class="trades-wrap">
+        <!-- Multi-trade review hint: plain prose hint above the column headers (only when ≥2 trades). -->
+        <div id="trade-multi-hint" class="trade-multi-hint" data-i18n-html="tlog.multi_hint">Click <strong>#</strong> to review each trade individually. The highlighted # is the trade you're currently reviewing.</div>
         <div class="trade-row-headers">
           <div class="trade-header-cell" data-i18n="tlog.col.num">#</div>
           <div class="trade-header-cell" data-i18n="tlog.col.result">Result</div>
@@ -1208,9 +1214,6 @@
           <strong style="color:var(--text);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;font-style:normal;display:block;margin-bottom:4px;" data-i18n="mt5_banner.label">Finish logging your imports</strong>
           <span id="mt5-completion-banner-body" data-i18n-html="mt5_banner.body">Your imported trades still need <em>Pot R / Pips</em> and <em>Type</em>. Click the cells in each row to fill them in — the banner will disappear once everything's logged.</span>
         </div>
-        <!-- Multi-trade review hint: appears only when ≥2 trades are logged, since with 1 trade
-             there's nothing to switch between. Points users at the # cell as the row-switcher. -->
-        <div id="trade-multi-hint" class="trade-multi-hint" data-i18n-html="tlog.multi_hint">Click <strong>#</strong> to review each trade individually. The highlighted # is the trade you're currently reviewing.</div>
         <div id="trade-rows"></div>
         <button class="add-trade" id="add-trade" data-i18n="btn.add_trade">+ Add Trade</button>
       </div>
