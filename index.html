@@ -1386,6 +1386,9 @@
   </div>
 
   <div class="page" id="page-stats">
+    <!-- Contextual encouragement / math-based feedback about the current series. -->
+    <div id="current-series-message" style="margin-top:32px;margin-bottom:24px;font-family:'Fraunces',serif;font-size:18px;color:var(--text);line-height:1.5;letter-spacing:-0.005em;display:none;"></div>
+
     <div class="stats-summary stats-summary-3col">
       <div class="stat-cell" id="stat-pnl-cell">
         <div class="stat-tooltip" data-i18n="tip.pnl_series">Net P&L = profit after costs. Gross P&L = profit before costs. Click the toggle to swap. Shared with the Statistics tab.</div>
@@ -1411,11 +1414,6 @@
       <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-top:8px;" id="current-tally" data-i18n="series.no_trades_yet">No trades logged yet</div>
       <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;" data-i18n="modal.click_dot_edit">CLICK ANY TRADE DOT TO EDIT OR DELETE</div>
     </div>
-
-    <!-- Contextual encouragement / math-based feedback about the current series.
-         Sits just below the Current Series box so the commentary is read in context with the
-         dots/tally above it (e.g. "+6.41R at 7/10. Series is locked in"). -->
-    <div id="current-series-message" style="margin-top:24px;margin-bottom:24px;font-family:'Fraunces',serif;font-size:18px;color:var(--text);line-height:1.5;letter-spacing:-0.005em;display:none;"></div>
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title" data-i18n="stats.s1.title">Series History</span></div>
@@ -3385,7 +3383,7 @@
     if (typeof updateSessionDateStatus === 'function') try { updateSessionDateStatus(); } catch(e) {}
     if (typeof refreshRuleBanners === 'function') try { refreshRuleBanners(); } catch(e) {}
     // Reset cached greeting/tail picks so the bias-tab greeting re-renders in the new language
-    try { _cachedTail = null; _cachedOpener = null; } catch(e) { /* vars not declared yet */ }
+    try { _cachedTailBias = null; _cachedTailReview = null; _cachedOpener = null; _cachedReviewOpener = null; } catch(e) { /* vars not declared yet */ }
     if (typeof renderBiasGreeting === 'function') try { renderBiasGreeting(); } catch(e) {}
     // Refresh the rotating page captions on every page so they pick the new language
     if (typeof refreshPageCaption === 'function') {
@@ -12101,7 +12099,8 @@
   let _greetingNonce = 0;
   function bumpGreetingNonce() {
     _greetingNonce++;
-    _cachedTail = null;
+    _cachedTailBias = null;
+    _cachedTailReview = null;
     _cachedOpener = null;
     _cachedReviewOpener = null;
     if (typeof renderBiasGreeting === 'function') {
@@ -12109,8 +12108,10 @@
     }
   }
 
-  // Memoize so re-renders (e.g. after rename) don't reshuffle the line.
-  let _cachedTail = null;
+  // Memoize so re-renders (e.g. after rename) don't reshuffle the line. Two tails: one for
+  // Session Bias (yesterday-only) and one for Session Review (today-aware with fallback).
+  let _cachedTailBias = null;
+  let _cachedTailReview = null;
   let _cachedOpener = null;
   let _cachedReviewOpener = null;
 
@@ -12132,35 +12133,41 @@
     const name = (data.userName && data.userName.trim()) || 'friend';
     const safeName = name.replace(/</g, '&lt;');
     const nameSpan = `<span class="greet-name" title="${t('tip.change_name')}">${safeName}</span>`;
-    // Tail is shared across all surfaces — same recap regardless of which tab you're on.
-    if (!_cachedTail) {
+    // Cache TWO tails — one for the Bias surface (yesterday-flavoured only, ignoring today),
+    // one for the Review surface (today-aware, falls back to yesterday).
+    // This way each surface gets the recap that fits its purpose: planning vs reflecting.
+    if (!_cachedTailBias) {
+      // Bias = planning. Talks about yesterday + last-7-day context. Never about today.
+      const yesterdayOutcome = getRecentDayOutcome();
+      _cachedTailBias = pickTail(yesterdayOutcome, false);
+    }
+    if (!_cachedTailReview) {
+      // Review = reflecting. Prefers today's outcome when trades have been logged; otherwise
+      // falls back to the same yesterday-flavoured tail.
       const todayOutcome = getTodayOutcome();
       if (todayOutcome) {
-        _cachedTail = pickTail(todayOutcome, true);
+        _cachedTailReview = pickTail(todayOutcome, true);
       } else {
-        const outcome = getRecentDayOutcome();
-        _cachedTail = pickTail(outcome, false);
+        const yesterdayOutcome = getRecentDayOutcome();
+        _cachedTailReview = pickTail(yesterdayOutcome, false);
       }
     }
-    // Cache the time-of-day opener (Bias-style) and review opener separately. Each target picks
-    // whichever fits its context. Cached so re-renders on the same day don't reshuffle.
     if (!_cachedOpener) _cachedOpener = timeOfDayOpener();
     if (!_cachedReviewOpener) _cachedReviewOpener = reviewOpener();
     const vocativePattern = /\b(mate|trader|night owl|owl|caffeinated|búho|amigo|tío|colega)\b/i;
-    // Build a greeting for one target with a specific opener.
-    const compose = (opener) => {
+    const compose = (opener, tail) => {
       const hasBuiltInVocative = vocativePattern.test(opener);
       if (hasBuiltInVocative) {
-        return `${opener}. ${nameSpan}, ${_cachedTail}`;
+        return `${opener}. ${nameSpan}, ${tail}`;
       }
-      return `${opener}, ${nameSpan}. ${_cachedTail.charAt(0).toUpperCase()}${_cachedTail.slice(1)}`;
+      return `${opener}, ${nameSpan}. ${tail.charAt(0).toUpperCase()}${tail.slice(1)}`;
     };
     targets.forEach(el => {
-      // Pick opener based on the target's context. data-greeting-context="review" gets the
-      // review-flavoured opener; everything else (default = Bias) gets the time-of-day opener.
       const ctx = el.dataset && el.dataset.greetingContext;
-      const opener = (ctx === 'review') ? _cachedReviewOpener : _cachedOpener;
-      el.innerHTML = compose(opener);
+      const isReview = (ctx === 'review');
+      const opener = isReview ? _cachedReviewOpener : _cachedOpener;
+      const tail   = isReview ? _cachedTailReview  : _cachedTailBias;
+      el.innerHTML = compose(opener, tail);
       const nameEl = el.querySelector('.greet-name');
       if (nameEl) nameEl.addEventListener('click', openInlineNameEdit);
     });
