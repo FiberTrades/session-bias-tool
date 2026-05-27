@@ -270,6 +270,10 @@
   .trade-review-tab.active { border-color: var(--text); color: var(--text); font-weight: 600; background: var(--bg-elev); }
   .trade-review-tab .tab-dot { font-size: 9px; line-height: 1; opacity: 0.7; }
   .trade-review-tab.active .tab-dot { opacity: 1; }
+  /* Locked state — applied to per-trade review sections when the user has ≥2 trades but
+     hasn't yet picked one via the tab strip. Greys out the content + blocks interaction so the
+     user is forced to make an explicit choice. */
+  section.review-locked { opacity: 0.4; pointer-events: none; user-select: none; transition: opacity 200ms; }
   .review-active-trade-label { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-mid); margin: 0 0 18px 60px; padding: 6px 0; border-bottom: 1px solid var(--border-2); }
   .review-active-trade-label.hidden { display: none; }
   .trade-select, .trade-input { width: 100%; background: transparent; color: var(--text); border: none; font-family: 'DM Mono', monospace; font-size: 11px; outline: none; }
@@ -1218,12 +1222,10 @@
       </div>
     </section>
 
-    <!-- Trade-review SELECTOR section. Hidden when ≤1 trade. When ≥2 trades, shows a full
-         section header "Select to review" + a tab strip with one tab per trade (dot indicates
-         if that trade has any review content yet). Clicking a tab switches all per-trade review
-         sections below (Execution, Focus, Close, Charts, Concepts, Mindset, Reflection). -->
+    <!-- Trade-review SELECTOR section. Hidden when ≤1 trade. When ≥2 trades, sits above the
+         per-trade review sections and visually disables them until the user picks a trade. -->
     <section id="section-trade-select" class="hidden">
-      <div class="section-header"><span class="section-num">★</span><span class="section-title" data-i18n="review.select_to_review">Select to Review</span></div>
+      <div class="section-header"><span class="section-title" data-i18n="review.select_to_review">Select to Review</span></div>
       <p class="section-hint" data-i18n="review.select_to_review_hint">You've logged multiple trades. Pick which one's review you want to fill in — each trade has its own set of fields below.</p>
       <div class="trade-review-tabs" id="trade-review-tabs"></div>
     </section>
@@ -3898,6 +3900,12 @@
   // bind to data.review.trades[_activeReviewTradeIdx]. Clicking a trade row's # cell
   // switches this.
   let _activeReviewTradeIdx = 0;
+  // Lock flag for the multi-trade review flow. When ≥2 trades are logged and the user hasn't
+  // yet explicitly picked a trade via the tab strip, the per-trade review sections are visible
+  // but disabled (greyed out, no interactions). Clicking a tab unlocks them for the session.
+  // Resets to true whenever trade count goes from <2 to ≥2 (so adding a 2nd trade after editing
+  // a single-trade session pauses you until you re-confirm).
+  let _tradeReviewLocked = false;
 
   // Paint all review-section UI from the active trade's values. Called on tab load,
   // when the active trade switches, and after addTrade/deleteTrade.
@@ -3911,12 +3919,20 @@
     sections.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); });
     const trades = (data.review.trades || []);
     const hasTrades = trades.length > 0;
+    // Apply / remove the lock class on each per-trade review section. Locked = greyed out
+    // + pointer-events disabled until the user picks a trade from the tab strip.
+    const shouldLock = trades.length >= 2 && _tradeReviewLocked;
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('review-locked', shouldLock);
+    });
     // Trade-select section. Visible only when ≥2 trades (with 1 trade there's nothing to switch).
     // Each tab shows a dot indicating whether that trade's review has any content yet.
     if (tabsEl && tabsSection) {
       if (trades.length >= 2) {
         tabsSection.classList.remove('hidden');
         const tradeWord = t('review.trade_short') || 'Trade';
+        // While locked, no tab is rendered as "active" — the user hasn't picked yet.
         tabsEl.innerHTML = trades.map((tr, i) => {
           const hasContent = !!(
             tr.execution || tr.focus || tr.close ||
@@ -3927,7 +3943,7 @@
             (tr.reflection && tr.reflection.trim())
           );
           const dot = hasContent ? '●' : '○';
-          const activeCls = (i === _activeReviewTradeIdx) ? ' active' : '';
+          const activeCls = (!_tradeReviewLocked && i === _activeReviewTradeIdx) ? ' active' : '';
           return `<button type="button" class="trade-review-tab${activeCls}" data-trade-idx="${i}"><span class="tab-dot">${dot}</span>${tradeWord} ${i + 1}</button>`;
         }).join('');
         tabsEl.querySelectorAll('.trade-review-tab').forEach(btn => {
@@ -3935,6 +3951,7 @@
             const idx = parseInt(btn.dataset.tradeIdx, 10);
             if (isNaN(idx)) return;
             _activeReviewTradeIdx = idx;
+            _tradeReviewLocked = false; // user has explicitly picked — unlock sections
             saveData();
             syncReviewSectionsToActiveTrade();
             renderReviewPreview();
@@ -5139,6 +5156,9 @@
   function addTradeRow() {
     data.review.trades.push(newTradeBlank());
     _activeReviewTradeIdx = data.review.trades.length - 1; // jump to the new trade
+    // Trade count just changed — re-engage the multi-trade lock so the user explicitly picks
+    // which trade they want to review. (No-op when only 1 trade exists; the lock has no UI effect there.)
+    _tradeReviewLocked = true;
     syncTradedFromTrades();
     renderTrades();
     syncReviewSectionsToActiveTrade();
@@ -12574,6 +12594,10 @@
       if (k === 'Delete' || k === 'c' || k === 'C') { fire('clear'); e.preventDefault(); return; }
     });
   })();
+
+  // On page load, if there are already ≥2 trades from a previous save, engage the lock so the
+  // user explicitly re-picks which trade they're editing. Avoids accidental edits to the wrong trade.
+  if ((data.review.trades || []).length >= 2) _tradeReviewLocked = true;
 
   // Initial render on load
   checkSkipNudge();
