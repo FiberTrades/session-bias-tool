@@ -598,16 +598,14 @@
     .section-with-pie { flex-direction: column; }
     .section-with-pie .pie-cell-inline { flex: 0 0 auto; max-width: 380px; margin-left: auto; margin-right: auto; }
   }
-  .pie-cell { background: var(--bg); padding: 26px 16px 22px; position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .pie-cell { background: var(--bg); padding: 26px 16px 22px; position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .pie-cell:hover .stat-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
   .pie-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px; }
-  .pie-detail { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); width: 100%; max-width: 220px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-mid); line-height: 1.7; letter-spacing: 0.02em; }
-  .pie-detail .pie-detail-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .pie-detail .pie-detail-key { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; font-size: 9px; }
-  .pie-detail .pie-detail-val { color: var(--text); }
-  .pie-detail .pie-detail-val.good { color: var(--good); }
-  .pie-detail .pie-detail-val.bad  { color: var(--bad); }
-  .pie-svg-wrap { width: 140px; height: 140px; margin-bottom: 14px; }
+  /* Pie cell is now minimal: donut + centre number only. Legend + detail are hidden so the
+     visual reads as a pure colour-coded snapshot. The detail used to live in .pie-detail and
+     .pie-legend — keep their styles below in case we re-enable them later, but hide visually. */
+  .pie-detail, .pie-legend { display: none !important; }
+  .pie-svg-wrap { width: 140px; height: 140px; margin-bottom: 0; }
   .pie-svg { width: 100%; height: 100%; display: block; }
   .pie-svg .pie-center-num { font-family: 'DM Mono', monospace; font-size: 18px; fill: var(--text); }
   .pie-svg .pie-center-sub { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; fill: var(--text-dim); }
@@ -1793,7 +1791,7 @@
           <input type="file" id="mt5-file-input" accept=".html,.htm,.csv" style="display:none;" />
         </div>
         <div id="mt5-pick-error" style="margin-top:16px;padding:12px 16px;background:var(--bad-bg2);border:1px solid var(--bad);color:var(--bad);font-family:'DM Mono',monospace;font-size:12px;display:none;"></div>
-        <div style="margin-top:24px;font-size:12px;color:var(--text-dim);line-height:1.7;font-style:italic;font-family:'Fraunces',serif;">
+        <div style="margin-top:24px;font-size:13px;color:var(--text-dim);line-height:1.7;font-style:italic;font-family:'Fraunces',serif;">
           <strong style="color:var(--text-mid);font-style:normal;" data-i18n="mt5.how_to_export">How to export from MT5:</strong> <span data-i18n-html="mt5.how_to_export_body">In MT5 desktop, open the <em>Toolbox</em> → <em>History</em> tab. Right-click the table → choose your timeframe (e.g. "Custom Period") → right-click again → <em>Report</em> → <em>Open in Web</em>. Save the resulting <code style="background:var(--bg-elev);padding:1px 6px;font-family:'DM Mono',monospace;font-style:normal;">.html</code> file and drop it here.</span>
         </div>
       </div>
@@ -9325,7 +9323,7 @@
         : '';
       const setterBlock = `<div>
           <div style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">${t('rule.next_week_label')}</div>
-          <div style="font-size:11px;color:var(--text-dim);font-style:italic;margin-bottom:10px;line-height:1.5;font-family:'Fraunces',serif;">${t('rule.next_week_hint')}</div>
+          <div style="font-size:13px;color:var(--text-dim);font-style:italic;margin-bottom:10px;line-height:1.5;font-family:'Fraunces',serif;">${t('rule.next_week_hint')}</div>
           <input type="text" id="rfx-rule-next" maxlength="200" placeholder="${t('rule.next_week_placeholder')}" value="${esc(nextRuleText)}" style="width:100%;background:var(--bg-elev);border:1px solid var(--border-2);color:var(--text);padding:10px 12px;font-family:'DM Mono',monospace;font-size:12px;outline:none;" />
         </div>`;
       // Cadence block — controls the global setting for how often the rule reminder fires during the session.
@@ -9333,7 +9331,7 @@
       const opt = (v, k) => `<option value="${v}"${currentCadence === v ? ' selected' : ''}>${t(k)}</option>`;
       const cadenceBlock = `<div style="margin-top:20px;">
           <div style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">${t('settings.rule_reminder')}</div>
-          <div style="font-size:11px;color:var(--text-dim);font-style:italic;margin-bottom:10px;line-height:1.5;font-family:'Fraunces',serif;">${t('rule.cadence_hint')}</div>
+          <div style="font-size:13px;color:var(--text-dim);font-style:italic;margin-bottom:10px;line-height:1.5;font-family:'Fraunces',serif;">${t('rule.cadence_hint')}</div>
           <select id="rfx-rule-cadence" style="width:100%;background:var(--bg-elev);border:1px solid var(--border-2);color:var(--text);padding:10px 12px;font-family:'DM Mono',monospace;font-size:12px;outline:none;">
             ${opt('off',   'settings.rule_reminder_off')}
             ${opt('start', 'settings.rule_reminder_start')}
