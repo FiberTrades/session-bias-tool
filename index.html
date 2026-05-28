@@ -584,9 +584,15 @@
   /* Pie-chart breakdown grid — replaces the old W/L/BE cells. Three donut charts side by side,
      each with a small legend underneath showing count + percentage for each slice. */
   .pie-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
-  .pie-cell { background: var(--bg); padding: 22px 16px; position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .pie-cell { background: var(--bg); padding: 26px 16px 22px; position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; }
   .pie-cell:hover .stat-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
   .pie-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px; }
+  .pie-detail { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); width: 100%; max-width: 220px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-mid); line-height: 1.7; letter-spacing: 0.02em; }
+  .pie-detail .pie-detail-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .pie-detail .pie-detail-key { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; font-size: 9px; }
+  .pie-detail .pie-detail-val { color: var(--text); }
+  .pie-detail .pie-detail-val.good { color: var(--good); }
+  .pie-detail .pie-detail-val.bad  { color: var(--bad); }
   .pie-svg-wrap { width: 140px; height: 140px; margin-bottom: 14px; }
   .pie-svg { width: 100%; height: 100%; display: block; }
   .pie-svg .pie-center-num { font-family: 'DM Mono', monospace; font-size: 18px; fill: var(--text); }
@@ -1489,22 +1495,22 @@
       <p class="section-hint" data-i18n="hint.wins_vs_losses">Three breakdowns: outcome, direction, and trade type. BEs excluded from the outcome split.</p>
       <div class="pie-grid">
         <div class="pie-cell">
-          <div class="stat-tooltip" data-i18n="tip.pie_wl">Share of wins vs losses across all decided trades. BEs are excluded so the split reflects pure outcome.</div>
-          <div class="pie-label" data-i18n="kpi.wins_vs_losses">Wins vs Losses</div>
+          <div class="stat-tooltip" data-i18n="tip.pie_wl">Share of wins vs losses across all decided trades. BEs are excluded so the split reflects pure outcome. Detail below shows R totals and averages.</div>
           <div class="pie-svg-wrap"><svg class="pie-svg" id="pie-wl" viewBox="0 0 120 120"></svg></div>
           <div class="pie-legend" id="pie-wl-legend"></div>
+          <div class="pie-detail" id="pie-wl-detail"></div>
         </div>
         <div class="pie-cell">
-          <div class="stat-tooltip" data-i18n="tip.pie_side">Share of long vs short trades. Tells you which direction you favour — and whether one side is your edge.</div>
-          <div class="pie-label" data-i18n="kpi.long_vs_short">Long vs Short</div>
+          <div class="stat-tooltip" data-i18n="tip.pie_side">Share of long vs short trades. Detail below shows win rate and R per side — find out which direction is actually your edge.</div>
           <div class="pie-svg-wrap"><svg class="pie-svg" id="pie-side" viewBox="0 0 120 120"></svg></div>
           <div class="pie-legend" id="pie-side-legend"></div>
+          <div class="pie-detail" id="pie-side-detail"></div>
         </div>
         <div class="pie-cell">
-          <div class="stat-tooltip" data-i18n="tip.pie_type">Share of reaction vs continuation trades. Reveals your default tendency — fading moves vs riding them.</div>
-          <div class="pie-label" data-i18n="kpi.reaction_vs_continuation">Reaction vs Continuation</div>
+          <div class="stat-tooltip" data-i18n="tip.pie_type">Share of reaction vs continuation trades. Detail below shows win rate and R per type — reveals which style pays better.</div>
           <div class="pie-svg-wrap"><svg class="pie-svg" id="pie-type" viewBox="0 0 120 120"></svg></div>
           <div class="pie-legend" id="pie-type-legend"></div>
+          <div class="pie-detail" id="pie-type-detail"></div>
         </div>
       </div>
     </section>
@@ -1852,6 +1858,24 @@
   </div>
 </div>
 
+<!-- Starting-balance prompt — fires immediately after the user saves their name on first run.
+     Sets data.settings.startingBalance so the Account Balance KPI on Statistics has a baseline
+     to compute against. Skippable via the × so users without a starting balance to declare
+     aren't forced to invent one. -->
+<div class="modal-bg" id="balance-modal-bg">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="modal.balance_title">One more thing</div>
+      <button class="modal-close" id="balance-modal-skip" title="Skip">×</button>
+    </div>
+    <p style="color:var(--text-mid);font-size:13px;line-height:1.6;margin-bottom:18px;" data-i18n="modal.balance_body">What's your starting balance? This sets the baseline for Account Balance and P&amp;L on the Statistics tab. You can change or skip this any time.</p>
+    <input type="number" step="any" id="balance-modal-input" class="input" style="margin-left:0;width:100%;" placeholder="10000" />
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+      <button type="button" id="balance-modal-save" style="background:var(--text);color:var(--bg);border:none;padding:8px 18px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;" data-i18n="btn.save">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- Potential R popup: prompted after R + pips are entered on a Win trade -->
 <div class="modal-bg" id="potr-modal-bg">
   <div class="modal" style="max-width:480px;">
@@ -2068,6 +2092,9 @@
       // ----- Settings panel (Statistics tab) -----
       'settings.account': 'Account Settings',
       'settings.starting_balance': 'Starting Balance {C}',
+      'modal.balance_title': 'One more thing',
+      'modal.balance_body': "What's your starting balance? This sets the baseline for Account Balance and P&L on the Statistics tab. You can change or skip this any time.",
+      'btn.save': 'Save',
       'settings.defaults_hint': 'Risk & Costs defaults are set in Review tab',
       // ----- Toggle / period labels -----
       'period.label': 'Period',
@@ -2358,6 +2385,7 @@
       'tip.pie_type': 'Share of reaction vs continuation trades. Reveals your default tendency — fading moves vs riding them.',
       'pie.no_data': 'No data yet',
       'pie.trades_label': 'Trades',
+      'pie.avg': 'Avg',
       'kpi.expectancy': 'Expectancy',
       'kpi.profit_factor': 'Profit Factor',
       'eq.eyebrow': 'Equity Curve',
@@ -2741,6 +2769,9 @@
       // ----- Settings panel (Statistics tab) -----
       'settings.account': 'Configuración de Cuenta',
       'settings.starting_balance': 'Balance Inicial {C}',
+      'modal.balance_title': 'Una cosa más',
+      'modal.balance_body': 'Cuál es tu balance inicial? Esto establece la base para Balance de Cuenta y P&L en la pestaña Estadísticas. Puedes cambiarlo o saltarlo en cualquier momento.',
+      'btn.save': 'Guardar',
       'settings.defaults_hint': 'Riesgo y Costes por defecto se configuran en Revisión',
       // ----- Toggle / period labels -----
       'period.label': 'Periodo',
@@ -4287,6 +4318,7 @@
     // Personalization + weekly reviews + nudge tracking
     if (d.userName === undefined) d.userName = '';
     if (d._nameSkipped === undefined) d._nameSkipped = false;
+    if (d._balanceSkipped === undefined) d._balanceSkipped = false;
     if (!Array.isArray(d.weeklyReviews)) d.weeklyReviews = [];
     if (!d.weeklyRules || typeof d.weeklyRules !== 'object') d.weeklyRules = {};
     if (!Array.isArray(d.monthlyReviews)) d.monthlyReviews = [];
@@ -6194,25 +6226,81 @@
     rLeftEl.className = 'stat-value dual ' + rLeftCls;
 
     // Render the three pie charts (Wins/Losses, Long/Short, Reaction/Continuation) using a shared
-    // donut-chart helper. Each pie shows two slices with a legend underneath. Outcome-pie excludes
-    // BEs (a true binary win/loss split is more informative than a triple with 0R BEs in the middle).
-    // The Long/Short and Reaction/Continuation pies use only decided trades that have side/type set.
-    const sideLong = all.filter(t => t.side === 'Long').length;
-    const sideShort = all.filter(t => t.side === 'Short').length;
-    const typeReaction = all.filter(t => t.type === 'Reaction').length;
-    const typeContinuation = all.filter(t => t.type === 'Continuation').length;
+    // donut-chart helper. Each pie shows two slices with a legend underneath, and a detail block
+    // below the legend with the substantive numbers (totals, averages, win rate per slice).
+    // Outcome-pie excludes BEs (a true binary win/loss split is more informative than a triple
+    // with 0R BEs in the middle). The Long/Short and Reaction/Continuation pies use only trades
+    // that have side/type set.
+    const sideLong  = all.filter(t => t.side === 'Long');
+    const sideShort = all.filter(t => t.side === 'Short');
+    const typeReact = all.filter(t => t.type === 'Reaction');
+    const typeCont  = all.filter(t => t.type === 'Continuation');
     renderPie('pie-wl', 'pie-wl-legend', [
-      { label: t('opt.win'),  value: wins.length,   color: 'var(--good)' },
-      { label: t('opt.lose'), value: losses.length, color: 'var(--bad)' },
+      { label: t('res.win'),  value: wins.length,   color: 'var(--good)' },
+      { label: t('res.lose'), value: losses.length, color: 'var(--bad)' },
     ]);
     renderPie('pie-side', 'pie-side-legend', [
-      { label: t('side.long'),  value: sideLong,  color: 'var(--good)' },
-      { label: t('side.short'), value: sideShort, color: 'var(--bad)' },
+      { label: t('side.long'),  value: sideLong.length,  color: 'var(--good)' },
+      { label: t('side.short'), value: sideShort.length, color: 'var(--bad)' },
     ]);
     renderPie('pie-type', 'pie-type-legend', [
-      { label: t('type.reaction'),     value: typeReaction,     color: 'var(--info)' },
-      { label: t('type.continuation'), value: typeContinuation, color: 'var(--good)' },
+      { label: t('type.reaction'),     value: typeReact.length, color: 'var(--info)' },
+      { label: t('type.continuation'), value: typeCont.length,  color: 'var(--good)' },
     ]);
+
+    // === Detail block #1: Wins/Losses/BEs — restores the original cell content. ===
+    // Totals show R captured / lost, avg R per win, and BE count + costs paid.
+    const totalWinR  = wins.reduce((s, t) => s + (parseFloat(t.r) || 0), 0);
+    const totalLossR = losses.length; // 1R per loss by convention
+    const avgWinR    = wins.length > 0 ? totalWinR / wins.length : 0;
+    const beCosts    = bes.reduce((s, t) => s + (parseFloat(t.costs) || 0), 0);
+    // Helper — builds a single key/value row.
+    const detailRow = (key, val, valClass) => `<div class="pie-detail-row"><span class="pie-detail-key">${key}</span><span class="pie-detail-val ${valClass || ''}">${val}</span></div>`;
+    document.getElementById('pie-wl-detail').innerHTML = (wins.length === 0 && losses.length === 0 && bes.length === 0)
+      ? ''
+      : [
+          wins.length   > 0 ? detailRow(t('res.win').toUpperCase()    + ' R',   '+' + totalWinR.toFixed(1) + 'R', 'good') : '',
+          wins.length   > 0 ? detailRow(t('pie.avg').toUpperCase()    + ' R',   '+' + avgWinR.toFixed(2)    + 'R', 'good') : '',
+          losses.length > 0 ? detailRow(t('res.lose').toUpperCase()   + ' R',   '-' + totalLossR.toFixed(1) + 'R', 'bad')  : '',
+          bes.length    > 0 ? detailRow(t('res.be').toUpperCase()              , bes.length + ' · ' + curSym() + beCosts.toFixed(0), '') : '',
+        ].filter(Boolean).join('');
+
+    // === Detail block #2: Long/Short — win rate and R total per side. ===
+    // Shows which direction is actually your edge, not just which you take more often.
+    const longDecided  = sideLong.filter(t  => t.result === 'Win' || t.result === 'Lose');
+    const shortDecided = sideShort.filter(t => t.result === 'Win' || t.result === 'Lose');
+    const longWins  = sideLong.filter(t  => t.result === 'Win');
+    const shortWins = sideShort.filter(t => t.result === 'Win');
+    const longWR  = longDecided.length  > 0 ? Math.round((longWins.length  / longDecided.length)  * 100) : null;
+    const shortWR = shortDecided.length > 0 ? Math.round((shortWins.length / shortDecided.length) * 100) : null;
+    const longR  = sideLong.reduce((s, x)  => s + (x.result === 'Win' ? (parseFloat(x.r) || 0) : x.result === 'Lose' ? -1 : 0), 0);
+    const shortR = sideShort.reduce((s, x) => s + (x.result === 'Win' ? (parseFloat(x.r) || 0) : x.result === 'Lose' ? -1 : 0), 0);
+    document.getElementById('pie-side-detail').innerHTML = (sideLong.length === 0 && sideShort.length === 0)
+      ? ''
+      : [
+          sideLong.length  > 0 ? detailRow(t('side.long').toUpperCase()  + ' WR',  longWR  !== null ? longWR  + '%' : '—', '') : '',
+          sideLong.length  > 0 ? detailRow(t('side.long').toUpperCase()  + ' R',   (longR  >= 0 ? '+' : '') + longR.toFixed(1)  + 'R', longR  >= 0 ? 'good' : 'bad') : '',
+          sideShort.length > 0 ? detailRow(t('side.short').toUpperCase() + ' WR',  shortWR !== null ? shortWR + '%' : '—', '') : '',
+          sideShort.length > 0 ? detailRow(t('side.short').toUpperCase() + ' R',   (shortR >= 0 ? '+' : '') + shortR.toFixed(1) + 'R', shortR >= 0 ? 'good' : 'bad') : '',
+        ].filter(Boolean).join('');
+
+    // === Detail block #3: Reaction/Continuation — same idea, by trade type. ===
+    const reactDecided = typeReact.filter(t => t.result === 'Win' || t.result === 'Lose');
+    const contDecided  = typeCont.filter(t  => t.result === 'Win' || t.result === 'Lose');
+    const reactWins = typeReact.filter(t => t.result === 'Win');
+    const contWins  = typeCont.filter(t  => t.result === 'Win');
+    const reactWR = reactDecided.length > 0 ? Math.round((reactWins.length / reactDecided.length) * 100) : null;
+    const contWR  = contDecided.length  > 0 ? Math.round((contWins.length  / contDecided.length)  * 100) : null;
+    const reactR = typeReact.reduce((s, x) => s + (x.result === 'Win' ? (parseFloat(x.r) || 0) : x.result === 'Lose' ? -1 : 0), 0);
+    const contR  = typeCont.reduce((s, x)  => s + (x.result === 'Win' ? (parseFloat(x.r) || 0) : x.result === 'Lose' ? -1 : 0), 0);
+    document.getElementById('pie-type-detail').innerHTML = (typeReact.length === 0 && typeCont.length === 0)
+      ? ''
+      : [
+          typeReact.length > 0 ? detailRow(t('type.reaction').toUpperCase()     + ' WR',  reactWR !== null ? reactWR + '%' : '—', '') : '',
+          typeReact.length > 0 ? detailRow(t('type.reaction').toUpperCase()     + ' R',   (reactR >= 0 ? '+' : '') + reactR.toFixed(1) + 'R', reactR >= 0 ? 'good' : 'bad') : '',
+          typeCont.length  > 0 ? detailRow(t('type.continuation').toUpperCase() + ' WR',  contWR  !== null ? contWR  + '%' : '—', '') : '',
+          typeCont.length  > 0 ? detailRow(t('type.continuation').toUpperCase() + ' R',   (contR  >= 0 ? '+' : '') + contR.toFixed(1)  + 'R', contR  >= 0 ? 'good' : 'bad') : '',
+        ].filter(Boolean).join('');
 
     let mw=0, ml=0, mb=0, cw=0, cl=0, cb=0;
     all.forEach(t => {
@@ -9678,9 +9766,54 @@
     saveData();
     document.getElementById('name-modal-bg').classList.remove('show');
     if (typeof renderBiasGreeting === 'function') renderBiasGreeting();
+    // Chain into the starting-balance prompt for first-run users who haven't set one yet.
+    // Small delay so the name modal can finish dismissing visually before the next one appears.
+    setTimeout(maybePromptForBalance, 200);
   });
   document.getElementById('name-modal-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('name-modal-save').click();
+  });
+
+  // ===== Starting balance prompt =====
+  // Fires once on first run (after the name modal). Sets data.settings.startingBalance — the
+  // baseline used by Account Balance + P&L on the Statistics tab. Skippable: × button leaves
+  // the value unset and records a "skipped" flag so we don't re-pester on every page load.
+  function maybePromptForBalance() {
+    const sb = data.settings && data.settings.startingBalance;
+    if (sb !== null && sb !== undefined && sb !== '' && Number(sb) > 0) return; // already set
+    if (data._balanceSkipped) return; // user dismissed previously
+    document.getElementById('balance-modal-bg').classList.add('show');
+    setTimeout(() => {
+      const inp = document.getElementById('balance-modal-input');
+      if (inp) inp.focus();
+    }, 100);
+  }
+  document.getElementById('balance-modal-save').addEventListener('click', () => {
+    const raw = document.getElementById('balance-modal-input').value.trim();
+    const v = parseFloat(raw);
+    if (!raw || isNaN(v) || v <= 0) return; // require a positive number — empty/invalid keeps it open
+    data.settings.startingBalance = v;
+    saveData();
+    document.getElementById('balance-modal-bg').classList.remove('show');
+    // Sync the Statistics-tab input field if it exists, and re-render dependent KPIs.
+    const settingInput = document.getElementById('setting-balance');
+    if (settingInput) settingInput.value = v;
+    if (typeof renderStats === 'function') try { renderStats(); } catch (e) {}
+  });
+  document.getElementById('balance-modal-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('balance-modal-save').click();
+  });
+  document.getElementById('balance-modal-skip').addEventListener('click', () => {
+    document.getElementById('balance-modal-bg').classList.remove('show');
+    data._balanceSkipped = true;
+    saveData();
+  });
+  // Backdrop click dismisses (same as Skip ×) — sets the skipped flag so it doesn't re-pop.
+  document.getElementById('balance-modal-bg').addEventListener('click', (e) => {
+    if (e.target !== e.currentTarget) return;
+    e.currentTarget.classList.remove('show');
+    data._balanceSkipped = true;
+    saveData();
   });
 
   // Time-of-day opener — chosen by the user's current local hour
