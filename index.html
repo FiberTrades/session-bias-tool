@@ -584,6 +584,20 @@
   /* Pie-chart breakdown grid — replaces the old W/L/BE cells. Three donut charts side by side,
      each with a small legend underneath showing count + percentage for each slice. */
   .pie-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  /* Single-pie variant — used when a section has only one pie (e.g. the Wins/Losses pie on
+     Statistics after L/S and R/C pies moved to the Trades tab). Centres the cell so it doesn't
+     stretch to full width — pie reads as a focused element rather than a banner. */
+  .pie-grid.pie-grid-single { grid-template-columns: 1fr; max-width: 380px; margin-left: auto; margin-right: auto; }
+  /* Section-with-pie layout — used on the Trades tab to place a pie cell BESIDE the existing
+     stat-grid breakdown table. Pie sits at a fixed ~260px on the left; breakdown table fills
+     remaining space. Collapses to single column at narrow viewports. */
+  .section-with-pie { display: flex; gap: 32px; align-items: stretch; margin-top: 16px; }
+  .section-with-pie .pie-cell-inline { flex: 0 0 260px; border: 1px solid var(--border); padding: 24px 16px 22px; }
+  .section-with-pie-main { flex: 1; min-width: 0; }
+  @media (max-width: 900px) {
+    .section-with-pie { flex-direction: column; }
+    .section-with-pie .pie-cell-inline { flex: 0 0 auto; max-width: 380px; margin-left: auto; margin-right: auto; }
+  }
   .pie-cell { background: var(--bg); padding: 26px 16px 22px; position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; }
   .pie-cell:hover .stat-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
   .pie-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px; }
@@ -1492,25 +1506,13 @@
 
     <section style="margin-top:40px;">
       <div class="section-header"><span class="section-num">—</span><span class="section-title" data-i18n="stats.s2.title">Wins vs Losses</span></div>
-      <p class="section-hint" data-i18n="hint.wins_vs_losses">Three breakdowns: outcome, direction, and trade type. BEs excluded from the outcome split.</p>
-      <div class="pie-grid">
+      <p class="section-hint" data-i18n="hint.wins_vs_losses">Win/Loss/BE share across all logged trades. Detail below shows R totals and averages.</p>
+      <div class="pie-grid pie-grid-single">
         <div class="pie-cell">
-          <div class="stat-tooltip" data-i18n="tip.pie_wl">Share of wins vs losses across all decided trades. BEs are excluded so the split reflects pure outcome. Detail below shows R totals and averages.</div>
+          <div class="stat-tooltip" data-i18n="tip.pie_wl">Share of wins, losses, and break-evens across all logged trades. Detail below shows R totals and averages.</div>
           <div class="pie-svg-wrap"><svg class="pie-svg" id="pie-wl" viewBox="0 0 120 120"></svg></div>
           <div class="pie-legend" id="pie-wl-legend"></div>
           <div class="pie-detail" id="pie-wl-detail"></div>
-        </div>
-        <div class="pie-cell">
-          <div class="stat-tooltip" data-i18n="tip.pie_side">Share of long vs short trades. Detail below shows win rate and R per side — find out which direction is actually your edge.</div>
-          <div class="pie-svg-wrap"><svg class="pie-svg" id="pie-side" viewBox="0 0 120 120"></svg></div>
-          <div class="pie-legend" id="pie-side-legend"></div>
-          <div class="pie-detail" id="pie-side-detail"></div>
-        </div>
-        <div class="pie-cell">
-          <div class="stat-tooltip" data-i18n="tip.pie_type">Share of reaction vs continuation trades. Detail below shows win rate and R per type — reveals which style pays better.</div>
-          <div class="pie-svg-wrap"><svg class="pie-svg" id="pie-type" viewBox="0 0 120 120"></svg></div>
-          <div class="pie-legend" id="pie-type-legend"></div>
-          <div class="pie-detail" id="pie-type-detail"></div>
         </div>
       </div>
     </section>
@@ -1532,12 +1534,28 @@
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title"><span data-i18n="trades.s2.title">Long vs Short</span><span class="info-tip"><span class="info-tip-icon">?</span><span class="info-tip-content">Performance by direction — find out if one side of the market is your edge. Same column meanings as above.</span></span></span></div>
-      <div id="side-breakdown"></div>
+      <div class="section-with-pie">
+        <div class="pie-cell pie-cell-inline">
+          <div class="stat-tooltip" data-i18n="tip.pie_side">Share of long vs short trades. Detail below shows win rate and R per side — find out which direction is actually your edge.</div>
+          <div class="pie-svg-wrap"><svg class="pie-svg" id="pie-side" viewBox="0 0 120 120"></svg></div>
+          <div class="pie-legend" id="pie-side-legend"></div>
+          <div class="pie-detail" id="pie-side-detail"></div>
+        </div>
+        <div class="section-with-pie-main" id="side-breakdown"></div>
+      </div>
     </section>
 
     <section>
       <div class="section-header"><span class="section-num">—</span><span class="section-title"><span data-i18n="trades.s3.title">Reaction vs Continuation</span><span class="info-tip"><span class="info-tip-icon">?</span><span class="info-tip-content">Performance by trade type — tag trades in Review tab. Reaction = countertrend / mean-revert. Continuation = with-trend.</span></span></span></div>
-      <div id="type-breakdown"></div>
+      <div class="section-with-pie">
+        <div class="pie-cell pie-cell-inline">
+          <div class="stat-tooltip" data-i18n="tip.pie_type">Share of reaction vs continuation trades. Detail below shows win rate and R per type — reveals which style pays better.</div>
+          <div class="pie-svg-wrap"><svg class="pie-svg" id="pie-type" viewBox="0 0 120 120"></svg></div>
+          <div class="pie-legend" id="pie-type-legend"></div>
+          <div class="pie-detail" id="pie-type-detail"></div>
+        </div>
+        <div class="section-with-pie-main" id="type-breakdown"></div>
+      </div>
     </section>
 
     <section>
@@ -2380,7 +2398,7 @@
       'kpi.wins_vs_losses': 'Wins vs Losses',
       'kpi.long_vs_short': 'Long vs Short',
       'kpi.reaction_vs_continuation': 'Reaction vs Continuation',
-      'tip.pie_wl': 'Share of wins vs losses across all decided trades. BEs are excluded so the split reflects pure outcome.',
+      'tip.pie_wl': 'Share of wins, losses, and break-evens across all logged trades. Detail below shows R totals and averages.',
       'tip.pie_side': 'Share of long vs short trades. Tells you which direction you favour — and whether one side is your edge.',
       'tip.pie_type': 'Share of reaction vs continuation trades. Reveals your default tendency — fading moves vs riding them.',
       'pie.no_data': 'No data yet',
@@ -2390,7 +2408,7 @@
       'kpi.profit_factor': 'Profit Factor',
       'eq.eyebrow': 'Equity Curve',
       'eq.title': 'Account balance over time',
-      'hint.wins_vs_losses': 'Side-by-side comparison of your winning and losing trades.',
+      'hint.wins_vs_losses': 'Three breakdowns: outcome (wins, losses, BEs), direction, and trade type.',
       'hint.max_streaks': 'Longest runs across all history. Critical for position sizing.',
       'hint.tags_analysis': 'Your 10 most-used concept and mindset tags across all trades.',
       'hint.mental_state': 'Mental state — be honest, this is how you grow.',
@@ -3054,11 +3072,20 @@
       'kpi.account_balance': 'Balance de Cuenta',
       'kpi.total_costs': 'Costes Totales',
       'kpi.win_rate': 'Ratio de Acierto',
+      'kpi.wins_vs_losses': 'Ganadoras vs Perdedoras',
+      'kpi.long_vs_short': 'Long vs Short',
+      'kpi.reaction_vs_continuation': 'Reacción vs Continuación',
+      'tip.pie_wl': 'Proporción de ganadoras, perdedoras y break-even en todas las operaciones registradas. El detalle abajo muestra totales R y medias.',
+      'tip.pie_side': 'Proporción de longs vs shorts. Te dice qué dirección prefieres — y si un lado es tu edge.',
+      'tip.pie_type': 'Proporción de operaciones de reacción vs continuación. Revela tu tendencia por defecto — desvanecer movimientos vs seguirlos.',
+      'pie.no_data': 'Sin datos aún',
+      'pie.trades_label': 'Operaciones',
+      'pie.avg': 'Media',
       'kpi.expectancy': 'Expectativa',
       'kpi.profit_factor': 'Factor de Beneficio',
       'eq.eyebrow': 'Curva de Capital',
       'eq.title': 'Balance de cuenta a lo largo del tiempo',
-      'hint.wins_vs_losses': 'Comparación en paralelo de tus operaciones ganadoras y perdedoras.',
+      'hint.wins_vs_losses': 'Tres desgloses: resultado (ganadoras, perdedoras, BE), dirección y tipo de operación.',
       'hint.max_streaks': 'Rachas más largas en todo el historial. Crítico para el tamaño de la posición.',
       'hint.tags_analysis': 'Tus 10 etiquetas de concepto y mentalidad más usadas en todas las operaciones.',
       'hint.mental_state': 'Estado mental — sé honesto, así es como se crece.',
@@ -6238,6 +6265,7 @@
     renderPie('pie-wl', 'pie-wl-legend', [
       { label: t('res.win'),  value: wins.length,   color: 'var(--good)' },
       { label: t('res.lose'), value: losses.length, color: 'var(--bad)' },
+      { label: t('res.be'),   value: bes.length,    color: 'var(--info)' },
     ]);
     renderPie('pie-side', 'pie-side-legend', [
       { label: t('side.long'),  value: sideLong.length,  color: 'var(--good)' },
