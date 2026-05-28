@@ -12034,14 +12034,29 @@
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const isSameDay = (d) => {
       if (!d) return false;
-      const dt = new Date(d);
+      let dt;
+      // YYYY-MM-DD strings parse as UTC by default in JS — we want local. Build a local Date.
+      if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+        const [y, m, day] = d.split('-').map(Number);
+        dt = new Date(y, m - 1, day);
+      } else {
+        dt = new Date(d);
+      }
       dt.setHours(0, 0, 0, 0);
       return dt.getTime() === today.getTime();
     };
+    // Determine the in-progress review's session date. data.review.sessionDate is set when the
+    // user is logging trades for the current session — if it's not today's, the in-progress
+    // trades belong to yesterday (or whenever) and must NOT count toward today's outcome.
+    const reviewDateStr = data.review && data.review.sessionDate;
+    const reviewIsToday = reviewDateStr ? isSameDay(reviewDateStr) : false;
     // Gather today's saved trades from currentSeries.
     const saved = (data.currentSeries || []).filter(t => isSameDay(t.date) && t.result);
-    // Plus in-progress trades from the active review form (only count ones with a result picked).
-    const inProgress = ((data.review && data.review.trades) || []).filter(t => t.result);
+    // Plus in-progress trades — but only if the review session is for TODAY. Otherwise the
+    // in-progress trades are for a different day and don't belong in today's outcome.
+    const inProgress = reviewIsToday
+      ? ((data.review && data.review.trades) || []).filter(t => t.result)
+      : [];
     const all = saved.concat(inProgress);
     _todayLossCount = all.filter(t => t.result === 'Lose').length;
     if (all.length === 0) return null;
