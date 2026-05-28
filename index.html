@@ -9641,10 +9641,9 @@
       ]
     },
     REVIEW_OPENERS: [
-      'Sesión cerrada', 'Hora de repaso', 'Pues, el repaso', 'Hora de ser honesto',
-      'Mirada atrás', 'Repaso de hoy', 'Hora del espejo, colega', 'El repaso honesto',
-      'El post-mortem, pues', 'Revisando los gráficos', 'Marcador a la vista',
-      'El recap'
+      'Hoy hasta ahora', 'Dónde estás', 'Lo que va de hoy', 'El recuento de hoy',
+      'Registrando hoy', 'Hoy, de momento', 'Pues, el total provisional', 'El registro de hoy',
+      'Esto es hoy', 'El día hasta ahora', 'Hoy en el libro', 'Recuento provisional'
     ],
     REVIEW_IDLE: [
       'ninguna operación registrada todavía. El formulario espera.',
@@ -10269,14 +10268,13 @@
     ]
   };
 
-  // Review-flavoured openers — used on the Session Review tab instead of time-of-day openers.
-  // No "morning/evening/planning" framing because by the time you're on this tab, the session
-  // is over and you're reflecting. Tone: "session done, look at what happened, learn".
+  // Review-flavoured openers — used on the Session Review tab. Deliberately NEUTRAL: the app
+  // can't know whether the session is actually over (you might be on trade 1 of 3), so these
+  // describe "here's where today stands" rather than claiming "session done".
   const REVIEW_OPENERS = [
-    'Session done', 'Review time', 'Right, the recap', 'Time to be honest',
-    'Look back time', 'Reflection bit', 'Mirror time, mate', 'The honest review',
-    'Right, the post-mortem', 'Reviewing the tape', 'Score on the door',
-    'The recap'
+    'Today so far', 'Where you\'re at', 'The story so far', 'Today\'s tally',
+    'Logging today', 'Today, so far', 'Right, the running total', 'Today\'s record',
+    'Here\'s today', 'The day so far', 'Today on the books', 'Running tally'
   ];
   // Review-IDLE pool — used on Session Review when today has NO trades logged yet. The user
   // is on the Review tab but there's nothing to review. Tone: calm, not pushy, not pretending
