@@ -12047,17 +12047,25 @@
     };
     // Determine the in-progress review's session date. data.review.sessionDate is set when the
     // user is logging trades for the current session — if it's not today's, the in-progress
-    // trades belong to yesterday (or whenever) and must NOT count toward today's outcome.
+    // trades belong to a different day and must NOT count toward today's outcome.
     const reviewDateStr = data.review && data.review.sessionDate;
     const reviewIsToday = reviewDateStr ? isSameDay(reviewDateStr) : false;
-    // Gather today's saved trades from currentSeries.
+    // Today's saved trades from currentSeries.
     const saved = (data.currentSeries || []).filter(t => isSameDay(t.date) && t.result);
-    // Plus in-progress trades — but only if the review session is for TODAY. Otherwise the
-    // in-progress trades are for a different day and don't belong in today's outcome.
-    const inProgress = reviewIsToday
+    // In-progress trades — only if the review session is for TODAY. After performReviewSave the
+    // form is NOT cleared (user can keep adding to the session), so trades may live in both
+    // arrays. We dedupe by signature to count each real trade exactly once.
+    const inProgress = (reviewIsToday)
       ? ((data.review && data.review.trades) || []).filter(t => t.result)
       : [];
-    const all = saved.concat(inProgress);
+    // Build a Set of "signatures" from saved trades. Each in-progress trade with a matching
+    // signature is a duplicate of an already-saved trade and gets skipped.
+    // Signature: result + entryTime + r-or-pips — stable enough that the same trade in both
+    // arrays matches, but distinct enough that two genuinely different trades don't collide.
+    const sig = (t) => `${t.result}|${t.entryTime || ''}|${t.r || ''}|${t.pips || ''}`;
+    const savedSigs = new Set(saved.map(sig));
+    const uniqueInProgress = inProgress.filter(t => !savedSigs.has(sig(t)));
+    const all = saved.concat(uniqueInProgress);
     _todayLossCount = all.filter(t => t.result === 'Lose').length;
     if (all.length === 0) return null;
     const wins = all.filter(t => t.result === 'Win').length;
@@ -12066,7 +12074,6 @@
     if (wins > 0 && losses === 0) return 'positive';
     if (losses > 0 && wins === 0) return 'negative';
     if (wins === 0 && losses === 0 && bes > 0) return 'be';
-    // Mixed day — tiebreak by total R (Win=typed r, Lose=-1, BE=0)
     const totalR = all.reduce((s, t) => {
       if (t.result === 'Win')  return s + (parseFloat(t.r) || 0);
       if (t.result === 'Lose') return s - 1;
